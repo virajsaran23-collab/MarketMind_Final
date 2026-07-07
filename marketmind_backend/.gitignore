@@ -1,0 +1,22 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+config.json
+secret.txt
+*.pem
+*.key
+
+# Python / Django
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.log
+*.sqlite3
+*.db
+media/
+staticfiles/
+
+# OS files
+.DS_Store

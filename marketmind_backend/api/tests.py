@@ -1,0 +1,159 @@
+from unittest.mock import patch
+
+from django.contrib.auth.models import User
+from django.core.management import call_command
+from django.test import TestCase
+from rest_framework.test import APIClient
+
+from .models import Asset, Trade, UserChallenge, GameChallenge, LeaderboardEntry
+from .views import fetch_and_create_asset, sync_user_challenges
+from .mentor import build_llm_prompt, extract_symbols, generate_reply
+
+
+class ChallengeSyncTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='tester', password='testpass')
+        self.asset = Asset.objects.create(
+            id='AAPL',
+            symbol='AAPL',
+            name='Apple',
+            category='Stocks',
+            price=100.0,
+            change=1.2,
+            market_cap='2T',
+            sector='Technology',
+            spark=[],
+        )
+
+    def test_sync_user_challenges_creates_defaults_and_marks_first_trade_complete(self):
+        Trade.objects.create(user=self.user, asset=self.asset, mode='buy', shares=1, price=100.0, total=100.0)
+
+        sync_user_challenges(self.user)
+
+        self.assertTrue(GameChallenge.objects.filter(slug='first_trade').exists())
+        challenge = UserChallenge.objects.get(user=self.user, challenge__slug='first_trade')
+        self.assertEqual(challenge.status, 'complete')
+        self.assertGreaterEqual(challenge.progress, 1)
+
+
+class LeaderboardTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='leaderboard-user', password='testpass')
+        self.client = APIClient()
+
+    def test_leaderboard_lists_new_users_even_before_they_earn_tokens(self):
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get('/api/leaderboard/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['name'], self.user.username)
+
+
+class SeedDataTests(TestCase):
+    def test_seed_data_cleans_previous_demo_leaderboard_entries(self):
+        demo_user = User.objects.create_user(username='aria_mehta', password='demo1234')
+        LeaderboardEntry.objects.create(
+            user=demo_user,
+            rank=1,
+            portfolio=482400,
+            token_count=382,
+            learning_score=9840,
+            badge='Market Legend',
+            accuracy=94,
+            handle='@aria',
+        )
+
+        call_command('seed_data')
+
+        self.assertFalse(LeaderboardEntry.objects.filter(user__username='aria_mehta').exists())
+
+
+class MentorReplyTests(TestCase):
+    def test_build_llm_prompt_includes_market_context(self):
+        prompt = build_llm_prompt(
+            'what should I buy today?',
+            [{'symbol': 'AAPL', 'price': 200.0, 'change': 2.5, 'name': 'Apple'}],
+            [{'symbol': 'AAPL', 'shares': 2, 'return_pct': 10.0}],
+            50000.0,
+        )
+
+        self.assertIn('AAPL', prompt)
+        self.assertIn('50,000.00', prompt)
+        self.assertIn('what should I buy today?', prompt)
+
+    def test_buy_requests_use_market_momentum_when_available(self):
+        reply = generate_reply(
+            'what should I buy today?',
+            [{'symbol': 'AAPL', 'price': 200.0, 'change': 2.5, 'name': 'Apple'}],
+            [],
+            50000.0,
+        )
+
+        self.assertIn('AAPL', reply)
+        self.assertIn('200.00', reply)
+
+    def test_portfolio_requests_include_cash_context(self):
+        reply = generate_reply(
+            'what is my portfolio?',
+            [{'symbol': 'MSFT', 'price': 400.0, 'change': 1.2, 'name': 'Microsoft'}],
+            [{'symbol': 'MSFT', 'return_pct': 12.0}],
+            25000.0,
+        )
+
+        self.assertIn('portfolio', reply.lower())
+        self.assertIn('25,000.00', reply)
+
+    def test_extract_symbols_uses_deterministic_stock_catalog(self):
+        Asset.objects.create(
+            id='MSFT', symbol='MSFT', name='Microsoft', exchange='NASDAQ', category='Stocks', sector='Technology'
+        )
+        Asset.objects.create(
+            id='AAPL', symbol='AAPL', name='Apple', exchange='NASDAQ', category='Stocks', sector='Technology'
+        )
+        Asset.objects.create(
+            id='NVDA', symbol='NVDA', name='NVIDIA', exchange='NASDAQ', category='Stocks', sector='Technology'
+        )
+
+        symbols = extract_symbols('')
+
+        self.assertEqual(symbols, ['AAPL', 'MSFT', 'NVDA'])
+
+    def test_extract_symbols_matches_full_names_without_false_positives(self):
+        Asset.objects.create(
+            id='AAPL', symbol='AAPL', name='Apple Inc.', exchange='NASDAQ', category='Stocks', sector='Technology'
+        )
+
+        symbols = extract_symbols('I want to buy Apple Inc. today')
+
+        self.assertEqual(symbols, ['AAPL'])
+
+
+class DynamicAssetTests(TestCase):
+    def test_fetch_and_create_asset_creates_asset_from_search_result(self):
+        class DummyResponse:
+            def __init__(self, payload, status_code=200):
+                self._payload = payload
+                self.status_code = status_code
+
+            def json(self):
+                return self._payload
+
+            def raise_for_status(self):
+                return None
+
+        def fake_get(url, headers=None, timeout=None, params=None):
+            if 'chart' in url:
+                return DummyResponse({'chart': {'result': [{'meta': {'regularMarketPrice': 123.45}}]}})
+            if 'search' in url:
+                return DummyResponse({'quotes': [{'shortname': 'Tesla', 'longname': 'Tesla Inc.', 'symbol': 'TSLA'}]})
+            raise AssertionError(url)
+
+        with patch('api.views.requests.get', side_effect=fake_get):
+            asset = fetch_and_create_asset('Tesla')
+
+        self.assertIsNotNone(asset)
+        self.assertEqual(asset.symbol, 'TSLA')
+        self.assertEqual(asset.name, 'Tesla Inc.')
+        self.assertEqual(asset.category, 'Stocks')
+        self.assertTrue(Asset.objects.filter(id='tsla').exists())

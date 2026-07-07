@@ -1,0 +1,46 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python / Django
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.venv/
+venv/
+env/
+ENV/
+*.log
+*.sqlite3
+*.db
+media/
+staticfiles/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+config.json
+secret.txt
+*.pem
+*.key
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+build/
+dist/
+coverage/
+*.tsbuildinfo
+
+# Local data
+*.local
