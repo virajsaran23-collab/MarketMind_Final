@@ -232,7 +232,7 @@ export default function ProfilePage() {
                                 </div>
                               </div>
                               <div className="flex flex-col items-end gap-1 shrink-0">
-                                <Badge variant={completed ? 'secondary' : 'outline'}>
+                                <Badge variant={completed ? 'muted' : 'outline'}>
                                   {completed ? 'Complete' : 'Pending'}
                                 </Badge>
                                 <span className="text-xs text-muted-foreground">+{challenge.token_reward} tokens</span>
@@ -285,7 +285,7 @@ export default function ProfilePage() {
                                 </div>
                               </div>
                               <div className="flex flex-col items-end gap-1 shrink-0">
-                                <Badge variant={completed ? 'secondary' : 'outline'}>
+                                <Badge variant={completed ? 'muted' : 'outline'}>
                                   {completed ? 'Done' : 'Pending'}
                                 </Badge>
                                 <span className="text-xs text-muted-foreground">+{challenge.token_reward} tokens</span>

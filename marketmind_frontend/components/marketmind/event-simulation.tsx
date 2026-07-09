@@ -69,7 +69,7 @@ export function EventSimulation({ study }: { study: CaseStudy }) {
             {study.title}
           </h2>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            {study.longDescription}
+            {study.long_description}
           </p>
           <div className="mt-5 space-y-2">
             <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">

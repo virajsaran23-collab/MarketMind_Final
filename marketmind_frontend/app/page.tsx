@@ -14,6 +14,7 @@ import { Logo } from '@/components/marketmind/logo'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button'
+import { CaseStudyImage } from '@/components/marketmind/case-study-image'
 
 import { cn } from '@/lib/utils'
 
@@ -187,20 +188,18 @@ export default async function LandingPage() {
         </div>
 
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {caseStudies.map((cs) => (
+          {caseStudies.map((cs: any) => (
             <Link
               key={cs.id}
               href={`/case-studies/${cs.id}`}
               className="group overflow-hidden rounded-2xl border border-border bg-card transition-all hover:border-primary/40 hover:shadow-md"
             >
-              <div className="relative aspect-[16/10] overflow-hidden">
-                <Image
-                  src={cs.image}
-                  alt={cs.title}
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-              </div>
+              <CaseStudyImage
+                src={cs.image}
+                alt={cs.title}
+                seed={cs.id}
+                className="aspect-[16/10] overflow-hidden rounded-none"
+              />
               <div className="p-4">
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Badge variant="muted">{cs.difficulty}</Badge>

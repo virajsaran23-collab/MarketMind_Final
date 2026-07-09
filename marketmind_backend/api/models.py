@@ -125,6 +125,11 @@ class CaseStudy(models.Model):
     read_time = models.CharField(max_length=20)
     image = models.CharField(max_length=200)
     tags = models.JSONField(default=list)
+    timeline = models.JSONField(default=list, blank=True)
+    stats = models.JSONField(default=list, blank=True)
+    lessons = models.JSONField(default=list, blank=True)
+    chart_data = models.JSONField(default=list, blank=True)
+    quiz = models.JSONField(default=list, blank=True)
 
     def __str__(self):
         return self.title
