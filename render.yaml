@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: marketmind-backend
+    env: python
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --no-input && python manage.py migrate && python manage.py seed_data
+    startCommand: gunicorn --pythonpath marketmind_backend marketmind.wsgi:application
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: marketmind-db
+          property: connectionString
+      - key: ALLOWED_HOSTS
+        value: "localhost,127.0.0.1,.onrender.com"
+      - key: FRONTEND_URL
+        value: "https://marketmind.vercel.app"
+    rootDirectory: marketmind_backend
+
+databases:
+  - name: marketmind-db
+    plan: free
