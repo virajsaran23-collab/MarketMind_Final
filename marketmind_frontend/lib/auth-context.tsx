@@ -96,6 +96,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const data = await api.me()
       setUser(data.user)
       setProfile(data.profile)
+
+      // Fetch and initialize completed challenges list silently
+      const challengesData = await api.challenges()
+      const currentCompletedSlugs = (challengesData.challenges || [])
+        .filter((uc: any) => uc.status === 'complete' || uc.status === 'done')
+        .map((uc: any) => uc.challenge?.slug)
+        .filter(Boolean)
+      localStorage.setItem('MM_COMPLETED_CHALLENGES', JSON.stringify(currentCompletedSlugs))
     } catch {
       setUser(null)
       setProfile(null)
@@ -110,12 +118,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const data = await api.login(username, password)
     setUser(data.user)
     setProfile(data.profile)
+
+    // Fetch and initialize completed challenges list silently
+    try {
+      const challengesData = await api.challenges()
+      const currentCompletedSlugs = (challengesData.challenges || [])
+        .filter((uc: any) => uc.status === 'complete' || uc.status === 'done')
+        .map((uc: any) => uc.challenge?.slug)
+        .filter(Boolean)
+      localStorage.setItem('MM_COMPLETED_CHALLENGES', JSON.stringify(currentCompletedSlugs))
+    } catch {}
   }
 
   const logout = async () => {
     await api.logout()
     setUser(null)
     setProfile(null)
+    localStorage.removeItem('MM_COMPLETED_CHALLENGES')
   }
 
   return (
