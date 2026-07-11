@@ -16,7 +16,7 @@ services:
       - key: ALLOWED_HOSTS
         value: "localhost,127.0.0.1,.onrender.com"
       - key: FRONTEND_URL
-        value: "https://marketmind.vercel.app"
+        value: "https://market-mind-final.vercel.app"
     rootDirectory: marketmind_backend
 
 databases:

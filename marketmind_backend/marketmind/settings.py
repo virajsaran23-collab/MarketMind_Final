@@ -96,6 +96,8 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 frontend_url = os.getenv('FRONTEND_URL')
+if frontend_url:
+    frontend_url = frontend_url.rstrip('/')
 
 CORS_ALLOWED_ORIGINS = env_list(
     'CORS_ALLOWED_ORIGINS',
