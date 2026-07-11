@@ -21,6 +21,7 @@ import { Card } from '@/components/ui/card'
 import { CaseStudyImage } from '@/components/marketmind/case-study-image'
 import { api } from '@/lib/api'
 import { cn } from '@/lib/utils'
+import { useAuth, checkChallengeCompletions } from '@/lib/auth-context'
 import {
   AreaChart,
   Area,
@@ -78,6 +79,7 @@ interface CaseStudyDetails {
 
 export default function CaseStudyPage() {
   const { id } = useParams<{ id: string }>()
+  const { refresh: refreshAuth, showToast } = useAuth()
   const [cs, setCs] = useState<CaseStudyDetails | null>(null)
   const [activeTab, setActiveTab] = useState<'overview' | 'quiz'>('overview')
   
@@ -167,6 +169,12 @@ export default function CaseStudyPage() {
       setIsSubmitted(false)
     } else {
       setQuizFinished(true)
+      api.completeSimulation(score * 100).then((res) => {
+        if (res.challenges) {
+          checkChallengeCompletions(res.challenges, showToast)
+        }
+        refreshAuth()
+      }).catch(() => {})
     }
   }
 

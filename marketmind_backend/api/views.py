@@ -37,6 +37,26 @@ def record_portfolio_snapshot(user):
     PortfolioSnapshot.objects.create(user=user, value=value, cash=profile.cash)
 
 
+def update_user_badge(profile):
+    score = profile.learning_score
+    sims = profile.simulations_completed
+
+    if score >= 1000 or sims >= 10:
+        new_badge = 'Market Legend'
+    elif score >= 600 or sims >= 5:
+        new_badge = 'Event Strategist'
+    elif score >= 300 or sims >= 3:
+        new_badge = 'Trend Hunter'
+    elif score >= 100 or sims >= 1:
+        new_badge = 'Value Investor'
+    else:
+        new_badge = 'Market Rookie'
+
+    if profile.badge != new_badge:
+        profile.badge = new_badge
+        profile.save(update_fields=['badge'])
+
+
 def calculate_token_count(portfolio_value, bonus_tokens=0):
     portfolio_tokens = max(0, int((portfolio_value - 100000) // 1000))
     return portfolio_tokens + max(0, bonus_tokens)
@@ -695,6 +715,7 @@ def rebuild_leaderboard_ranks():
 
 def update_leaderboard_for_user(user):
     profile = UserProfile.objects.get_or_create(user=user)[0]
+    update_user_badge(profile)
     portfolio_value = calculate_portfolio_value(user)
     entry = get_or_create_leaderboard_entry(user)
     entry.portfolio = portfolio_value
@@ -747,6 +768,7 @@ def user_login(request):
     if user:
         login(request, user)
         profile = UserProfile.objects.get_or_create(user=user)[0]
+        update_user_badge(profile)
         get_or_create_leaderboard_entry(user)
         accuracy = calculate_accuracy(user)
         risk_score = calculate_risk_score(user)
@@ -777,6 +799,7 @@ def user_logout(request):
 @permission_classes([IsAuthenticated])
 def me(request):
     profile = UserProfile.objects.get_or_create(user=request.user)[0]
+    update_user_badge(profile)
     get_or_create_leaderboard_entry(request.user)
     sync_user_challenges(request.user)
     profile.refresh_from_db()
@@ -1105,8 +1128,15 @@ def complete_simulation(request):
     profile = UserProfile.objects.get_or_create(user=request.user)[0]
     profile.simulations_completed += 1
     profile.learning_score += request.data.get('score', 100)
+    update_user_badge(profile)
     profile.save()
-    return Response({'message': 'Simulation recorded', 'learning_score': profile.learning_score})
+    user_challenges = sync_user_challenges(request.user)
+    return Response({
+        'message': 'Simulation recorded',
+        'learning_score': profile.learning_score,
+        'challenges': UserChallengeSerializer(user_challenges, many=True).data,
+        'profile': UserProfileSerializer(profile).data,
+    })
 
 
 @api_view(['POST'])

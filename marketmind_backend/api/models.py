@@ -53,7 +53,7 @@ class UserProfile(models.Model):
         ('Market Rookie', 'Market Rookie'),
         ('Value Investor', 'Value Investor'),
         ('Trend Hunter', 'Trend Hunter'),
-        ('Risk Master', 'Risk Master'),
+        ('Event Strategist', 'Event Strategist'),
         ('Market Legend', 'Market Legend'),
     ]
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
@@ -181,7 +181,7 @@ class LeaderboardEntry(models.Model):
         ('Market Rookie', 'Market Rookie'),
         ('Value Investor', 'Value Investor'),
         ('Trend Hunter', 'Trend Hunter'),
-        ('Risk Master', 'Risk Master'),
+        ('Event Strategist', 'Event Strategist'),
         ('Market Legend', 'Market Legend'),
     ]
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='leaderboard')

@@ -7,13 +7,22 @@ import { Badge } from '@/components/ui/badge'
 import { ProgressRing } from '@/components/marketmind/progress-ring'
 import { formatCurrency } from '@/lib/market-data'
 import { api } from '@/lib/api'
-import { useAuth } from '@/lib/auth-context'
+import { useAuth, checkChallengeCompletions } from '@/lib/auth-context'
 import { cn } from '@/lib/utils'
 
-const earnedBadges = [
-  { name: 'Value Investor', desc: 'Held quality assets through volatility', icon: BookOpen },
-  { name: 'Trend Hunter', desc: 'Caught 3 momentum moves early', icon: Flame },
-  { name: 'Event Strategist', desc: 'Positioned ahead of a major event', icon: Target },
+const BADGE_RANKS: Record<string, number> = {
+  'Market Rookie': 1,
+  'Value Investor': 2,
+  'Trend Hunter': 3,
+  'Event Strategist': 4,
+  'Market Legend': 5,
+}
+
+const ALL_BADGES = [
+  { name: 'Value Investor', desc: 'Held quality assets through volatility', icon: BookOpen, rank: 2 },
+  { name: 'Trend Hunter', desc: 'Caught 3 momentum moves early', icon: Flame, rank: 3 },
+  { name: 'Event Strategist', desc: 'Positioned ahead of a major event', icon: Target, rank: 4 },
+  { name: 'Market Legend', desc: 'Conquered the stock market with top performance', icon: Trophy, rank: 5 },
 ]
 
 function getRiskLabel(score: number) {
@@ -24,7 +33,7 @@ function getRiskLabel(score: number) {
 }
 
 export default function ProfilePage() {
-  const { user, profile, refresh: refreshAuth } = useAuth()
+  const { user, profile, refresh: refreshAuth, showToast } = useAuth()
   const [challenges, setChallenges] = useState<any[]>([])
   const [loadingChallenges, setLoadingChallenges] = useState(true)
   const [riskScore, setRiskScore] = useState<number>(profile?.risk_score ?? 30)
@@ -36,12 +45,13 @@ export default function ProfilePage() {
       setChallenges(data.challenges || [])
       if (typeof data.risk_score === 'number') setRiskScore(data.risk_score)
       if (typeof data.accuracy === 'number') setAccuracy(data.accuracy)
+      checkChallengeCompletions(data.challenges || [], showToast)
     } catch {
       setChallenges([])
     } finally {
       setLoadingChallenges(false)
     }
-  }, [])
+  }, [showToast])
 
   useEffect(() => {
     fetchChallenges()
@@ -173,17 +183,39 @@ export default function ProfilePage() {
         <Card>
           <CardHeader><CardTitle>Badges earned</CardTitle></CardHeader>
           <CardContent className="space-y-3">
-            {earnedBadges.map((b) => (
-              <div key={b.name} className="flex items-center gap-3 rounded-xl border border-border bg-secondary/40 p-3">
-                <span className="flex size-10 items-center justify-center rounded-xl bg-primary/15">
-                  <b.icon className="size-5 text-primary" />
-                </span>
-                <div>
-                  <p className="text-sm font-medium">{b.name}</p>
-                  <p className="text-xs text-muted-foreground">{b.desc}</p>
+            {ALL_BADGES.map((b) => {
+              const currentRank = BADGE_RANKS[profile?.badge || 'Market Rookie'] || 1
+              const isUnlocked = currentRank >= b.rank
+              return (
+                <div
+                  key={b.name}
+                  className={cn(
+                    "flex items-center gap-3 rounded-xl border p-3 transition-all",
+                    isUnlocked
+                      ? "border-border bg-secondary/40"
+                      : "border-border/40 bg-secondary/10 opacity-40 select-none"
+                  )}
+                >
+                  <span className={cn(
+                    "flex size-10 items-center justify-center rounded-xl",
+                    isUnlocked ? "bg-primary/15" : "bg-muted"
+                  )}>
+                    <b.icon className={cn("size-5", isUnlocked ? "text-primary" : "text-muted-foreground")} />
+                  </span>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-sm font-medium">{b.name}</p>
+                      {!isUnlocked && (
+                        <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
+                          Locked
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground">{b.desc}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </CardContent>
         </Card>
 

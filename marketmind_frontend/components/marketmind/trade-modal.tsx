@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { type Asset, formatCurrency, formatPct } from '@/lib/market-data'
 import { api } from '@/lib/api'
-import { useAuth } from '@/lib/auth-context'
+import { useAuth, checkChallengeCompletions } from '@/lib/auth-context'
 import { cn } from '@/lib/utils'
 
 export function TradeModal({
@@ -27,7 +27,7 @@ export function TradeModal({
   const [cash, setCash] = useState<number | null>(null)
   const [portfolioValue, setPortfolioValue] = useState(100000)
   const [completedChallenges, setCompletedChallenges] = useState<any[]>([])
-  const { refresh: refreshAuth } = useAuth()
+  const { refresh: refreshAuth, showToast } = useAuth()
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
@@ -58,6 +58,7 @@ export function TradeModal({
       // Capture newly completed challenges returned from the trade response
       if (res.completed_challenges && res.completed_challenges.length > 0) {
         setCompletedChallenges(res.completed_challenges)
+        checkChallengeCompletions(res.completed_challenges, showToast)
       }
       const refreshed = await api.portfolio()
       setCash(refreshed.cash)

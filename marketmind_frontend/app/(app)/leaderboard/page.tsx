@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils'
 
 const BADGE_COLOR: Record<string, string> = {
   'Market Legend': 'bg-yellow-500/15 text-yellow-400',
-  'Risk Master': 'bg-purple-500/15 text-purple-400',
+  'Event Strategist': 'bg-purple-500/15 text-purple-400',
   'Trend Hunter': 'bg-blue-500/15 text-blue-400',
   'Value Investor': 'bg-green-500/15 text-green-400',
   'Market Rookie': 'bg-secondary text-muted-foreground',

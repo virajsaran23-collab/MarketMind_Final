@@ -31,7 +31,7 @@ export type LeaderRow = {
   handle: string
   portfolio: number
   learning_score: number
-  badge: 'Market Rookie' | 'Value Investor' | 'Trend Hunter' | 'Risk Master' | 'Market Legend'
+  badge: 'Market Rookie' | 'Value Investor' | 'Trend Hunter' | 'Event Strategist' | 'Market Legend'
   accuracy: number
   token_count: number
 }
