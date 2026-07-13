@@ -88,13 +88,39 @@ Set these environment variables on the Render service:
 - `FRONTEND_URL=https://<your-vercel-app>.vercel.app`
 - `CORS_ALLOWED_ORIGINS=https://<your-vercel-app>.vercel.app`
 - `CSRF_TRUSTED_ORIGINS=https://<your-vercel-app>.vercel.app,https://*.vercel.app`
-- `DATABASE_URL=<Render Postgres URL>`
+- `DATABASE_URL=postgresql://<user>:<password>@<your-neon-host>/<database>?sslmode=require`
 
 Start command:
 
 ```bash
 gunicorn marketmind.wsgi:application
 ```
+
+If you want the exact Neon setup:
+
+- Host: copy the Neon host from the Neon dashboard, for example `ep-abc123.us-east-2.aws.neon.tech`
+- Database: use the database name Neon created, commonly `neondb`
+- User: use the Neon role name you created
+- Password: use the Neon password for that role
+- SSL: keep `sslmode=require` in the connection string
+
+Example:
+
+```bash
+DATABASE_URL=postgresql://marketmind_owner:your-password@ep-abc123.us-east-2.aws.neon.tech/neondb?sslmode=require
+```
+
+Redeploy steps on Render:
+
+1. Open your backend service in Render.
+2. Go to Environment and replace the old `DATABASE_URL` from Render Postgres with the Neon connection string.
+3. Save the changes.
+4. Trigger a manual deploy, or push a commit if auto-deploy is enabled.
+5. Watch the deploy logs for `migrate` and `seed_data` to finish successfully.
+
+If this is the first deploy after changing databases, run migrations against Neon before reusing the app.
+
+If you deploy from `render.yaml`, Render only prompts for `sync: false` secrets during the initial Blueprint creation flow. For an existing service, update `DATABASE_URL` in the Render dashboard first, then redeploy.
 
 ### Vercel frontend
 
