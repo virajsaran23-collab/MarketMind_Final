@@ -10,7 +10,7 @@ from rest_framework.response import Response
 import requests
 
 from .models import Asset, UserProfile, Holding, Trade, CaseStudy, LeaderboardEntry, GameChallenge, UserChallenge, PortfolioSnapshot
-from .mentor import build_portfolio_context, extract_symbols, fetch_news, fetch_quotes, generate_reply, summarize_market
+from .mentor import _normalize_text, build_portfolio_context, extract_symbols, fetch_news, fetch_quotes, generate_reply, summarize_market
 from .serializers import (
     AssetSerializer, UserProfileSerializer, HoldingSerializer,
     TradeSerializer, CaseStudySerializer, LeaderboardEntrySerializer,
@@ -1145,9 +1145,17 @@ def mentor(request):
     ensure_foundation_assets()
     message = request.data.get('message', '')
     requested_symbols = request.data.get('symbols') or []
+    history = request.data.get('history') or []
+
+    history_text = ' '.join(
+        _normalize_text(item.get('content', ''))
+        for item in history
+        if isinstance(item, dict)
+    )
+    combined_message = ' '.join(part for part in [message, history_text] if part).strip()
 
     profile, holdings, portfolio_symbols = build_portfolio_context(request.user)
-    symbols = extract_symbols(message, requested_symbols or portfolio_symbols)
+    symbols = extract_symbols(combined_message or message, requested_symbols or portfolio_symbols)
     quotes = fetch_quotes(symbols)
     news = fetch_news(symbols[:3])
 
@@ -1165,8 +1173,9 @@ def mentor(request):
 
     response = {
         'message': message,
+        'history': history[-6:] if isinstance(history, list) else [],
         'symbols': symbols,
-        'reply': generate_reply(message, quotes, holdings, profile.cash),
+        'reply': generate_reply(message, quotes, holdings, profile.cash, history=history[-6:] if isinstance(history, list) else []),
         'summary': summarize_market(quotes, holdings, profile.cash),
         'portfolio': {
             'cash': profile.cash,

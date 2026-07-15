@@ -1,18 +1,39 @@
 import json
 import os
 import re
+from difflib import SequenceMatcher
 from datetime import datetime, timezone as dt_timezone
 from urllib.error import URLError, HTTPError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 import requests
+from dotenv import load_dotenv
+# Load environment variables from .env file relative to this file
+dotenv_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
+load_dotenv(dotenv_path)
 
 from .models import Asset, Holding, UserProfile
 from .services.market_data import get_quote
 
 GROQ_API_KEY = os.getenv('GROQ_API_KEY', '')
 GROQ_MODEL = os.getenv('GROQ_MODEL', 'llama-3.1-8b-instant')
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
+
+import sys
+IS_TESTING = 'test' in sys.argv
+
+# Auto-enable LLM in runtime if any API key is present, unless explicitly disabled
+raw_use_llm = os.getenv('USE_LLM_MENTOR', '')
+if IS_TESTING:
+    USE_LLM_MENTOR = raw_use_llm.lower() in {'1', 'true', 'yes'}
+else:
+    if raw_use_llm.lower() in {'0', 'false', 'no'}:
+        USE_LLM_MENTOR = False
+    else:
+        USE_LLM_MENTOR = bool(GROQ_API_KEY or GEMINI_API_KEY or OPENAI_API_KEY)
+
 
 
 def _fetch_json(url: str, timeout: int = 4):
@@ -23,6 +44,56 @@ def _fetch_json(url: str, timeout: int = 4):
 
 def _normalize_text(value):
     return re.sub(r'\s+', ' ', str(value or '')).strip()
+
+
+def _search_tokens(value):
+    tokens = re.findall(r'[a-z0-9]+', _normalize_text(value).lower())
+    stopwords = {
+        'a', 'an', 'and', 'are', 'as', 'at', 'be', 'buy', 'can', 'did', 'do', 'does', 'for', 'from',
+        'how', 'i', 'in', 'is', 'it', 'me', 'my', 'of', 'on', 'or', 'should', 'sell', 'the', 'to',
+        'today', 'trading', 'was', 'what', 'when', 'where', 'which', 'with', 'would', 'you', 'your',
+        'stock', 'stocks', 'share', 'shares', 'position', 'positions', 'invest', 'investment', 'portfolio',
+    }
+    return {token for token in tokens if len(token) >= 3 and token not in stopwords}
+
+
+def _matches_asset_name(message, asset):
+    normalized_message = _normalize_text(message).lower()
+    symbol = asset.symbol.lower()
+    name = _normalize_text(asset.name).lower()
+
+    if re.search(r'(?<!\w)' + re.escape(symbol) + r'(?!\w)', normalized_message):
+        return True
+
+    if name and name in normalized_message:
+        return True
+
+    return bool(_search_tokens(normalized_message) & _search_tokens(asset.name))
+
+
+def _asset_match_score(message, asset):
+    normalized_message = _normalize_text(message).lower()
+    if not normalized_message:
+        return 0.0
+
+    symbol = asset.symbol.lower()
+    name = _normalize_text(asset.name).lower()
+    message_tokens = _search_tokens(normalized_message)
+    asset_tokens = _search_tokens(asset.name)
+
+    score = 0.0
+    if re.search(r'(?<!\w)' + re.escape(symbol) + r'(?!\w)', normalized_message):
+        score += 1.0
+
+    if name and name in normalized_message:
+        score += 0.9
+
+    overlap = len(message_tokens & asset_tokens)
+    if overlap:
+        score += min(0.6, overlap * 0.3)
+
+    score += SequenceMatcher(None, normalized_message, name or symbol).ratio() * 0.5
+    return score
 
 
 def _get_stock_catalog_symbols(limit=6):
@@ -153,19 +224,16 @@ def fetch_news(symbols):
 def extract_symbols(message, default_symbols=None):
     message = (message or '').upper()
     default_symbols = default_symbols or []
+    assets = list(Asset.objects.live_stocks().order_by('symbol'))
     symbols = []
 
-    def has_phrase(text, phrase):
-        if not phrase:
-            return False
-        pattern = r'(?<!\w)' + re.escape(phrase) + r'(?!\w)'
-        return re.search(pattern, text) is not None
+    ranked = sorted(assets, key=lambda asset: _asset_match_score(message, asset), reverse=True)
+    if ranked and _asset_match_score(message, ranked[0]) >= 0.55:
+        symbols.append(ranked[0].symbol.upper())
 
-    for asset in Asset.objects.live_stocks().order_by('symbol'):
-        sym = asset.symbol.upper()
-        name = asset.name.upper()
-        if has_phrase(message, sym) or has_phrase(message, name):
-            symbols.append(sym)
+    for asset in assets:
+        if _matches_asset_name(message, asset):
+            symbols.append(asset.symbol.upper())
 
     if not symbols:
         symbols = [symbol.upper() for symbol in default_symbols if symbol]
@@ -210,7 +278,8 @@ def _label(item):
     return symbol
 
 
-def build_llm_prompt(message, quotes, holdings, cash):
+def build_llm_prompt(message, quotes, holdings, cash, history=None):
+    history = history or []
     quote_lines = []
     for item in quotes[:5]:
         quote_lines.append(
@@ -225,6 +294,13 @@ def build_llm_prompt(message, quotes, holdings, cash):
 
     safe_quote_lines = quote_lines if quote_lines else ['- No quote data available']
     safe_holding_lines = holding_lines if holding_lines else ['- No holdings available']
+    conversation_lines = []
+    for item in history[-6:]:
+        role = _normalize_text(item.get('role', '')).lower()
+        content = _normalize_text(item.get('content', ''))
+        if content:
+            speaker = 'Assistant' if role == 'assistant' else 'User'
+            conversation_lines.append(f'- {speaker}: {content}')
 
     context = [
         'You are MarketMind, a concise trading assistant for a stock simulation app.',
@@ -232,6 +308,8 @@ def build_llm_prompt(message, quotes, holdings, cash):
         'Only use the prices provided in the market context below — never invent or guess prices.',
         'Use the user message plus the market context below to answer in 2-4 short sentences.',
         f"User message: {message or ''}",
+        'Recent conversation:',
+        *(conversation_lines if conversation_lines else ['- No prior conversation available']),
         'Market context:',
         *safe_quote_lines,
         'Portfolio context:',
@@ -242,36 +320,94 @@ def build_llm_prompt(message, quotes, holdings, cash):
     return '\n'.join(context)
 
 
-def call_llm(message, quotes, holdings, cash):
-    if not GROQ_API_KEY:
-        return None
+def call_llm(message, quotes, holdings, cash, history=None):
+    prompt = build_llm_prompt(message, quotes, holdings, cash, history=history)
+    system_instruction = 'You are a helpful stock-trading mentor who answers briefly and clearly. Always refer to stocks by their full company name with ticker in parentheses (e.g. Apple Inc. (AAPL)). Only use the prices given in the context — never invent prices.'
 
-    prompt = build_llm_prompt(message, quotes, holdings, cash)
-    payload = {
-        'model': GROQ_MODEL,
-        'messages': [
-            {'role': 'system', 'content': 'You are a helpful stock-trading mentor who answers briefly and clearly. Always refer to stocks by their full company name with ticker in parentheses (e.g. Apple Inc. (AAPL)). Only use the prices given in the context — never invent prices.'},
-            {'role': 'user', 'content': prompt},
-        ],
-        'temperature': 0.3,
-        'max_tokens': 220,
-    }
+    # Try Gemini first if key is present
+    if GEMINI_API_KEY:
+        try:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={GEMINI_API_KEY}"
+            payload = {
+                "contents": [
+                    {
+                        "parts": [
+                            {"text": f"System Instruction: {system_instruction}\n\nUser Context and Question:\n{prompt}"}
+                        ]
+                    }
+                ],
+                "generationConfig": {
+                    "temperature": 0.3,
+                    "maxOutputTokens": 220
+                }
+            }
+            response = requests.post(
+                url,
+                headers={"Content-Type": "application/json"},
+                json=payload,
+                timeout=20
+            )
+            response.raise_for_status()
+            data = response.json()
+            return data["candidates"][0]["content"]["parts"][0]["text"].strip()
+        except Exception:
+            pass
 
-    try:
-        response = requests.post(
-            'https://api.groq.com/openai/v1/chat/completions',
-            headers={
-                'Authorization': f'Bearer {GROQ_API_KEY}',
-                'Content-Type': 'application/json',
-            },
-            json=payload,
-            timeout=20,
-        )
-        response.raise_for_status()
-        data = response.json()
-        return data['choices'][0]['message']['content'].strip()
-    except Exception:
-        return None
+    # Try Groq next
+    if GROQ_API_KEY:
+        try:
+            payload = {
+                'model': GROQ_MODEL,
+                'messages': [
+                    {'role': 'system', 'content': system_instruction},
+                    {'role': 'user', 'content': prompt},
+                ],
+                'temperature': 0.3,
+                'max_tokens': 220,
+            }
+            response = requests.post(
+                'https://api.groq.com/openai/v1/chat/completions',
+                headers={
+                    'Authorization': f'Bearer {GROQ_API_KEY}',
+                    'Content-Type': 'application/json',
+                },
+                json=payload,
+                timeout=20,
+            )
+            response.raise_for_status()
+            data = response.json()
+            return data['choices'][0]['message']['content'].strip()
+        except Exception:
+            pass
+
+    # Try OpenAI last
+    if OPENAI_API_KEY:
+        try:
+            payload = {
+                'model': 'gpt-4o-mini',
+                'messages': [
+                    {'role': 'system', 'content': system_instruction},
+                    {'role': 'user', 'content': prompt},
+                ],
+                'temperature': 0.3,
+                'max_tokens': 220,
+            }
+            response = requests.post(
+                'https://api.openai.com/v1/chat/completions',
+                headers={
+                    'Authorization': f'Bearer {OPENAI_API_KEY}',
+                    'Content-Type': 'application/json',
+                },
+                json=payload,
+                timeout=20,
+            )
+            response.raise_for_status()
+            data = response.json()
+            return data['choices'][0]['message']['content'].strip()
+        except Exception:
+            pass
+
+    return None
 
 
 def summarize_market(quotes, holdings, cash):
@@ -298,10 +434,11 @@ def summarize_market(quotes, holdings, cash):
     return ' '.join(lines)
 
 
-def generate_reply(message, quotes, holdings, cash):
-    llm_reply = call_llm(message, quotes, holdings, cash)
-    if llm_reply:
-        return llm_reply
+def generate_reply(message, quotes, holdings, cash, history=None):
+    if USE_LLM_MENTOR:
+        llm_reply = call_llm(message, quotes, holdings, cash, history=history)
+        if llm_reply:
+            return llm_reply
 
     normalized = (message or '').strip().lower()
     if not normalized:

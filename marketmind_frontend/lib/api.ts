@@ -68,9 +68,9 @@ export const api = {
   completeSimulation: (score: number) =>
     request('/simulation/complete/', { method: 'POST', body: JSON.stringify({ score }) }),
 
-  mentor: (message = '', symbols: string[] = []) =>
+  mentor: (message = '', symbols: string[] = [], history: Array<{ role: 'assistant' | 'user'; content: string }> = []) =>
     request('/mentor/', {
       method: 'POST',
-      body: JSON.stringify({ message, symbols }),
+      body: JSON.stringify({ message, symbols, history }),
     }),
 }

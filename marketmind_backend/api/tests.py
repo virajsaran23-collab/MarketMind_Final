@@ -18,11 +18,8 @@ class ChallengeSyncTests(TestCase):
             symbol='AAPL',
             name='Apple',
             category='Stocks',
-            price=100.0,
-            change=1.2,
-            market_cap='2T',
+            last_price=100.0,
             sector='Technology',
-            spark=[],
         )
 
     def test_sync_user_challenges_creates_defaults_and_marks_first_trade_complete(self):
@@ -93,6 +90,19 @@ class MentorReplyTests(TestCase):
         self.assertIn('AAPL', reply)
         self.assertIn('200.00', reply)
 
+    def test_generate_reply_stays_deterministic_even_if_llm_is_available(self):
+        with patch('api.mentor.USE_LLM_MENTOR', False):
+            with patch('api.mentor.call_llm', return_value='LLM response'):
+                reply = generate_reply(
+                    'should i buy disney?',
+                    [{'symbol': 'DIS', 'price': 102.0, 'change': 1.1, 'name': 'The Walt Disney Company'}],
+                    [],
+                    50000.0,
+                )
+
+        self.assertIn('DIS', reply)
+        self.assertNotIn('LLM response', reply)
+
     def test_portfolio_requests_include_cash_context(self):
         reply = generate_reply(
             'what is my portfolio?',
@@ -127,6 +137,24 @@ class MentorReplyTests(TestCase):
         symbols = extract_symbols('I want to buy Apple Inc. today')
 
         self.assertEqual(symbols, ['AAPL'])
+
+    def test_extract_symbols_matches_partial_company_names(self):
+        Asset.objects.create(
+            id='DIS', symbol='DIS', name='The Walt Disney Company', exchange='NYSE', category='Stocks', sector='Communication Services'
+        )
+
+        symbols = extract_symbols('Should I buy Disney?')
+
+        self.assertEqual(symbols, ['DIS'])
+
+    def test_extract_symbols_matches_alphabet_by_name(self):
+        Asset.objects.create(
+            id='GOOGL', symbol='GOOGL', name='Alphabet Inc.', exchange='NASDAQ', category='Stocks', sector='Communication Services'
+        )
+
+        symbols = extract_symbols('should i by alphabet')
+
+        self.assertEqual(symbols[0], 'GOOGL')
 
 
 class DynamicAssetTests(TestCase):

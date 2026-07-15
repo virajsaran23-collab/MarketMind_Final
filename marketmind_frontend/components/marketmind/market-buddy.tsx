@@ -229,7 +229,8 @@ export function MarketBuddy({ assets = [], holdings = [], portfolioValue, cash }
     setSending(true)
 
     try {
-      const data = await api.mentor(text, briefing.symbols || featured.map((item) => item.symbol))
+      const history = [...messages, { role: 'user' as const, content: text }].slice(-6)
+      const data = await api.mentor(text, briefing.symbols || featured.map((item) => item.symbol), history)
       setBriefing(data)
       setMessages((current) => [...current, { role: 'assistant', content: data.reply || data.summary || 'Here is the latest market read.' }])
       setStatus('live')
