@@ -338,14 +338,14 @@ def call_llm(message, quotes, holdings, cash, history=None):
                 ],
                 "generationConfig": {
                     "temperature": 0.3,
-                    "maxOutputTokens": 220
+                    "maxOutputTokens": 1024
                 }
             }
             response = requests.post(
                 url,
                 headers={"Content-Type": "application/json"},
                 json=payload,
-                timeout=20
+                timeout=45
             )
             response.raise_for_status()
             data = response.json()
