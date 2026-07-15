@@ -666,11 +666,14 @@ def refresh_leaderboard_entries():
         if entry.accuracy != new_accuracy:
             entry.accuracy = new_accuracy
             dirty = True
+        if entry.learning_score != profile.learning_score:
+            entry.learning_score = profile.learning_score
+            dirty = True
         if dirty:
             updated.append(entry)
 
     if updated:
-        LeaderboardEntry.objects.bulk_update(updated, ['portfolio', 'token_count', 'accuracy'])
+        LeaderboardEntry.objects.bulk_update(updated, ['portfolio', 'token_count', 'accuracy', 'learning_score'])
 
     rebuild_leaderboard_ranks()
 
@@ -697,7 +700,7 @@ def rebuild_leaderboard_ranks():
     entries = list(
         LeaderboardEntry.objects.select_related('user')
         .filter(user__is_active=True)
-        .order_by('-token_count', '-portfolio', 'user__username')
+        .order_by('-learning_score', '-token_count', '-portfolio', 'user__username')
     )
     updated = []
     for idx, entry in enumerate(entries, start=1):
@@ -1130,6 +1133,7 @@ def complete_simulation(request):
     profile.learning_score += request.data.get('score', 100)
     update_user_badge(profile)
     profile.save()
+    update_leaderboard_for_user(request.user)
     user_challenges = sync_user_challenges(request.user)
     return Response({
         'message': 'Simulation recorded',

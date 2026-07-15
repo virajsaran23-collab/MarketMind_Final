@@ -79,7 +79,7 @@ interface CaseStudyDetails {
 
 export default function CaseStudyPage() {
   const { id } = useParams<{ id: string }>()
-  const { refresh: refreshAuth, showToast } = useAuth()
+  const { profile, refresh: refreshAuth, showToast } = useAuth()
   const [cs, setCs] = useState<CaseStudyDetails | null>(null)
   const [activeTab, setActiveTab] = useState<'overview' | 'quiz'>('overview')
   
@@ -502,6 +502,56 @@ export default function CaseStudyPage() {
         {/* Right Side: Sidebar (Key Statistics & Event Timeline) */}
         <div className="space-y-6">
           
+          {/* User Rank & Learning Stats Card */}
+          {profile && (
+            <Card className="p-6 border border-primary/20 bg-gradient-to-br from-primary/10 via-card/40 to-card shadow-xl relative overflow-hidden backdrop-blur-md">
+              {/* Decorative background glow */}
+              <div className="absolute -right-8 -top-8 w-24 h-24 bg-primary/20 rounded-full blur-2xl pointer-events-none" />
+              <h3 className="font-bold text-base border-b border-border/60 pb-3 mb-4 flex items-center gap-2 text-foreground/95">
+                <Trophy className="size-4.5 text-yellow-400 animate-pulse shrink-0" /> Your Learning Progress
+              </h3>
+              <div className="space-y-4">
+                {/* Rank display */}
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground font-medium">Learning Rank</span>
+                  <span className="text-lg font-extrabold text-primary tabular-nums">
+                    #{profile.global_rank || '—'}
+                  </span>
+                </div>
+                
+                {/* Correct answers count */}
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground font-medium">Right Answers</span>
+                  <span className="text-sm font-semibold text-foreground/90 tabular-nums">
+                    {Math.round(profile.learning_score / 100)} correct
+                  </span>
+                </div>
+
+                {/* Score display */}
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground font-medium">Total Learning Score</span>
+                  <span className="text-sm font-semibold text-foreground/90 tabular-nums">
+                    {profile.learning_score.toLocaleString()} pts
+                  </span>
+                </div>
+
+                {/* Badge display */}
+                <div className="flex items-center justify-between pt-3 border-t border-border/40">
+                  <span className="text-xs text-muted-foreground font-medium">Rank Title</span>
+                  <Badge className={cn('text-[10px] font-bold uppercase tracking-wider', 
+                    profile.badge === 'Market Legend' ? 'bg-yellow-500/15 text-yellow-400 border-yellow-500/20' :
+                    profile.badge === 'Event Strategist' ? 'bg-purple-500/15 text-purple-400 border-purple-500/20' :
+                    profile.badge === 'Trend Hunter' ? 'bg-blue-500/15 text-blue-400 border-blue-500/20' :
+                    profile.badge === 'Value Investor' ? 'bg-green-500/15 text-green-400 border-green-500/20' :
+                    'bg-secondary text-muted-foreground border-transparent'
+                  )}>
+                    {profile.badge}
+                  </Badge>
+                </div>
+              </div>
+            </Card>
+          )}
+
           {/* Key Statistics Card */}
           {cs.stats && cs.stats.length > 0 && (
             <Card className="p-5 bg-card/45 border-border backdrop-blur-sm shadow-xl">
