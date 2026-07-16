@@ -59,6 +59,12 @@ export const api = {
 
   caseStudy: (id: string) => request(`/case-studies/${id}/`),
 
+  completeCaseStudy: (id: string, score: number, totalQuestions: number) =>
+    request(`/case-studies/${id}/complete/`, {
+      method: 'POST',
+      body: JSON.stringify({ score, total_questions: totalQuestions }),
+    }),
+
   leaderboard: () => request('/leaderboard/'),
 
   analytics: () => request('/analytics/'),
@@ -73,4 +79,6 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ message, symbols, history }),
     }),
+
+  aiAnalyzer: () => request('/ai-analyzer/'),
 }

@@ -169,7 +169,7 @@ export default function CaseStudyPage() {
       setIsSubmitted(false)
     } else {
       setQuizFinished(true)
-      api.completeSimulation(score * 100).then((res) => {
+      api.completeCaseStudy(id, score, cs.quiz.length).then((res: any) => {
         if (res.challenges) {
           checkChallengeCompletions(res.challenges, showToast)
         }

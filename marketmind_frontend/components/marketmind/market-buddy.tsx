@@ -256,7 +256,7 @@ export function MarketBuddy({ assets = [], holdings = [], portfolioValue, cash }
   }
 
   return (
-    <Card className="relative overflow-hidden border-primary/20 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,252,0.92))] shadow-lg">
+    <Card className="relative overflow-hidden border-primary/20 bg-[linear-gradient(180deg,rgba(17,24,39,0.96),rgba(15,23,42,0.92))] shadow-lg">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.14),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(34,197,94,0.1),transparent_32%)]" />
       <div className="relative p-5">
         <div className="flex items-start justify-between gap-4">

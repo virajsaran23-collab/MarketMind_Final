@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { Brain, Target, Flame, Trophy, BookOpen, ShieldAlert, TrendingUp, CheckCircle2 } from 'lucide-react'
 import { useEffect, useMemo, useState, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -35,6 +36,7 @@ function getRiskLabel(score: number) {
 export default function ProfilePage() {
   const { user, profile, refresh: refreshAuth, showToast } = useAuth()
   const [challenges, setChallenges] = useState<any[]>([])
+  const [completions, setCompletions] = useState<any[]>([])
   const [loadingChallenges, setLoadingChallenges] = useState(true)
   const [riskScore, setRiskScore] = useState<number>(profile?.risk_score ?? 30)
   const [accuracy, setAccuracy] = useState<number>(profile?.accuracy ?? 0)
@@ -43,11 +45,13 @@ export default function ProfilePage() {
     try {
       const data = await api.challenges()
       setChallenges(data.challenges || [])
+      setCompletions(data.completions || [])
       if (typeof data.risk_score === 'number') setRiskScore(data.risk_score)
       if (typeof data.accuracy === 'number') setAccuracy(data.accuracy)
       checkChallengeCompletions(data.challenges || [], showToast)
     } catch {
       setChallenges([])
+      setCompletions([])
     } finally {
       setLoadingChallenges(false)
     }
@@ -179,7 +183,7 @@ export default function ProfilePage() {
         </Card>
       </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
         <Card>
           <CardHeader><CardTitle>Badges earned</CardTitle></CardHeader>
           <CardContent className="space-y-3">
@@ -344,6 +348,40 @@ export default function ProfilePage() {
                   </div>
                 )}
               </>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BookOpen className="size-5 text-primary" />
+              <span>Case studies completed</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {completions.length === 0 ? (
+              <div className="py-8 text-center text-sm text-muted-foreground">
+                <BookOpen className="mx-auto size-8 opacity-40 mb-2" />
+                <p>No case studies completed yet.</p>
+                <Link href="/case-studies" className="mt-3 inline-flex text-xs font-semibold text-primary hover:underline">
+                  Browse Case Studies &rarr;
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-2.5 max-h-[360px] overflow-y-auto pr-1">
+                {completions.map((item) => (
+                  <div key={item.id} className="flex items-start gap-3 rounded-xl border border-border bg-secondary/40 p-3">
+                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-success" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{item.title}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Score: <span className="font-semibold text-foreground">{item.score}/{item.total_questions}</span>
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
           </CardContent>
         </Card>

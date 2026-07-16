@@ -198,3 +198,18 @@ class LeaderboardEntry(models.Model):
 
     def __str__(self):
         return f"#{self.rank} {self.user.username}"
+
+
+class UserCaseStudyCompletion(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='case_study_completions')
+    case_study = models.ForeignKey(CaseStudy, on_delete=models.CASCADE)
+    score = models.IntegerField(default=0)
+    total_questions = models.IntegerField(default=0)
+    completed_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'case_study')
+
+    def __str__(self):
+        return f"{self.user.username} completed {self.case_study.title} ({self.score}/{self.total_questions})"
+

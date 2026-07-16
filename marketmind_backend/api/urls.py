@@ -18,6 +18,7 @@ urlpatterns = [
 
     path('case-studies/', views.case_studies),
     path('case-studies/<str:study_id>/', views.case_study_detail),
+    path('case-studies/<str:study_id>/complete/', views.complete_case_study),
 
     path('leaderboard/', views.leaderboard),
 
@@ -25,4 +26,5 @@ urlpatterns = [
     path('simulation/complete/', views.complete_simulation),
     path('mentor/', views.mentor),
     path('challenges/', views.challenges),
+    path('ai-analyzer/', views.ai_analyzer),
 ]

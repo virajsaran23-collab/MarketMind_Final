@@ -185,3 +185,91 @@ class DynamicAssetTests(TestCase):
         self.assertEqual(asset.name, 'Tesla Inc.')
         self.assertEqual(asset.category, 'Stocks')
         self.assertTrue(Asset.objects.filter(id='tsla').exists())
+
+
+class LocalAIAnalyzerTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='analyzer-tester', password='testpass')
+        self.client = APIClient()
+        self.asset = Asset.objects.create(
+            id='PLTR',
+            symbol='PLTR',
+            name='Palantir Technologies Inc.',
+            category='Stocks',
+            last_price=133.76,
+            sector='Technology',
+        )
+
+    def test_analyze_asset_returns_expected_fields(self):
+        from .mentor import analyze_asset
+        res = analyze_asset(self.asset)
+        self.assertEqual(res['symbol'], 'PLTR')
+        self.assertEqual(res['name'], 'Palantir Technologies Inc.')
+        self.assertIn(res['decision'], ['BUY', 'SELL', 'HOLD'])
+        self.assertGreaterEqual(res['confidence'], 50)
+        self.assertIn('trend', res)
+        self.assertIn('momentum', res)
+        self.assertIn('volatility', res)
+        self.assertIn('analysis', res)
+
+    def test_generate_reply_fuzzy_matches_typo(self):
+        reply = generate_reply(
+            'what about plantir?',
+            [{'symbol': 'PLTR', 'price': 133.76, 'change': 1.16, 'name': 'Palantir Technologies Inc.'}],
+            [],
+            100000.0,
+        )
+        self.assertIn('Palantir Technologies Inc. (PLTR)', reply)
+        self.assertIn('AI Buddy', reply)
+
+    def test_ai_analyzer_view_returns_all_analyzed_assets(self):
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get('/api/ai-analyzer/')
+        self.assertEqual(response.status_code, 200)
+        self.assertGreaterEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['symbol'], 'PLTR')
+
+
+class CaseStudyQuizTests(TestCase):
+    def setUp(self):
+        from .models import CaseStudy
+        self.user = User.objects.create_user(username='quiz-tester', password='testpass')
+        self.client = APIClient()
+        self.case_study = CaseStudy.objects.create(
+            id='russia-ukraine',
+            title='Russia-Ukraine Conflict',
+            description='Test description',
+            long_description='Test long description',
+            difficulty='Intermediate',
+            read_time='8 min',
+            image='/test.png',
+            tags=['Test'],
+            quiz=[
+                {
+                    'question': 'Q1',
+                    'options': ['A', 'B'],
+                    'answer': 'A',
+                    'explanation': 'E1'
+                }
+            ]
+        )
+
+    def test_complete_case_study_saves_score_and_updates_profile(self):
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post(
+            f'/api/case-studies/{self.case_study.id}/complete/',
+            {'score': 1, 'total_questions': 1},
+            format='json'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['completion']['score'], 1)
+        self.assertEqual(response.data['completion']['total_questions'], 1)
+
+        # Check that completions is returned in challenges endpoint
+        challenges_resp = self.client.get('/api/challenges/')
+        self.assertEqual(challenges_resp.status_code, 200)
+        self.assertEqual(len(challenges_resp.data['completions']), 1)
+        self.assertEqual(challenges_resp.data['completions'][0]['id'], self.case_study.id)
+        self.assertEqual(challenges_resp.data['completions'][0]['score'], 1)
+
+

@@ -226,6 +226,11 @@ export default function CaseStudiesPage() {
                         <span className={cn('rounded-full px-2.5 py-0.5 text-[10px] font-bold border', DIFF_COLOR[featuredStudy.difficulty])}>
                           {featuredStudy.difficulty}
                         </span>
+                        {featuredStudy.completed && (
+                          <Badge className="bg-success/10 text-success border-success/20 hover:bg-success/15 gap-1 text-[10px] py-0.5 px-2.5 font-bold">
+                            Completed ({featuredStudy.completion_score?.score}/{featuredStudy.completion_score?.total_questions})
+                          </Badge>
+                        )}
                         <span className="flex items-center gap-1 text-xs text-muted-foreground">
                           <Clock className="size-3" /> {featuredStudy.read_time} read
                         </span>
@@ -280,10 +285,15 @@ export default function CaseStudiesPage() {
                         
                         {/* Card Content body */}
                         <div className="p-5 space-y-3">
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
                             <span className={cn('rounded-full px-2 py-0.5 text-[10px] font-bold border', DIFF_COLOR[cs.difficulty])}>
                               {cs.difficulty}
                             </span>
+                            {cs.completed && (
+                              <Badge className="bg-success/10 text-success border-success/20 hover:bg-success/15 gap-1 text-[9px] py-0.5 px-2 font-bold">
+                                Completed ({cs.completion_score?.score}/{cs.completion_score?.total_questions})
+                              </Badge>
+                            )}
                             <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
                               <Clock className="size-3" /> {cs.read_time}
                             </span>

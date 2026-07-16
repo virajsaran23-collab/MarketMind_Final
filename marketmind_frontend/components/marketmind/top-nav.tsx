@@ -12,6 +12,7 @@ const links = [
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/portfolio', label: 'Portfolio' },
   { href: '/markets', label: 'Markets' },
+  { href: '/ai-analyzer', label: 'AI Analyzer' },
   { href: '/case-studies', label: 'Case Studies' },
   { href: '/analytics', label: 'Analytics' },
   { href: '/leaderboard', label: 'Leaderboard' },

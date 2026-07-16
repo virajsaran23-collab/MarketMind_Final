@@ -1049,11 +1049,26 @@ def challenges(request):
     ensure_default_challenges()
     user_challenges = sync_user_challenges(request.user)
     serialized = UserChallengeSerializer(user_challenges, many=True)
+    
+    from .models import UserCaseStudyCompletion
+    completions = UserCaseStudyCompletion.objects.filter(user=request.user).select_related('case_study')
+    completions_data = [
+        {
+            'id': c.case_study.id,
+            'title': c.case_study.title,
+            'score': c.score,
+            'total_questions': c.total_questions,
+            'completed_at': c.completed_at.isoformat()
+        }
+        for c in completions
+    ]
+    
     return Response({
         'challenges': serialized.data,
         'bonus_tokens': profile.bonus_tokens,
         'accuracy': profile.accuracy,
         'risk_score': profile.risk_score,
+        'completions': completions_data,
     })
 
 
@@ -1068,7 +1083,7 @@ def trade_history(request):
 @permission_classes([AllowAny])
 def case_studies(request):
     qs = CaseStudy.objects.all()
-    return Response(CaseStudySerializer(qs, many=True).data)
+    return Response(CaseStudySerializer(qs, many=True, context={'request': request}).data)
 
 
 @api_view(['GET'])
@@ -1076,9 +1091,57 @@ def case_studies(request):
 def case_study_detail(request, study_id):
     try:
         cs = CaseStudy.objects.get(id=study_id)
-        return Response(CaseStudySerializer(cs).data)
+        return Response(CaseStudySerializer(cs, context={'request': request}).data)
     except CaseStudy.DoesNotExist:
         return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def complete_case_study(request, study_id):
+    from .models import CaseStudy, UserCaseStudyCompletion
+    try:
+        cs = CaseStudy.objects.get(id=study_id)
+    except CaseStudy.DoesNotExist:
+        return Response({'error': 'Case study not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+    score = request.data.get('score', 0)
+    total_questions = request.data.get('total_questions', 0)
+    
+    completion, created = UserCaseStudyCompletion.objects.update_or_create(
+        user=request.user,
+        case_study=cs,
+        defaults={
+            'score': score,
+            'total_questions': total_questions
+        }
+    )
+    
+    profile = UserProfile.objects.get_or_create(user=request.user)[0]
+    if created:
+        profile.simulations_completed += 1
+        profile.learning_score += (score * 100) + 200
+        profile.bonus_tokens += score * 10
+        update_user_badge(profile)
+        profile.save()
+        update_leaderboard_for_user(request.user)
+        
+    user_challenges = sync_user_challenges(request.user)
+    
+    return Response({
+        'message': 'Case study completion recorded',
+        'learning_score': profile.learning_score,
+        'bonus_tokens': profile.bonus_tokens,
+        'profile': UserProfileSerializer(profile).data,
+        'challenges': UserChallengeSerializer(user_challenges, many=True).data,
+        'completion': {
+            'case_study_id': cs.id,
+            'score': score,
+            'total_questions': total_questions,
+            'completed_at': completion.completed_at
+        }
+    })
+
 
 
 @api_view(['GET'])
@@ -1190,3 +1253,12 @@ def mentor(request):
         'news': news,
     }
     return Response(response)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def ai_analyzer(request):
+    from .mentor import analyze_all_assets
+    results = analyze_all_assets()
+    return Response(results)
+

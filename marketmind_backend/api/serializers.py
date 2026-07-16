@@ -66,9 +66,33 @@ class TradeSerializer(serializers.ModelSerializer):
 
 
 class CaseStudySerializer(serializers.ModelSerializer):
+    completed = serializers.SerializerMethodField()
+    completion_score = serializers.SerializerMethodField()
+
     class Meta:
         model = CaseStudy
-        fields = '__all__'
+        fields = [
+            'id', 'title', 'description', 'long_description', 'difficulty',
+            'read_time', 'image', 'tags', 'timeline', 'stats', 'lessons',
+            'chart_data', 'quiz', 'completed', 'completion_score'
+        ]
+
+    def get_completed(self, obj):
+        request = self.context.get('request')
+        if request and request.user and request.user.is_authenticated:
+            from .models import UserCaseStudyCompletion
+            return UserCaseStudyCompletion.objects.filter(user=request.user, case_study=obj).exists()
+        return False
+
+    def get_completion_score(self, obj):
+        request = self.context.get('request')
+        if request and request.user and request.user.is_authenticated:
+            from .models import UserCaseStudyCompletion
+            record = UserCaseStudyCompletion.objects.filter(user=request.user, case_study=obj).first()
+            if record:
+                return {'score': record.score, 'total_questions': record.total_questions}
+        return None
+
 
 
 class GameChallengeSerializer(serializers.ModelSerializer):
