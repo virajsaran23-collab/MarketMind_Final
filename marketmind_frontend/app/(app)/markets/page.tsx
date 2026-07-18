@@ -6,26 +6,39 @@ import { api } from '@/lib/api'
 
 export default function MarketsPage() {
   const [assets, setAssets] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState<string>('All')
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const fetchAssets = useCallback((category?: string, search?: string) => {
-    api.assets(category, search).then(setAssets).catch(() => {})
+  const fetchAssets = useCallback((category?: string, search?: string, showSkeleton = false) => {
+    if (showSkeleton) {
+      setIsLoading(true)
+    }
+    api.assets(category, search)
+      .then(setAssets)
+      .catch(() => {})
+      .finally(() => {
+        setIsLoading(false)
+      })
   }, [])
 
-  // Initial load + polling (no search term)
+  // Initial load
   useEffect(() => {
-    fetchAssets(filter, '')
-    const iv = setInterval(() => fetchAssets(filter, query), 30000)
+    fetchAssets(filter, '', true)
+  }, [filter, fetchAssets])
+
+  // Polling in background
+  useEffect(() => {
+    const iv = setInterval(() => fetchAssets(filter, query, false), 30000)
     return () => clearInterval(iv)
-  }, [fetchAssets, filter]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [fetchAssets, filter, query])
 
   // Debounced search
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(() => {
-      fetchAssets(filter, query)
+      fetchAssets(filter, query, true)
     }, query ? 400 : 0)
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current)
@@ -35,7 +48,8 @@ export default function MarketsPage() {
   return (
     <MarketsExplorer
       assets={assets}
-      onRefresh={() => fetchAssets(filter, query)}
+      isLoading={isLoading}
+      onRefresh={() => fetchAssets(filter, query, true)}
       query={query}
       onQueryChange={setQuery}
       filter={filter}

@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button'
 import { api } from '@/lib/api'
 import { type Asset, formatCurrency, formatPct } from '@/lib/market-data'
 import { cn } from '@/lib/utils'
+import { useAuth } from '@/lib/auth-context'
 
 type BuddyHolding = {
   asset: Asset
@@ -143,6 +144,7 @@ function buildLocalMentor(assets: Asset[], holdings: BuddyHolding[], portfolioVa
 }
 
 export function MarketBuddy({ assets = [], holdings = [], portfolioValue, cash }: MarketBuddyProps) {
+  const { showToast } = useAuth()
   const stockAssets = useMemo(() => assets.filter((asset) => asset.category === 'Stocks'), [assets])
   const localFallback = useMemo(() => buildLocalMentor(assets, holdings, portfolioValue, cash), [assets, holdings, portfolioValue, cash])
   const [briefing, setBriefing] = useState<MentorResponse>(localFallback)
@@ -232,8 +234,25 @@ export function MarketBuddy({ assets = [], holdings = [], portfolioValue, cash }
       const history = [...messages, { role: 'user' as const, content: text }].slice(-6)
       const data = await api.mentor(text, briefing.symbols || featured.map((item) => item.symbol), history)
       setBriefing(data)
-      setMessages((current) => [...current, { role: 'assistant', content: data.reply || data.summary || 'Here is the latest market read.' }])
+      const replyContent = data.reply || data.summary || 'Here is the latest market read.'
+      setMessages((current) => [...current, { role: 'assistant', content: replyContent }])
       setStatus('live')
+
+      // If reply is about the stock not being listed, pop a notification
+      const replyLower = replyContent.toLowerCase()
+      if (
+        replyLower.includes('not currently included in our available market data') ||
+        replyLower.includes('not listed') ||
+        replyLower.includes('cannot provide an analysis for') ||
+        replyLower.includes('not currently listed') ||
+        replyLower.includes('not included in our available market data')
+      ) {
+        showToast(
+          "Stock Not Available",
+          "First search that stock in the Explore Market section to import it!",
+          "info"
+        )
+      }
     } catch {
       const fallbackReply = localFallback.reply || 'I could not reach the live mentor endpoint, so I am using the local market board.'
       setBriefing(localFallback)

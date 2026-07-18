@@ -3,7 +3,7 @@ services:
     name: marketmind-backend
     env: python
     buildCommand: pip install -r requirements.txt && python manage.py collectstatic --no-input && python manage.py migrate && python manage.py seed_data
-    startCommand: gunicorn --pythonpath marketmind_backend marketmind.wsgi:application
+    startCommand: gunicorn marketmind.wsgi:application
     envVars:
       - key: DEBUG
         value: "False"

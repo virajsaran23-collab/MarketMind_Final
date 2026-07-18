@@ -17,24 +17,130 @@ import { cn } from '@/lib/utils'
 export default function DashboardPage() {
   const [portfolioData, setPortfolioData] = useState<any>(null)
   const [stocks, setStocks] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
-  const refreshPortfolio = useCallback(() => {
-    api.portfolio().then(setPortfolioData).catch(() => {})
-  }, [])
-
-  const refreshStocks = useCallback(() => {
-    api.assets('Stocks').then(setStocks).catch(() => {})
+  const refreshData = useCallback((showSkeleton = false) => {
+    if (showSkeleton) {
+      setIsLoading(true)
+    }
+    return Promise.all([
+      api.portfolio().then(setPortfolioData).catch(() => {}),
+      api.assets('Stocks').then(setStocks).catch(() => {})
+    ]).finally(() => {
+      setIsLoading(false)
+    })
   }, [])
 
   useEffect(() => {
-    refreshPortfolio()
-    refreshStocks()
+    refreshData(true)
+  }, [refreshData])
+
+  useEffect(() => {
     const iv = setInterval(() => {
-      refreshPortfolio()
-      refreshStocks()
+      refreshData(false)
     }, 30000)
     return () => clearInterval(iv)
-  }, [refreshPortfolio, refreshStocks])
+  }, [refreshData])
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6 animate-pulse">
+        {/* Header Skeleton */}
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div className="space-y-2">
+            <div className="h-4 w-24 rounded bg-muted/60" />
+            <div className="h-8 w-48 rounded bg-muted/60" />
+          </div>
+          <div className="h-10 w-32 rounded-lg bg-muted/60" />
+        </div>
+
+        {/* 4 Stat Cards Skeletons */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Card key={i} className="p-5 border border-border/60">
+              <div className="flex items-center justify-between">
+                <div className="h-4 w-24 rounded bg-muted/60" />
+                <div className="size-9 rounded-xl bg-muted/60" />
+              </div>
+              <div className="mt-3 h-8 w-32 rounded bg-muted/60" />
+              <div className="mt-2 h-4 w-16 rounded bg-muted/60" />
+            </Card>
+          ))}
+        </div>
+
+        {/* MarketBuddy Placeholder */}
+        <div className="h-28 rounded-2xl bg-muted/60" />
+
+        {/* Chart + Holdings Skeletons */}
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            <Card className="h-[300px] border border-border/60 p-5 flex flex-col justify-between">
+              <div className="space-y-2">
+                <div className="h-4 w-32 rounded bg-muted/60" />
+                <div className="h-8 w-24 rounded bg-muted/60" />
+              </div>
+              <div className="h-[180px] w-full rounded bg-muted/30" />
+            </Card>
+          </div>
+          <Card className="p-5 border border-border/60">
+            <div className="flex items-center justify-between">
+              <div className="h-5 w-28 rounded bg-muted/60" />
+              <div className="h-4 w-12 rounded bg-muted/60" />
+            </div>
+            <div className="mt-6 space-y-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="flex items-center justify-between py-1">
+                  <div className="flex items-center gap-3">
+                    <div className="size-9 rounded-lg bg-muted/60 animate-pulse" />
+                    <div className="space-y-1.5">
+                      <div className="h-4 w-24 rounded bg-muted/60 animate-pulse" />
+                      <div className="h-3 w-16 rounded bg-muted/60 animate-pulse" />
+                    </div>
+                  </div>
+                  <div className="space-y-1.5 text-right">
+                    <div className="h-4 w-16 rounded bg-muted/60 ml-auto animate-pulse" />
+                    <div className="h-3 w-10 rounded bg-muted/60 ml-auto animate-pulse" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+
+        {/* Watchlist Skeleton */}
+        <div>
+          <div className="mb-4 flex items-center justify-between">
+            <div className="h-6 w-32 rounded bg-muted/60 animate-pulse" />
+            <div className="h-4 w-24 rounded bg-muted/60 animate-pulse" />
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Card key={i} className="flex flex-col p-4 border border-border/60">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="size-10 rounded-xl bg-muted/60 animate-pulse" />
+                    <div className="space-y-1.5">
+                      <div className="h-4 w-20 rounded bg-muted/60 animate-pulse" />
+                      <div className="h-3 w-10 rounded bg-muted/60 animate-pulse" />
+                    </div>
+                  </div>
+                  <div className="h-5 w-12 rounded-full bg-muted/60 animate-pulse" />
+                </div>
+                <div className="mt-6 flex items-end justify-between gap-2">
+                  <div className="h-7 w-16 rounded bg-muted/60 animate-pulse" />
+                  <div className="h-9 w-20 rounded bg-muted/60 animate-pulse" />
+                </div>
+                <div className="mt-5 flex gap-2">
+                  <div className="h-9 flex-1 rounded-md bg-muted/60 animate-pulse" />
+                  <div className="h-9 flex-1 rounded-md bg-muted/60 animate-pulse" />
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   const stats = portfolioData || { value: 0, cash: 0, day_change: 0, day_change_pct: 0, return_pct: 0, holdings: [] }
   const watchlist = stocks.slice(0, 4)

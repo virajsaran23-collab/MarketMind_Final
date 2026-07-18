@@ -8,11 +8,14 @@ import { TradeModal } from './trade-modal'
 import { type Asset } from '@/lib/market-data'
 import { cn } from '@/lib/utils'
 
+import { Card } from '@/components/ui/card'
+
 const filters = ['All', 'Stocks', 'Industries', 'Commodities'] as const
 type Filter = (typeof filters)[number]
 
 type MarketsExplorerProps = {
   assets?: Asset[]
+  isLoading?: boolean
   onRefresh?: () => void
   query?: string
   onQueryChange?: (q: string) => void
@@ -20,8 +23,36 @@ type MarketsExplorerProps = {
   onFilterChange?: (f: string) => void
 }
 
+export function MarketCardSkeleton() {
+  return (
+    <Card className="flex flex-col p-4 border border-border/60">
+      <div className="flex items-start justify-between">
+        <div className="flex items-center gap-3">
+          <div className="size-10 rounded-xl bg-muted/60 animate-pulse" />
+          <div className="space-y-1.5">
+            <div className="h-4 w-24 rounded bg-muted/60 animate-pulse" />
+            <div className="h-3 w-12 rounded bg-muted/60 animate-pulse" />
+          </div>
+        </div>
+        <div className="h-5 w-14 rounded-full bg-muted/60 animate-pulse" />
+      </div>
+
+      <div className="mt-6 flex items-end justify-between gap-2">
+        <div className="h-7 w-20 rounded bg-muted/60 animate-pulse" />
+        <div className="h-9 w-24 rounded bg-muted/60 animate-pulse" />
+      </div>
+
+      <div className="mt-5 flex gap-2">
+        <div className="h-9 flex-1 rounded-md bg-muted/60 animate-pulse" />
+        <div className="h-9 flex-1 rounded-md bg-muted/60 animate-pulse" />
+      </div>
+    </Card>
+  )
+}
+
 export function MarketsExplorer({
   assets = [],
+  isLoading = false,
   onRefresh,
   query: externalQuery,
   onQueryChange,
@@ -106,9 +137,15 @@ export function MarketsExplorer({
         </div>
       </div>
 
-      {assets.length === 0 ? (
+      {isLoading ? (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <MarketCardSkeleton key={i} />
+          ))}
+        </div>
+      ) : assets.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border py-16 text-center text-muted-foreground">
-          {query ? `No results for "${query}". Try a different ticker or name.` : 'Loading markets…'}
+          {query ? `No results for "${query}". Try a different ticker or name.` : 'No markets available.'}
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

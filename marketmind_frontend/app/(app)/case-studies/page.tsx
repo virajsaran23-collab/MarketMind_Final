@@ -26,12 +26,17 @@ const DIFF_COLOR: Record<string, string> = {
 
 export default function CaseStudiesPage() {
   const [studies, setStudies] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedDifficulty, setSelectedDifficulty] = useState('All')
   const [selectedTag, setSelectedTag] = useState('All')
 
   useEffect(() => {
-    api.caseStudies().then(setStudies).catch(() => {})
+    setIsLoading(true)
+    api.caseStudies()
+      .then(setStudies)
+      .catch(() => {})
+      .finally(() => setIsLoading(false))
   }, [])
 
   // Categories/Tags for filtering
@@ -183,8 +188,57 @@ export default function CaseStudiesPage() {
         </div>
       </div>
 
-      {/* No Results Placeholder */}
-      {filteredStudies.length === 0 ? (
+      {/* No Results or Loading Placeholder */}
+      {isLoading ? (
+        <div className="space-y-10 animate-pulse">
+          {/* Featured Card Skeleton */}
+          <div className="space-y-4">
+            <div className="h-6 w-40 rounded bg-muted/60" />
+            <Card className="overflow-hidden border border-border bg-card/35 rounded-3xl grid grid-cols-1 lg:grid-cols-12 h-60 lg:h-96">
+              <div className="lg:col-span-7 bg-muted/30 w-full h-full animate-pulse" />
+              <div className="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between">
+                <div className="space-y-4">
+                  <div className="flex gap-2">
+                    <div className="h-4 w-16 rounded bg-muted/60 animate-pulse" />
+                    <div className="h-4 w-20 rounded bg-muted/60 animate-pulse" />
+                  </div>
+                  <div className="h-8 w-64 rounded bg-muted/60 animate-pulse" />
+                  <div className="space-y-2">
+                    <div className="h-4 w-full rounded bg-muted/60 animate-pulse" />
+                    <div className="h-4 w-full rounded bg-muted/60 animate-pulse" />
+                    <div className="h-4 w-3/4 rounded bg-muted/60 animate-pulse" />
+                  </div>
+                </div>
+                <div className="h-10 w-full rounded bg-muted/40 mt-4 animate-pulse" />
+              </div>
+            </Card>
+          </div>
+
+          {/* Grid of Remaining Studies Skeleton */}
+          <div className="space-y-6">
+            <div className="h-6 w-32 rounded bg-muted/60 animate-pulse" />
+            <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Card key={i} className="h-full overflow-hidden border border-border/70 bg-card/30 rounded-2xl flex flex-col justify-between">
+                  <div>
+                    <div className="aspect-[16/9] w-full bg-muted/30 animate-pulse" />
+                    <div className="p-5 space-y-3">
+                      <div className="flex gap-2">
+                        <div className="h-4 w-16 rounded bg-muted/60 animate-pulse" />
+                        <div className="h-4 w-12 rounded bg-muted/60 animate-pulse" />
+                      </div>
+                      <div className="h-5 w-40 rounded bg-muted/60 animate-pulse" />
+                      <div className="h-3 w-full rounded bg-muted/60 animate-pulse" />
+                      <div className="h-3 w-5/6 rounded bg-muted/60 animate-pulse" />
+                    </div>
+                  </div>
+                  <div className="p-5 h-12 bg-muted/10 w-full rounded-b-2xl border-t border-border/40" />
+                </Card>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : filteredStudies.length === 0 ? (
         <Card className="p-12 text-center border-dashed border-border/80 bg-card/10 rounded-3xl max-w-xl mx-auto mt-10">
           <HelpCircle className="size-12 mx-auto text-muted-foreground/60 mb-4 stroke-1 animate-pulse" />
           <h3 className="text-lg font-bold">No Case Studies Found</h3>

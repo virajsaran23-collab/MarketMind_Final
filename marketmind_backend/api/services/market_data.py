@@ -102,19 +102,12 @@ def _fetch_finnhub(symbol):
     return None
 
 
-def get_quote(symbol):
-    cache_key = f"quote_v2_{symbol}"
-    cached = cache.get(cache_key)
-    if cached:
-        return cached
+_fetching_symbols = set()
+_fetching_lock = threading.Lock()
 
-    with _lock:
-        cached = cache.get(cache_key)
-        if cached:
-            return cached
-
+def _bg_fetch_quote(symbol):
+    try:
         mapped = SYMBOL_MAP.get(symbol, symbol)
-
         result = None
 
         if mapped:
@@ -127,12 +120,81 @@ def get_quote(symbol):
             if result is None:
                 result = _fetch_yahoo(symbol)
 
-        if result is None:
-            fb_price, fb_chg = FALLBACK_PRICES.get(symbol, (100.0, 0.0))
-            result = {"price": fb_price, "change": fb_chg}
+        if result is not None:
+            cache.set(f"quote_v2_{symbol}", result, 60)
+            cache.set(f"quote_v2_stale_{symbol}", result, 86400)
+    except Exception:
+        pass
+    finally:
+        with _fetching_lock:
+            _fetching_symbols.discard(symbol)
 
-        cache.set(cache_key, result, 60)
-        return result
+
+def get_quote(symbol):
+    cache_key = f"quote_v2_{symbol}"
+    cached = cache.get(cache_key)
+    if cached:
+        return cached
+
+    with _fetching_lock:
+        if symbol not in _fetching_symbols:
+            _fetching_symbols.add(symbol)
+            t = threading.Thread(target=_bg_fetch_quote, args=(symbol,), daemon=True)
+            t.start()
+
+    stale_cached = cache.get(f"quote_v2_stale_{symbol}")
+    if stale_cached:
+        return stale_cached
+
+    fb_price, fb_chg = FALLBACK_PRICES.get(symbol, (100.0, 0.0))
+    return {"price": fb_price, "change": fb_chg}
+
+
+_fetching_candles = set()
+_candles_lock = threading.Lock()
+
+def _bg_fetch_candles(symbol, days):
+    try:
+        mapped = SYMBOL_MAP.get(symbol, symbol)
+        ticker = mapped if mapped else symbol
+
+        candles = []
+        try:
+            range_map = {7: "5d", 30: "1mo", 90: "3mo", 365: "1y"}
+            yrange = range_map.get(days, "1mo")
+            url = f"https://query1.finance.yahoo.com/v8/finance/chart/{ticker}"
+            headers = {"User-Agent": "Mozilla/5.0"}
+            r = requests.get(url, headers=headers, timeout=10, params={"interval": "1d", "range": yrange})
+            if r.status_code == 200:
+                data = r.json()
+                result = data.get("chart", {}).get("result", [])
+                if result:
+                    ts_list = result[0].get("timestamp", [])
+                    closes = result[0].get("indicators", {}).get("quote", [{}])[0].get("close", [])
+                    for ts, cl in zip(ts_list, closes):
+                        if cl is not None:
+                            candles.append({"t": ts, "c": round(float(cl), 4)})
+        except Exception:
+            pass
+
+        if not candles:
+            quote = get_quote(symbol)
+            base = quote["price"]
+            import math
+            now = int(time.time())
+            day_secs = 86400
+            for i in range(days, -1, -1):
+                noise = (math.sin(i * 1.7) + math.cos(i * 0.9)) * (base * 0.005)
+                drift = (base * 0.0003) * (days - i)
+                candles.append({"t": now - i * day_secs, "c": round(max(1, base - drift + noise), 4)})
+
+        cache.set(f"candles_v2_{symbol}_{days}", candles, 300)
+        cache.set(f"candles_v2_stale_{symbol}_{days}", candles, 86400)
+    except Exception:
+        pass
+    finally:
+        with _candles_lock:
+            _fetching_candles.discard((symbol, days))
 
 
 def get_candles(symbol, days=30):
@@ -141,38 +203,25 @@ def get_candles(symbol, days=30):
     if cached:
         return cached
 
-    mapped = SYMBOL_MAP.get(symbol, symbol)
-    ticker = mapped if mapped else symbol
+    with _candles_lock:
+        if (symbol, days) not in _fetching_candles:
+            _fetching_candles.add((symbol, days))
+            t = threading.Thread(target=_bg_fetch_candles, args=(symbol, days), daemon=True)
+            t.start()
 
+    stale_cached = cache.get(f"candles_v2_stale_{symbol}_{days}")
+    if stale_cached:
+        return stale_cached
+
+    quote = get_quote(symbol)
+    base = quote["price"]
+    import math
+    now = int(time.time())
+    day_secs = 86400
     candles = []
-    try:
-        range_map = {7: "5d", 30: "1mo", 90: "3mo", 365: "1y"}
-        yrange = range_map.get(days, "1mo")
-        url = f"https://query1.finance.yahoo.com/v8/finance/chart/{ticker}"
-        headers = {"User-Agent": "Mozilla/5.0"}
-        r = requests.get(url, headers=headers, timeout=10, params={"interval": "1d", "range": yrange})
-        if r.status_code == 200:
-            data = r.json()
-            result = data.get("chart", {}).get("result", [])
-            if result:
-                ts_list = result[0].get("timestamp", [])
-                closes = result[0].get("indicators", {}).get("quote", [{}])[0].get("close", [])
-                for ts, cl in zip(ts_list, closes):
-                    if cl is not None:
-                        candles.append({"t": ts, "c": round(float(cl), 4)})
-    except Exception:
-        pass
-
-    if not candles:
-        quote = get_quote(symbol)
-        base = quote["price"]
-        import math
-        now = int(time.time())
-        day_secs = 86400
-        for i in range(days, -1, -1):
-            noise = (math.sin(i * 1.7) + math.cos(i * 0.9)) * (base * 0.005)
-            drift = (base * 0.0003) * (days - i)
-            candles.append({"t": now - i * day_secs, "c": round(max(1, base - drift + noise), 4)})
-
-    cache.set(cache_key, candles, 300)
+    for i in range(days, -1, -1):
+        noise = (math.sin(i * 1.7) + math.cos(i * 0.9)) * (base * 0.005)
+        drift = (base * 0.0003) * (days - i)
+        candles.append({"t": now - i * day_secs, "c": round(max(1, base - drift + noise), 4)})
     return candles
+

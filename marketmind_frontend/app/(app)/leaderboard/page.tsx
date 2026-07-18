@@ -61,7 +61,48 @@ export default function LeaderboardPage() {
       <Card className="overflow-hidden p-0">
         <div className="overflow-x-auto">
           {loading && rows.length === 0 ? (
-            <div className="p-8 text-center text-sm text-muted-foreground">Loading leaderboard…</div>
+            <table className="w-full min-w-[560px] text-sm animate-pulse">
+              <thead>
+                <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
+                  <th className="px-5 py-3 font-medium">Rank</th>
+                  <th className="px-5 py-3 font-medium">Trader</th>
+                  <th className="px-5 py-3 text-right font-medium">Portfolio</th>
+                  <th className="px-5 py-3 text-right font-medium">Tokens</th>
+                  <th className="px-5 py-3 text-right font-medium">Score</th>
+                  <th className="px-5 py-3 text-right font-medium">Accuracy</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={i} className="border-b border-border last:border-0">
+                    <td className="px-5 py-4"><div className="h-4 w-6 rounded bg-muted/60 animate-pulse" /></td>
+                    <td className="px-5 py-4">
+                      <div className="flex items-center gap-3 animate-pulse">
+                        <div className="size-9 rounded-lg bg-muted/60" />
+                        <div className="space-y-1.5">
+                          <div className="h-4 w-20 rounded bg-muted/60" />
+                          <div className="h-3 w-12 rounded bg-muted/60" />
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-5 py-4 text-right">
+                      <div className="space-y-1.5 ml-auto w-fit animate-pulse">
+                        <div className="h-4 w-16 rounded bg-muted/60 ml-auto" />
+                        <div className="h-3 w-12 rounded bg-muted/60 ml-auto" />
+                      </div>
+                    </td>
+                    <td className="px-5 py-4 text-right"><div className="h-4 w-8 rounded bg-muted/60 ml-auto animate-pulse" /></td>
+                    <td className="px-5 py-4 text-right">
+                      <div className="space-y-1.5 ml-auto w-fit animate-pulse">
+                        <div className="h-4 w-12 rounded bg-muted/60 ml-auto" />
+                        <div className="h-3.5 w-16 rounded-full bg-muted/60 ml-auto" />
+                      </div>
+                    </td>
+                    <td className="px-5 py-4 text-right"><div className="h-4 w-10 rounded bg-muted/60 ml-auto animate-pulse" /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           ) : rows.length === 0 ? (
             <div className="p-8 text-center text-sm text-muted-foreground">
               No leaderboard entries yet. Make a trade to appear here.
