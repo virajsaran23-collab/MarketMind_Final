@@ -227,13 +227,46 @@ def extract_symbols(message, default_symbols=None):
     assets = list(Asset.objects.live_stocks().order_by('symbol'))
     symbols = []
 
-    ranked = sorted(assets, key=lambda asset: _asset_match_score(message, asset), reverse=True)
-    if ranked and _asset_match_score(message, ranked[0]) >= 0.55:
-        symbols.append(ranked[0].symbol.upper())
-
     for asset in assets:
         if _matches_asset_name(message, asset):
             symbols.append(asset.symbol.upper())
+
+    normalized = message.lower()
+    tokens = re.findall(r'[a-z0-9]+', normalized)
+    ignored_words = {
+        'a', 'an', 'and', 'are', 'as', 'at', 'be', 'buy', 'can', 'did', 'do', 'does', 'for', 'from',
+        'how', 'i', 'in', 'is', 'it', 'me', 'my', 'of', 'on', 'or', 'should', 'sell', 'the', 'to',
+        'today', 'trading', 'was', 'what', 'when', 'where', 'which', 'with', 'would', 'you', 'your',
+        'stock', 'stocks', 'share', 'shares', 'position', 'positions', 'invest', 'investment', 'portfolio',
+        'about', 'could', 'think', 'looks', 'strong', 'weak', 'today', 'price', 'setup', 'hold',
+        'compare', 'conpare', 'versus', 'diff', 'difference', 'predict', 'prediction', 'future', 'forecast',
+        'target', 'targets', 'outlook', 'want', 'wants', 'need', 'needs', 'like', 'likes', 'tell', 'tells',
+        'give', 'gives', 'show', 'shows', 'check', 'checks', 'analyze', 'analysis', 'recommend', 'recommendation',
+        'suggest', 'suggestion', 'opinion', 'view', 'views', 'info', 'information', 'detail', 'details'
+    }
+    search_tokens = [tok for tok in tokens if len(tok) >= 3 and tok not in ignored_words]
+
+    known_lower = {s.lower() for s in symbols}
+    unmatched_tokens = []
+    for tok in search_tokens:
+        if tok not in known_lower:
+            if not any(tok == a.symbol.lower() or tok in a.name.lower() for a in assets):
+                unmatched_tokens.append(tok)
+
+    if unmatched_tokens:
+        from .views import fetch_and_create_asset
+        for tok in unmatched_tokens[:3]:
+            try:
+                new_asset = fetch_and_create_asset(tok)
+                if new_asset:
+                    symbols.append(new_asset.symbol.upper())
+            except Exception:
+                pass
+
+    if not symbols:
+        ranked = sorted(assets, key=lambda asset: _asset_match_score(message, asset), reverse=True)
+        if ranked and _asset_match_score(message, ranked[0]) >= 0.55:
+            symbols.append(ranked[0].symbol.upper())
 
     if not symbols:
         symbols = [symbol.upper() for symbol in default_symbols if symbol]
@@ -322,7 +355,13 @@ def build_llm_prompt(message, quotes, holdings, cash, history=None):
 
 def call_llm(message, quotes, holdings, cash, history=None):
     prompt = build_llm_prompt(message, quotes, holdings, cash, history=history)
-    system_instruction = 'You are a helpful stock-trading mentor who answers briefly and clearly. Always refer to stocks by their full company name with ticker in parentheses (e.g. Apple Inc. (AAPL)). Only use the prices given in the context — never invent prices.'
+    system_instruction = (
+        'You are MarketMind, an expert stock trading mentor and analyst. Always refer to stocks by their full company name '
+        'with ticker in parentheses (e.g. Apple Inc. (AAPL)). Only use the prices given in the context — never invent prices. '
+        'If asked to compare stocks, perform a clear side-by-side technical and fundamental comparison with a concluding pick. '
+        'If asked for future predictions or price targets, provide multi-scenario technical price projections (Bullish, Base, Bearish) '
+        'with catalysts and risk guidance. Frame suggestions as educational guidance only.'
+    )
 
     # Try Gemini first if key is present
     if GEMINI_API_KEY:
@@ -578,21 +617,36 @@ def summarize_market(quotes, holdings, cash):
     return ' '.join(lines)
 
 
-def find_fuzzy_match(message, quotes=None):
+def find_fuzzy_matches_all(message, quotes=None):
     normalized = (message or '').strip().lower()
     tokens = re.findall(r'[a-z0-9]+', normalized)
     
-    search_tokens = [tok for tok in tokens if len(tok) >= 3 and tok not in {
-        'what', 'about', 'should', 'would', 'could', 'think', 'looks', 'strong', 'weak', 'today', 'price', 'setup',
-        'buy', 'sell', 'hold'
-    }]
-    if not search_tokens:
-        return None, False
-        
-    best_item = None
-    best_ratio = 0.0
-    is_model = False
+    ignored_words = {
+        'a', 'an', 'and', 'are', 'as', 'at', 'be', 'buy', 'can', 'did', 'do', 'does', 'for', 'from',
+        'how', 'i', 'in', 'is', 'it', 'me', 'my', 'of', 'on', 'or', 'should', 'sell', 'the', 'to',
+        'today', 'trading', 'was', 'what', 'when', 'where', 'which', 'with', 'would', 'you', 'your',
+        'stock', 'stocks', 'share', 'shares', 'position', 'positions', 'invest', 'investment', 'portfolio',
+        'about', 'could', 'think', 'looks', 'strong', 'weak', 'today', 'price', 'setup', 'hold',
+        'compare', 'conpare', 'versus', 'diff', 'difference', 'predict', 'prediction', 'future', 'forecast',
+        'target', 'targets', 'outlook', 'want', 'wants', 'need', 'needs', 'like', 'likes', 'tell', 'tells',
+        'give', 'gives', 'show', 'shows', 'check', 'checks', 'analyze', 'analysis', 'recommend', 'recommendation',
+        'suggest', 'suggestion', 'opinion', 'view', 'views', 'info', 'information', 'detail', 'details'
+    }
     
+    search_tokens = [tok for tok in tokens if len(tok) >= 3 and tok not in ignored_words]
+
+    matched = []
+    seen_symbols = set()
+
+    def get_sym(item, is_db):
+        return item.symbol.upper() if is_db else (item.get('symbol') or '').upper()
+
+    def add_match(item, is_db):
+        sym = get_sym(item, is_db)
+        if sym and sym not in seen_symbols:
+            seen_symbols.add(sym)
+            matched.append((item, is_db))
+
     # 1. Search database assets
     from .models import Asset
     assets = list(Asset.objects.live_assets())
@@ -600,69 +654,266 @@ def find_fuzzy_match(message, quotes=None):
         symbol = asset.symbol.lower()
         name_tokens = _search_tokens(asset.name)
         
+        if re.search(r'(?<!\w)' + re.escape(symbol) + r'(?!\w)', normalized):
+            add_match(asset, True)
+            continue
+
         for tok in search_tokens:
             if tok == symbol:
-                return asset, True
+                add_match(asset, True)
+                break
             r = SequenceMatcher(None, tok, symbol).ratio()
-            if r >= 0.80 and r > best_ratio:
-                best_ratio = r
-                best_item = asset
-                is_model = True
-                
-        for tok in search_tokens:
-            for n_tok in name_tokens:
-                if tok == n_tok:
-                    return asset, True
-                r = SequenceMatcher(None, tok, n_tok).ratio()
-                if r >= 0.80 and r > best_ratio:
-                    best_ratio = r
-                    best_item = asset
-                    is_model = True
-                    
-    # 2. Search passed quotes (dict objects)
-    if quotes:
-        for q in quotes:
-            symbol = q.get('symbol', '').lower()
-            name = q.get('name', '').lower()
-            name_tokens = _search_tokens(name)
-            
-            for tok in search_tokens:
-                if tok == symbol:
-                    return q, False
-                r = SequenceMatcher(None, tok, symbol).ratio()
-                if r >= 0.80 and r > best_ratio:
-                    best_ratio = r
-                    best_item = q
-                    is_model = False
-                    
+            if r >= 0.82:
+                add_match(asset, True)
+                break
+        else:
             for tok in search_tokens:
                 for n_tok in name_tokens:
                     if tok == n_tok:
-                        return q, False
+                        add_match(asset, True)
+                        break
                     r = SequenceMatcher(None, tok, n_tok).ratio()
-                    if r >= 0.80 and r > best_ratio:
-                        best_ratio = r
-                        best_item = q
-                        is_model = False
-                        
-    if best_ratio >= 0.80:
-        return best_item, is_model
+                    if r >= 0.82:
+                        add_match(asset, True)
+                        break
+                if asset.symbol.upper() in seen_symbols:
+                    break
+
+    # 2. Search passed quotes (dict objects)
+    if quotes:
+        for q in quotes:
+            symbol = (q.get('symbol') or '').lower()
+            name = (q.get('name') or '').lower()
+            name_tokens = _search_tokens(name)
+            sym_upper = symbol.upper()
+            if sym_upper in seen_symbols:
+                continue
+
+            if re.search(r'(?<!\w)' + re.escape(symbol) + r'(?!\w)', normalized):
+                add_match(q, False)
+                continue
+
+            for tok in search_tokens:
+                if tok == symbol:
+                    add_match(q, False)
+                    break
+                r = SequenceMatcher(None, tok, symbol).ratio()
+                if r >= 0.82:
+                    add_match(q, False)
+                    break
+            else:
+                for tok in search_tokens:
+                    for n_tok in name_tokens:
+                        if tok == n_tok:
+                            add_match(q, False)
+                            break
+                        r = SequenceMatcher(None, tok, n_tok).ratio()
+                        if r >= 0.82:
+                            add_match(q, False)
+                            break
+                    if sym_upper in seen_symbols:
+                        break
+
+    return matched
+
+
+def find_fuzzy_match(message, quotes=None):
+    matches = find_fuzzy_matches_all(message, quotes=quotes)
+    if matches:
+        return matches[0]
     return None, False
+
+
+def generate_comparison_reply(matches, message, quotes):
+    items_to_compare = list(matches)
+    
+    if len(items_to_compare) < 2 and quotes:
+        seen = {item.symbol.upper() if is_db else item.get('symbol', '').upper() for item, is_db in items_to_compare}
+        for q in quotes:
+            sym = (q.get('symbol') or '').upper()
+            if sym and sym not in seen:
+                items_to_compare.append((q, False))
+                seen.add(sym)
+                if len(items_to_compare) >= 2:
+                    break
+
+    if not items_to_compare:
+        return None
+
+    items_analysis = []
+    for item, is_model in items_to_compare[:3]:
+        if is_model:
+            data = analyze_asset(item)
+        else:
+            sym_str = item.get('symbol')
+            name_str = item.get('name') or sym_str
+            price = float(item.get('price') or 0)
+            change = float(item.get('change') or 0)
+            
+            if change > 0.5:
+                decision = "BUY"
+                trend = "Bullish"
+                momentum = "Strong Positive"
+                volatility = "Low"
+                analysis = f"Displays technical strength, trading higher at ${price:.2f} ({change:+.2f}%). Momentum suggests buyers are active."
+            elif change < -0.5:
+                decision = "SELL"
+                trend = "Bearish"
+                momentum = "Negative"
+                volatility = "Medium"
+                analysis = f"Shows technical weakness, trading down at ${price:.2f} ({change:+.2f}%). Distribution pressure is elevated."
+            else:
+                decision = "HOLD"
+                trend = "Neutral"
+                momentum = "Flat"
+                volatility = "Low"
+                analysis = f"Consolidating around ${price:.2f} ({change:+.2f}%). Structure is currently range-bound."
+
+            data = {
+                "symbol": sym_str,
+                "name": name_str,
+                "price": price,
+                "change": change,
+                "decision": decision,
+                "confidence": 75 if decision == "BUY" else (65 if decision == "SELL" else 55),
+                "trend": trend,
+                "momentum": momentum,
+                "volatility": volatility,
+                "analysis": analysis
+            }
+        items_analysis.append(data)
+
+    lines = ["According to the MarketMind AI Buddy, here is the comparative analysis:\n"]
+    for d in items_analysis:
+        name_label = f"**{d['name']} ({d['symbol']})**" if d['name'] and d['name'] != d['symbol'] else f"**{d['symbol']}**"
+        lines.append(
+            f"📊 {name_label}\n"
+            f"- **Price**: ${d['price']:.2f} ({d['change']:+.2f}%)\n"
+            f"- **Rating**: **{d['decision']}** (Confidence: {d['confidence']}%)\n"
+            f"- **Technical Setup**: Trend is **{d['trend']}**, Momentum is **{d['momentum']}**, Volatility is **{d['volatility']}**.\n"
+            f"- {d['analysis']}\n"
+        )
+
+    buys = [d for d in items_analysis if d['decision'] == 'BUY']
+    if buys:
+        top = max(buys, key=lambda x: x['confidence'])
+        verdict = f"Comparing the options, **{top['name']} ({top['symbol']})** shows the strongest technical momentum and clearest bullish setup."
+    else:
+        top = max(items_analysis, key=lambda x: x['change'])
+        verdict = f"Comparing the options, **{top['name']} ({top['symbol']})** currently leads in relative performance with today's gain of {top['change']:+.2f}%."
+
+    lines.append(f"💡 **Comparative Verdict**: {verdict}\n")
+    lines.append("*Please remember that this is for educational purposes and not financial advice.*")
+
+    return "\n".join(lines)
+
+
+def generate_prediction_reply(matches, message, quotes):
+    targets = list(matches)
+    if not targets and quotes:
+        targets = [(quotes[0], False)]
+
+    if not targets:
+        return None
+
+    lines = ["According to the MarketMind AI Buddy, here are the technical price predictions & forecasts:\n"]
+
+    for item, is_model in targets[:2]:
+        if is_model:
+            d = analyze_asset(item)
+        else:
+            sym_str = item.get('symbol')
+            name_str = item.get('name') or sym_str
+            price = float(item.get('price') or 0)
+            change = float(item.get('change') or 0)
+            decision = "BUY" if change > 0.5 else ("SELL" if change < -0.5 else "HOLD")
+            d = {
+                "symbol": sym_str,
+                "name": name_str,
+                "price": price,
+                "change": change,
+                "decision": decision,
+                "confidence": 70,
+                "trend": "Bullish" if change > 0 else "Neutral",
+                "momentum": "Strong Positive" if change > 1.0 else ("Positive" if change > 0 else "Flat"),
+                "volatility": "Low",
+                "analysis": f"Currently priced at ${price:.2f} ({change:+.2f}%)."
+            }
+
+        price = d['price']
+        change = d['change']
+        trend = d['trend']
+        name_label = f"**{d['name']} ({d['symbol']})**" if d['name'] and d['name'] != d['symbol'] else f"**{d['symbol']}**"
+
+        if trend == "Bullish":
+            bullish_pct = 12.5 + min(10.0, abs(change) * 2)
+            base_pct = 5.0 + min(5.0, abs(change))
+            bearish_pct = -6.0
+        elif trend == "Bearish":
+            bullish_pct = 4.0
+            base_pct = -3.0
+            bearish_pct = -14.0
+        else:
+            bullish_pct = 8.0
+            base_pct = 2.5
+            bearish_pct = -7.5
+
+        bullish_target = price * (1.0 + bullish_pct / 100.0)
+        base_target = price * (1.0 + base_pct / 100.0)
+        bearish_target = price * (1.0 + bearish_pct / 100.0)
+
+        lines.append(f"📈 {name_label} Price Projection")
+        lines.append(f"- **Current Level**: ${price:.2f} ({change:+.2f}%) | **Rating**: **{d['decision']}** (Confidence: {d['confidence']}%)\n")
+        lines.append("🎯 **Projected Price Scenarios (3 to 12 Month Horizon)**:")
+        lines.append(f"- 🟢 **Bullish Target**: **${bullish_target:.2f}** ({bullish_pct:+.1f}%) — Driven by breakout above resistance and sustained buying volume.")
+        lines.append(f"- 🔵 **Base Case Target**: **${base_target:.2f}** ({base_pct:+.1f}%) — Expected steady continuation under current moving average momentum.")
+        lines.append(f"- 🔴 **Bearish Support Level**: **${bearish_target:.2f}** ({bearish_pct:+.1f}%) — Key downside support zone if market sentiment weakens.\n")
+        lines.append(f"⚡ **Forecast Outlook**: Technical structure indicates a **{d['trend']}** trend with **{d['momentum']}** momentum under **{d['volatility']}** volatility. Price structure supports testing breakout zones near ${bullish_target:.2f}.\n")
+
+    lines.append("*Please remember that future predictions are technical scenario projections for educational purposes and not financial advice.*")
+    return "\n".join(lines)
 
 
 def generate_reply(message, quotes, holdings, cash, history=None):
     normalized = (message or '').strip().lower()
     
-    # Fuzzy match asset from either DB or quotes parameter
-    matched_asset, is_model = find_fuzzy_match(normalized, quotes=quotes)
+    # Fuzzy match assets from either DB or quotes parameter
+    matched_assets = find_fuzzy_matches_all(normalized, quotes=quotes)
 
-    if matched_asset:
+    comp_keywords = ['compare', 'conpare', ' vs ', ' vs.', ' versus ', 'difference', 'better', 'prefer', 'comparison', 'against']
+    is_comparison = any(kw in normalized for kw in comp_keywords) or (len(matched_assets) >= 2 and not any(kw in normalized for kw in ['buy', 'sell', 'portfolio', 'news']))
+
+    pred_keywords = ['predict', 'prediction', 'future', 'forecast', 'target', 'price target', 'outlook', 'where will', '2025', '2026', '2027', '2030', 'long term', 'next year', 'coming months', 'projection', 'project', 'expected']
+    is_prediction = any(kw in normalized for kw in pred_keywords)
+
+    # 1. Comparison tasks
+    if is_comparison and (matched_assets or quotes):
+        if USE_LLM_MENTOR:
+            llm_reply = call_llm(message, quotes, holdings, cash, history=history)
+            if llm_reply:
+                return llm_reply
+        comp_reply = generate_comparison_reply(matched_assets, message, quotes)
+        if comp_reply:
+            return comp_reply
+
+    # 2. Future prediction tasks
+    if is_prediction and (matched_assets or quotes):
+        if USE_LLM_MENTOR:
+            llm_reply = call_llm(message, quotes, holdings, cash, history=history)
+            if llm_reply:
+                return llm_reply
+        pred_reply = generate_prediction_reply(matched_assets, message, quotes)
+        if pred_reply:
+            return pred_reply
+
+    # 3. Single Asset Query - Exact Original Functionality
+    if matched_assets and not is_comparison and not is_prediction:
+        matched_asset, is_model = matched_assets[0]
         if is_model:
             analysis_data = analyze_asset(matched_asset)
             name_str = matched_asset.name
             sym_str = matched_asset.symbol
         else:
-            # Construct a mock analysis for quote dicts to satisfy tests/mock calls
             sym_str = matched_asset.get('symbol')
             name_str = matched_asset.get('name') or sym_str
             price = float(matched_asset.get('price') or 0)
@@ -693,6 +944,7 @@ def generate_reply(message, quotes, holdings, cash, history=None):
             f"*Please remember that this is for educational purposes and not financial advice.*"
         )
 
+    # 4. LLM for General Conversational Queries
     if USE_LLM_MENTOR:
         llm_reply = call_llm(message, quotes, holdings, cash, history=history)
         if llm_reply:

@@ -156,6 +156,41 @@ class MentorReplyTests(TestCase):
 
         self.assertEqual(symbols[0], 'GOOGL')
 
+    def test_generate_reply_comparison_task(self):
+        Asset.objects.create(id='F', symbol='F', name='Ford Motor Company', exchange='NYSE', category='Stocks', sector='Automotive', last_price=12.0)
+        Asset.objects.create(id='TM', symbol='TM', name='Toyota Motor Corporation', exchange='NYSE', category='Stocks', sector='Automotive', last_price=180.0)
+
+        with patch('api.mentor.USE_LLM_MENTOR', False):
+            reply = generate_reply(
+                'conpare toyota and ford',
+                [
+                    {'symbol': 'F', 'price': 12.5, 'change': 1.8, 'name': 'Ford Motor Company'},
+                    {'symbol': 'TM', 'price': 180.0, 'change': -0.5, 'name': 'Toyota Motor Corporation'},
+                ],
+                [],
+                50000.0,
+            )
+
+        self.assertIn('Ford Motor Company (F)', reply)
+        self.assertIn('Toyota Motor Corporation (TM)', reply)
+        self.assertIn('Comparative Verdict', reply)
+
+    def test_generate_reply_future_prediction_task(self):
+        Asset.objects.create(id='F', symbol='F', name='Ford Motor Company', exchange='NYSE', category='Stocks', sector='Automotive', last_price=12.0)
+
+        with patch('api.mentor.USE_LLM_MENTOR', False):
+            reply = generate_reply(
+                'future prediction for ford',
+                [{'symbol': 'F', 'price': 12.5, 'change': 1.8, 'name': 'Ford Motor Company'}],
+                [],
+                50000.0,
+            )
+
+        self.assertIn('Ford Motor Company (F)', reply)
+        self.assertIn('Projected Price Scenarios', reply)
+        self.assertIn('Bullish Target', reply)
+        self.assertIn('Bearish Support Level', reply)
+
 
 class DynamicAssetTests(TestCase):
     def test_fetch_and_create_asset_creates_asset_from_search_result(self):
@@ -213,12 +248,13 @@ class LocalAIAnalyzerTests(TestCase):
         self.assertIn('analysis', res)
 
     def test_generate_reply_fuzzy_matches_typo(self):
-        reply = generate_reply(
-            'what about plantir?',
-            [{'symbol': 'PLTR', 'price': 133.76, 'change': 1.16, 'name': 'Palantir Technologies Inc.'}],
-            [],
-            100000.0,
-        )
+        with patch('api.mentor.USE_LLM_MENTOR', False):
+            reply = generate_reply(
+                'what about plantir?',
+                [{'symbol': 'PLTR', 'price': 133.76, 'change': 1.16, 'name': 'Palantir Technologies Inc.'}],
+                [],
+                100000.0,
+            )
         self.assertIn('Palantir Technologies Inc. (PLTR)', reply)
         self.assertIn('AI Buddy', reply)
 
