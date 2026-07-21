@@ -11,10 +11,12 @@ import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button'
 import { formatCurrency, formatPct } from '@/lib/market-data'
+import { useLanguage } from '@/lib/language-context'
 import { api } from '@/lib/api'
 import { cn } from '@/lib/utils'
 
 export default function DashboardPage() {
+  const { t } = useLanguage()
   const [portfolioData, setPortfolioData] = useState<any>(null)
   const [stocks, setStocks] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -149,20 +151,20 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-sm text-muted-foreground">Welcome back</p>
-          <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
+          <p className="text-sm text-muted-foreground">{t('Welcome back', 'वापसी पर आपका स्वागत है')}</p>
+          <h1 className="text-2xl font-semibold tracking-tight">{t('Dashboard', 'डैशबोर्ड')}</h1>
         </div>
         <Link href="/markets" className={cn(buttonVariants(), 'h-10 px-4')}>
-          Trade Markets
-          <ArrowRight className="size-4" />
+          {t('Trade Markets', 'बाज़ार में व्यापार करें')}
+          <ArrowRight className="size-4 ml-1" />
         </Link>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Portfolio Value" value={formatCurrency(stats.value)} change={stats.day_change_pct} icon={Wallet} />
-        <StatCard label="Cash Available" value={formatCurrency(stats.cash)} hint="Ready to invest" icon={Banknote} />
-        <StatCard label="Today's Gain / Loss" value={formatCurrency(stats.day_change)} change={stats.day_change_pct} icon={TrendingUp} accent="success" />
-        <StatCard label="Portfolio Return" value={formatPct(stats.return_pct)} hint="All time" icon={Percent} accent="success" />
+        <StatCard label={t('Portfolio Value', 'पोर्टफोलियो मूल्य')} value={formatCurrency(stats.value)} change={stats.day_change_pct} icon={Wallet} />
+        <StatCard label={t('Cash Available', 'उपलब्ध नकदी')} value={formatCurrency(stats.cash)} hint={t('Ready to invest', 'निवेश के लिए तैयार')} icon={Banknote} />
+        <StatCard label={t("Today's Gain / Loss", 'आज का लाभ / हानि')} value={formatCurrency(stats.day_change)} change={stats.day_change_pct} icon={TrendingUp} accent="success" />
+        <StatCard label={t('Portfolio Return', 'पोर्टफोलियो रिटर्न')} value={formatPct(stats.return_pct)} hint={t('All time', 'कुल समय')} icon={Percent} accent="success" />
       </div>
 
       <MarketBuddy assets={stocks} holdings={stats.holdings} portfolioValue={stats.value} cash={stats.cash} />
@@ -173,8 +175,8 @@ export default function DashboardPage() {
         </div>
         <Card className="p-5">
           <div className="flex items-center justify-between">
-            <h2 className="font-semibold">Your Holdings</h2>
-            <Link href="/portfolio" className="text-sm font-medium text-primary hover:underline">View all</Link>
+            <h2 className="font-semibold">{t('Your Holdings', 'आपकी होल्डिंग्स')}</h2>
+            <Link href="/portfolio" className="text-sm font-medium text-primary hover:underline">{t('View all', 'सभी देखें')}</Link>
           </div>
           <div className="mt-4 space-y-1">
             {(stats.holdings || []).map((h: any) => (
@@ -185,7 +187,7 @@ export default function DashboardPage() {
                   </span>
                   <div>
                     <div className="text-sm font-medium">{h.asset.name}</div>
-                    <div className="text-xs text-muted-foreground">{h.shares} shares</div>
+                    <div className="text-xs text-muted-foreground">{h.shares} {t('shares', 'शेयर')}</div>
                   </div>
                 </div>
                 <div className="text-right">
@@ -197,7 +199,7 @@ export default function DashboardPage() {
               </div>
             ))}
             {(stats.holdings || []).length === 0 && (
-              <p className="py-4 text-center text-sm text-muted-foreground">No holdings yet. Start trading!</p>
+              <p className="py-4 text-center text-sm text-muted-foreground">{t('No holdings yet. Start trading!', 'अभी कोई होल्डिंग्स नहीं हैं। व्यापार शुरू करें!')}</p>
             )}
           </div>
         </Card>
@@ -206,10 +208,10 @@ export default function DashboardPage() {
       <div>
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <h2 className="text-lg font-semibold">Watchlist</h2>
-            <Badge variant="muted">Live</Badge>
+            <h2 className="text-lg font-semibold">{t('Watchlist', 'वॉचलिस्ट')}</h2>
+            <Badge variant="muted">{t('Live', 'लाइव')}</Badge>
           </div>
-          <Link href="/markets" className="text-sm font-medium text-primary hover:underline">Explore markets</Link>
+          <Link href="/markets" className="text-sm font-medium text-primary hover:underline">{t('Explore markets', 'बाज़ार देखें')}</Link>
         </div>
         <MarketGrid assets={watchlist} />
       </div>

@@ -6,6 +6,7 @@ import { MarketCard } from './market-card'
 import { MarketBuddy } from './market-buddy'
 import { TradeModal } from './trade-modal'
 import { type Asset } from '@/lib/market-data'
+import { useLanguage } from '@/lib/language-context'
 import { cn } from '@/lib/utils'
 
 import { Card } from '@/components/ui/card'
@@ -59,7 +60,7 @@ export function MarketsExplorer({
   filter: externalFilter,
   onFilterChange,
 }: MarketsExplorerProps) {
-  // Use external state if provided, otherwise local fallback
+  const { t } = useLanguage()
   const [localQuery, setLocalQuery] = useState('')
   const [localFilter, setLocalFilter] = useState<string>('All')
 
@@ -84,6 +85,13 @@ export function MarketsExplorer({
     onRefresh?.()
   }
 
+  const filterLabels: Record<string, string> = {
+    All: t('All', 'सभी'),
+    Stocks: t('Stocks', 'शेयर'),
+    Industries: t('Industries', 'उद्योग'),
+    Commodities: t('Commodities', 'कमोडिटीज़'),
+  }
+
   return (
     <div className="space-y-5">
       <MarketBuddy assets={assets} />
@@ -95,7 +103,7 @@ export function MarketsExplorer({
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search any stock, ticker, or commodity…"
+            placeholder={t("Search any stock, ticker, or commodity...", "किसी भी शेयर, टिकर या कमोडिटी को खोजें...")}
             className="h-11 w-full rounded-xl border border-border bg-card pl-10 pr-10 text-sm outline-none transition-colors focus:border-primary"
           />
           {query && (
@@ -118,7 +126,7 @@ export function MarketsExplorer({
                   filter === f ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground',
                 )}
               >
-                {f}
+                {filterLabels[f] || f}
               </button>
             ))}
           </div>
@@ -126,7 +134,7 @@ export function MarketsExplorer({
             <button
               onClick={onRefresh}
               className="flex items-center gap-1.5 rounded-xl border border-border px-3 py-2 text-xs text-muted-foreground hover:bg-secondary transition-colors"
-              title="Refresh prices"
+              title={t("Refresh prices", "कीमतें रीफ्रेश करें")}
             >
               <RefreshCw className="size-3.5" />
               <span className="hidden sm:inline">
@@ -145,7 +153,7 @@ export function MarketsExplorer({
         </div>
       ) : assets.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border py-16 text-center text-muted-foreground">
-          {query ? `No results for "${query}". Try a different ticker or name.` : 'No markets available.'}
+          {query ? t(`No results for "${query}". Try a different ticker or name.`, `"${query}" के लिए कोई परिणाम नहीं मिले। कोई अन्य टिकर या नाम आज़माएं।`) : t('No markets available.', 'कोई बाज़ार उपलब्ध नहीं है।')}
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

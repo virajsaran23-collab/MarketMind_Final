@@ -20,6 +20,7 @@ import { api } from '@/lib/api'
 import { type Asset, formatCurrency, formatPct } from '@/lib/market-data'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/lib/auth-context'
+import { useLanguage } from '@/lib/language-context'
 
 type BuddyHolding = {
   asset: Asset
@@ -67,10 +68,6 @@ type ChatMessage = {
   content: string
 }
 
-function percentSign(value: number) {
-  return value > 0 ? '+' : ''
-}
-
 function resolveReturnPct(holding: BuddyHolding) {
   if (typeof holding.return_pct === 'number') {
     return holding.return_pct
@@ -83,7 +80,7 @@ function resolveReturnPct(holding: BuddyHolding) {
   return ((holding.asset.price - holding.avg_price) / holding.avg_price) * 100
 }
 
-function buildLocalMentor(assets: Asset[], holdings: BuddyHolding[], portfolioValue?: number, cash?: number): MentorResponse {
+function buildLocalMentor(assets: Asset[], holdings: BuddyHolding[], portfolioValue?: number, cash?: number, lang: 'en' | 'hi' = 'en'): MentorResponse {
   const stockAssets = assets.filter((asset) => asset.category === 'Stocks')
   const featured = [...stockAssets].sort((a, b) => Math.abs(b.change) - Math.abs(a.change)).slice(0, 4)
   const strongest = [...stockAssets].filter((asset) => asset.change > 0).sort((a, b) => b.change - a.change)[0]
@@ -97,29 +94,39 @@ function buildLocalMentor(assets: Asset[], holdings: BuddyHolding[], portfolioVa
 
   const isFirstRun = holdings.length === 0
   const formatAssetLabel = (asset: Asset) => asset.name && asset.name !== asset.symbol ? `${asset.name} (${asset.symbol})` : asset.symbol
-  const summary = isFirstRun
-    ? 'Welcome! Start with a small Buy order in Markets, then use Sell from Portfolio when you want to lock in gains or reduce risk. After each trade, head to Profile to complete the starter tasks.'
-    : bestHolding && weakestHolding
-      ? `Your strongest position is ${formatAssetLabel(bestHolding.asset)}. Review ${formatAssetLabel(weakestHolding.asset)} before averaging down, and keep the thesis tighter than the price.`
-      : cashRatio !== undefined && cashRatio > 0.2
-        ? 'You have a healthy cash buffer, so you can wait for cleaner setups instead of chasing every move.'
-        : cashRatio !== undefined
-          ? 'You are fairly invested already, so focus on high-conviction trades and avoid overtrading.'
+  
+  let summary = ''
+  if (lang === 'hi') {
+    summary = isFirstRun
+      ? 'स्वागत है! बाज़ार में एक छोटे से खरीद ऑर्डर के साथ शुरुआत करें, फिर जब आप लाभ प्राप्त करना चाहते हैं तो पोर्टफोलियो से बिक्री करें।'
+      : bestHolding && weakestHolding
+        ? `आपकी सबसे मजबूत स्थिति ${formatAssetLabel(bestHolding.asset)} है। ${formatAssetLabel(weakestHolding.asset)} की समीक्षा करें।`
+        : cashRatio !== undefined && cashRatio > 0.2
+          ? 'आपके पास एक स्वस्थ नकद बफर है, इसलिए आप हर कदम का पीछा करने के बजाय साफ सेटअप का इंतजार कर सकते हैं।'
+          : 'मैं गति, समर्थन और अस्थिरता पर नज़र रख रहा हूँ ताकि आप यह तय कर सकें कि खरीदना है, बेचना है या प्रतीक्षा करनी है।'
+  } else {
+    summary = isFirstRun
+      ? 'Welcome! Start with a small Buy order in Markets, then use Sell from Portfolio when you want to lock in gains or reduce risk.'
+      : bestHolding && weakestHolding
+        ? `Your strongest position is ${formatAssetLabel(bestHolding.asset)}. Review ${formatAssetLabel(weakestHolding.asset)} before averaging down.`
+        : cashRatio !== undefined && cashRatio > 0.2
+          ? 'You have a healthy cash buffer, so you can wait for cleaner setups instead of chasing every move.'
           : 'I am watching momentum, support, and volatility so you can decide whether to buy, sell, or wait.'
+  }
 
   const news = [
     strongest && {
-      title: `${formatAssetLabel(strongest)} is leading the board`,
+      title: lang === 'hi' ? `${formatAssetLabel(strongest)} बढ़त का नेतृत्व कर रहा है` : `${formatAssetLabel(strongest)} is leading the board`,
       publisher: 'MarketMind',
       source: 'local',
     },
     weakest && {
-      title: `${formatAssetLabel(weakest)} is under pressure`,
+      title: lang === 'hi' ? `${formatAssetLabel(weakest)} दबाव में है` : `${formatAssetLabel(weakest)} is under pressure`,
       publisher: 'MarketMind',
       source: 'local',
     },
     featured[0] && {
-      title: `${formatAssetLabel(featured[0])} has the sharpest move`,
+      title: lang === 'hi' ? `${formatAssetLabel(featured[0])} में सबसे तेज हलचल है` : `${formatAssetLabel(featured[0])} has the sharpest move`,
       publisher: 'MarketMind',
       source: 'local',
     },
@@ -145,10 +152,11 @@ function buildLocalMentor(assets: Asset[], holdings: BuddyHolding[], portfolioVa
 
 export function MarketBuddy({ assets = [], holdings = [], portfolioValue, cash }: MarketBuddyProps) {
   const { showToast } = useAuth()
+  const { language, t } = useLanguage()
   const stockAssets = useMemo(() => assets.filter((asset) => asset.category === 'Stocks'), [assets])
-  const localFallback = useMemo(() => buildLocalMentor(assets, holdings, portfolioValue, cash), [assets, holdings, portfolioValue, cash])
+  const localFallback = useMemo(() => buildLocalMentor(assets, holdings, portfolioValue, cash, language), [assets, holdings, portfolioValue, cash, language])
   const [briefing, setBriefing] = useState<MentorResponse>(localFallback)
-  const [messages, setMessages] = useState<ChatMessage[]>([{ role: 'assistant', content: localFallback.summary || localFallback.reply || 'I am ready to help.' }])
+  const [messages, setMessages] = useState<ChatMessage[]>([{ role: 'assistant', content: localFallback.summary || localFallback.reply || t('I am ready to help.', 'मैं मदद के लिए तैयार हूँ।') }])
   const [draft, setDraft] = useState('')
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
@@ -163,7 +171,7 @@ export function MarketBuddy({ assets = [], holdings = [], portfolioValue, cash }
       setMessages((current) => {
         if (current.length <= 1 && current[0]?.role === 'assistant') {
           return [
-            { role: 'assistant', content: data.summary || 'I have loaded your market briefing.' },
+            { role: 'assistant', content: data.summary || t('I have loaded your market briefing.', 'मैंने आपकी बाज़ार ब्रीफिंग लोड कर ली है।') },
             ...(data.reply && data.reply !== data.summary ? [{ role: 'assistant' as const, content: data.reply }] : []),
           ]
         }
@@ -176,7 +184,7 @@ export function MarketBuddy({ assets = [], holdings = [], portfolioValue, cash }
       setBriefing(localFallback)
       setMessages((current) => {
         if (current.length <= 1 && current[0]?.role === 'assistant') {
-          return [{ role: 'assistant', content: localFallback.summary || 'I am ready to help.' }]
+          return [{ role: 'assistant', content: localFallback.summary || t('I am ready to help.', 'मैं मदद के लिए तैयार हूँ।') }]
         }
         return current
       })
@@ -187,7 +195,7 @@ export function MarketBuddy({ assets = [], holdings = [], portfolioValue, cash }
     return () => {
       alive = false
     }
-  }, [])
+  }, [language])
 
   const featured = (briefing.quotes && briefing.quotes.length > 0
     ? briefing.quotes
@@ -211,9 +219,14 @@ export function MarketBuddy({ assets = [], holdings = [], portfolioValue, cash }
       ? effectiveCash / effectivePortfolioValue
       : undefined
 
-  const guidance = briefing.summary || briefing.reply || localFallback.summary || 'I am watching momentum, support, and volatility.'
+  const guidance = briefing.summary || briefing.reply || localFallback.summary || t('I am watching momentum, support, and volatility.', 'मैं मोमेंटम और अस्थिरता पर नज़र रख रहा हूँ।')
 
-  const quickPrompts = [
+  const quickPrompts = language === 'hi' ? [
+    'खरीदें या बेचें कैसे?',
+    'कार्यों को कैसे पूरा करें?',
+    'नवीनतम समाचार क्या हैं?',
+    'कौन सा शेयर सबसे मजबूत दिख रहा है?',
+  ] : [
     'How do I buy or sell?',
     'How do I complete tasks?',
     'What is the latest news?',
@@ -234,27 +247,25 @@ export function MarketBuddy({ assets = [], holdings = [], portfolioValue, cash }
       const history = [...messages, { role: 'user' as const, content: text }].slice(-6)
       const data = await api.mentor(text, briefing.symbols || featured.map((item) => item.symbol), history)
       setBriefing(data)
-      const replyContent = data.reply || data.summary || 'Here is the latest market read.'
+      const replyContent = data.reply || data.summary || t('Here is the latest market read.', 'यहाँ नवीनतम बाज़ार विश्लेषण है।')
       setMessages((current) => [...current, { role: 'assistant', content: replyContent }])
       setStatus('live')
 
-      // If reply is about the stock not being listed, pop a notification
       const replyLower = replyContent.toLowerCase()
       if (
         replyLower.includes('not currently included in our available market data') ||
         replyLower.includes('not listed') ||
         replyLower.includes('cannot provide an analysis for') ||
-        replyLower.includes('not currently listed') ||
-        replyLower.includes('not included in our available market data')
+        replyLower.includes('not currently listed')
       ) {
         showToast(
-          "Stock Not Available",
-          "First search that stock in the Explore Market section to import it!",
+          t("Stock Not Available", "शेयर उपलब्ध नहीं है"),
+          t("First search that stock in the Explore Market section to import it!", "इसे आयात करने के लिए पहले एक्सप्लोर मार्केट अनुभाग में उस शेयर को खोजें!"),
           "info"
         )
       }
     } catch {
-      const fallbackReply = localFallback.reply || 'I could not reach the live mentor endpoint, so I am using the local market board.'
+      const fallbackReply = localFallback.reply || t('I am using the local market board.', 'मैं स्थानीय बाज़ार बोर्ड का उपयोग कर रहा हूँ।')
       setBriefing(localFallback)
       setMessages((current) => [...current, { role: 'assistant', content: fallbackReply }])
       setStatus('local')
@@ -281,17 +292,17 @@ export function MarketBuddy({ assets = [], holdings = [], portfolioValue, cash }
         <div className="flex items-start justify-between gap-4">
           <div>
             <Badge variant="default" className="mb-3">
-              <BrainCircuit className="size-3.5" />
+              <BrainCircuit className="size-3.5 mr-1" />
               Market Buddy
             </Badge>
-            <h2 className="text-lg font-semibold tracking-tight">Your trading mentor</h2>
+            <h2 className="text-lg font-semibold tracking-tight">{t('Your trading mentor', 'आपका ट्रेडिंग मेंटर')}</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              I scan live prices, recent headlines, and your portfolio to help you buy with more context.
+              {t('I scan live prices, recent headlines, and your portfolio to help you buy with more context.', 'मैं लाइव कीमतों, हाल की सुर्खियों और आपके पोर्टफोलियो को स्कैन करता हूँ ताकि आप बेहतर समझ के साथ निर्णय ले सकें।')}
             </p>
           </div>
           <div className="rounded-2xl border border-border bg-card px-3 py-2 text-right">
-            <div className="text-xs text-muted-foreground">Source</div>
-            <div className="text-sm font-semibold tabular-nums uppercase">{status}</div>
+            <div className="text-xs text-muted-foreground">{t('Source', 'स्रोत')}</div>
+            <div className="text-sm font-semibold tabular-nums uppercase">{status === 'live' ? t('Live', 'लाइव') : t('Local', 'लोकल')}</div>
           </div>
         </div>
 
@@ -299,7 +310,7 @@ export function MarketBuddy({ assets = [], holdings = [], portfolioValue, cash }
           <div className="rounded-2xl border border-border bg-card/80 p-4">
             <div className="flex items-center gap-2 text-sm font-medium">
               <MessageSquare className="size-4 text-primary" />
-              Chat with me
+              {t('Chat with me', 'मुझसे बात करें')}
             </div>
             <div className="mt-3 max-h-72 space-y-3 overflow-y-auto pr-1">
               {messages.map((message, index) => (
@@ -313,7 +324,7 @@ export function MarketBuddy({ assets = [], holdings = [], portfolioValue, cash }
               {loading && (
                 <div className="inline-flex items-center gap-2 rounded-2xl bg-secondary px-3 py-2 text-sm text-muted-foreground">
                   <Loader2 className="size-4 animate-spin" />
-                  Loading live briefing...
+                  {t('Loading live briefing...', 'लाइव ब्रीफिंग लोड हो रही है...')}
                 </div>
               )}
             </div>
@@ -336,25 +347,25 @@ export function MarketBuddy({ assets = [], holdings = [], portfolioValue, cash }
                 onChange={(event) => setDraft(event.target.value)}
                 onKeyDown={handleDraftKeyDown}
                 rows={3}
-                placeholder="Ask about a stock, a trade, or today's news..."
+                placeholder={t("Ask about a stock, a trade, or today's news...", "शेयर, व्यापार या आज के समाचार के बारे में पूछें...")}
                 className="min-h-24 flex-1 resize-none rounded-2xl border border-border bg-background px-4 py-3 text-sm outline-none transition-colors focus:border-primary"
               />
-              <Button onClick={submitDraft} disabled={sending} className="h-auto min-h-24 px-4 sm:w-28">
+              <Button onClick={submitDraft} disabled={sending} className="h-auto min-h-24 px-4 sm:w-28 flex items-center justify-center gap-1.5">
                 {sending ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
-                Send
+                {t('Send', 'भेजें')}
               </Button>
             </div>
 
             <div className="mt-4 flex flex-wrap gap-2">
-              <Badge variant="muted">Portfolio {formatCurrency(effectivePortfolioValue || 0, true)}</Badge>
-              {typeof effectiveCash === 'number' && <Badge variant="muted">Cash {formatCurrency(effectiveCash, true)}</Badge>}
-              {cashRatio !== undefined && <Badge variant={cashRatio > 0.2 ? 'success' : 'warning'}>{cashRatio > 0.2 ? 'Flexible' : 'Nearly deployed'}</Badge>}
+              <Badge variant="muted">{t('Portfolio', 'पोर्टफोलियो')} {formatCurrency(effectivePortfolioValue || 0, true)}</Badge>
+              {typeof effectiveCash === 'number' && <Badge variant="muted">{t('Cash', 'नकदी')} {formatCurrency(effectiveCash, true)}</Badge>}
+              {cashRatio !== undefined && <Badge variant={cashRatio > 0.2 ? 'success' : 'warning'}>{cashRatio > 0.2 ? t('Flexible', 'लचीला') : t('Nearly deployed', 'लगभग तैनात')}</Badge>}
             </div>
 
             <div className="mt-4 rounded-2xl border border-border bg-background/80 p-4">
               <div className="flex items-center gap-2 text-sm font-medium">
                 <Sparkles className="size-4 text-primary" />
-                Today&apos;s guidance
+                {t("Today's guidance", 'आज का मार्गदर्शन')}
               </div>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{guidance}</p>
             </div>
@@ -365,9 +376,9 @@ export function MarketBuddy({ assets = [], holdings = [], portfolioValue, cash }
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 text-sm font-medium">
                   <TrendingUp className="size-4 text-primary" />
-                  Live prices
+                  {t('Live prices', 'लाइव कीमतें')}
                 </div>
-                <Badge variant="muted">Stocks</Badge>
+                <Badge variant="muted">{t('Stocks', 'शेयर')}</Badge>
               </div>
               <div className="mt-4 space-y-3">
                 {featured.length > 0 ? (
@@ -388,7 +399,7 @@ export function MarketBuddy({ assets = [], holdings = [], portfolioValue, cash }
                   ))
                 ) : (
                   <div className="rounded-xl border border-dashed border-border py-8 text-center text-sm text-muted-foreground">
-                    Loading live market prices…
+                    {t('Loading live market prices...', 'लाइव बाज़ार कीमतें लोड हो रही हैं...')}
                   </div>
                 )}
               </div>
@@ -398,7 +409,7 @@ export function MarketBuddy({ assets = [], holdings = [], portfolioValue, cash }
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 text-sm font-medium">
                   <Newspaper className="size-4 text-primary" />
-                  Latest news
+                  {t('Latest news', 'नवीनतम समाचार')}
                 </div>
                 <Badge variant="muted">{news.length}</Badge>
               </div>
@@ -420,7 +431,7 @@ export function MarketBuddy({ assets = [], holdings = [], portfolioValue, cash }
                   ))
                 ) : (
                   <div className="rounded-xl border border-dashed border-border py-8 text-center text-sm text-muted-foreground">
-                    No headlines available right now.
+                    {t('No headlines available right now.', 'अभी कोई मुख्य समाचार उपलब्ध नहीं है।')}
                   </div>
                 )}
               </div>
@@ -430,7 +441,7 @@ export function MarketBuddy({ assets = [], holdings = [], portfolioValue, cash }
 
         <div className="mt-5 flex items-center gap-2 text-xs text-muted-foreground">
           <ShieldCheck className="size-3.5" />
-          Educational guidance only. Use it as a second opinion before you trade.
+          {t('Educational guidance only. Use it as a second opinion before you trade.', 'केवल शैक्षणिक मार्गदर्शन। व्यापार करने से पहले इसे दूसरी राय के रूप में उपयोग करें।')}
         </div>
       </div>
     </Card>

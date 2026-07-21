@@ -6,10 +6,12 @@ import { StatCard } from '@/components/marketmind/stat-card'
 import { PortfolioChart } from '@/components/marketmind/portfolio-chart'
 import { Card } from '@/components/ui/card'
 import { formatCurrency, formatPct } from '@/lib/market-data'
+import { useLanguage } from '@/lib/language-context'
 import { api } from '@/lib/api'
 import { cn } from '@/lib/utils'
 
 export default function PortfolioPage() {
+  const { t } = useLanguage()
   const [data, setData] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -68,12 +70,12 @@ export default function PortfolioPage() {
             <table className="w-full min-w-[640px] text-sm">
               <thead>
                 <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
-                  <th className="px-5 py-3">Asset</th>
-                  <th className="px-5 py-3 text-right">Shares</th>
-                  <th className="px-5 py-3 text-right">Avg Cost</th>
-                  <th className="px-5 py-3 text-right">Price</th>
-                  <th className="px-5 py-3 text-right">Value</th>
-                  <th className="px-5 py-3 text-right">Return</th>
+                  <th className="px-5 py-3">{t('Asset', 'संपत्ति')}</th>
+                  <th className="px-5 py-3 text-right">{t('Shares', 'शेयर')}</th>
+                  <th className="px-5 py-3 text-right">{t('Avg Cost', 'औसत मूल्य')}</th>
+                  <th className="px-5 py-3 text-right">{t('Price', 'कीमत')}</th>
+                  <th className="px-5 py-3 text-right">{t('Value', 'मूल्य')}</th>
+                  <th className="px-5 py-3 text-right">{t('Return', 'रिटर्न')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -108,34 +110,34 @@ export default function PortfolioPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Portfolio</h1>
-        <p className="mt-1 text-muted-foreground">Your holdings, allocation, and performance over time.</p>
+        <h1 className="text-2xl font-semibold tracking-tight">{t('Portfolio', 'पोर्टफोलियो')}</h1>
+        <p className="mt-1 text-muted-foreground">{t('Your holdings, allocation, and performance over time.', 'आपकी होल्डिंग्स, आवंटन और समय के साथ प्रदर्शन।')}</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Portfolio Value" value={formatCurrency(stats.value)} change={stats.day_change_pct} icon={Wallet} />
-        <StatCard label="Cash Available" value={formatCurrency(stats.cash)} hint="Ready to invest" icon={Banknote} />
-        <StatCard label="Today's Gain / Loss" value={formatCurrency(stats.day_change)} change={stats.day_change_pct} icon={TrendingUp} accent="success" />
-        <StatCard label="Total Return" value={formatPct(stats.return_pct)} hint="All time" icon={Percent} accent="success" />
+        <StatCard label={t('Portfolio Value', 'पोर्टफोलियो मूल्य')} value={formatCurrency(stats.value)} change={stats.day_change_pct} icon={Wallet} />
+        <StatCard label={t('Cash Available', 'उपलब्ध नकदी')} value={formatCurrency(stats.cash)} hint={t('Ready to invest', 'निवेश के लिए तैयार')} icon={Banknote} />
+        <StatCard label={t("Today's Gain / Loss", 'आज का लाभ / हानि')} value={formatCurrency(stats.day_change)} change={stats.day_change_pct} icon={TrendingUp} accent="success" />
+        <StatCard label={t('Total Return', 'कुल रिटर्न')} value={formatPct(stats.return_pct)} hint={t('All time', 'कुल समय')} icon={Percent} accent="success" />
       </div>
 
       <PortfolioChart value={stats.value} returnPct={stats.return_pct} />
 
       <Card className="overflow-hidden p-0">
         <div className="flex items-center justify-between border-b border-border p-5">
-          <h2 className="font-semibold">Holdings</h2>
-          <span className="text-sm text-muted-foreground">{(stats.holdings || []).length} positions</span>
+          <h2 className="font-semibold">{t('Holdings', 'होल्डिंग्स')}</h2>
+          <span className="text-sm text-muted-foreground">{(stats.holdings || []).length} {t('positions', 'स्थितियां')}</span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[640px] text-sm">
             <thead>
               <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
-                <th className="px-5 py-3 font-medium">Asset</th>
-                <th className="px-5 py-3 text-right font-medium">Shares</th>
-                <th className="px-5 py-3 text-right font-medium">Avg Cost</th>
-                <th className="px-5 py-3 text-right font-medium">Price</th>
-                <th className="px-5 py-3 text-right font-medium">Value</th>
-                <th className="px-5 py-3 text-right font-medium">Return</th>
+                <th className="px-5 py-3 font-medium">{t('Asset', 'संपत्ति')}</th>
+                <th className="px-5 py-3 text-right font-medium">{t('Shares', 'शेयर')}</th>
+                <th className="px-5 py-3 text-right font-medium">{t('Avg Cost', 'औसत मूल्य')}</th>
+                <th className="px-5 py-3 text-right font-medium">{t('Price', 'कीमत')}</th>
+                <th className="px-5 py-3 text-right font-medium">{t('Value', 'मूल्य')}</th>
+                <th className="px-5 py-3 text-right font-medium">{t('Return', 'रिटर्न')}</th>
               </tr>
             </thead>
             <tbody>
@@ -163,7 +165,7 @@ export default function PortfolioPage() {
               ))}
               {(stats.holdings || []).length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-5 py-8 text-center text-muted-foreground">No holdings yet.</td>
+                  <td colSpan={6} className="px-5 py-8 text-center text-muted-foreground">{t('No holdings yet.', 'अभी कोई होल्डिंग्स नहीं हैं।')}</td>
                 </tr>
               )}
             </tbody>

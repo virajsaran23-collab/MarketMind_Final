@@ -7,21 +7,24 @@ import { Menu, X, Bell, LogOut } from 'lucide-react'
 import { Logo } from './logo'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/lib/auth-context'
+import { useLanguage } from '@/lib/language-context'
+import { LanguageToggle } from './language-toggle'
 
 const links = [
-  { href: '/dashboard', label: 'Dashboard' },
-  { href: '/portfolio', label: 'Portfolio' },
-  { href: '/markets', label: 'Markets' },
-  { href: '/ai-analyzer', label: 'AI Analyzer' },
-  { href: '/case-studies', label: 'Case Studies' },
-  { href: '/analytics', label: 'Analytics' },
-  { href: '/leaderboard', label: 'Leaderboard' },
+  { href: '/dashboard', labelEn: 'Dashboard', labelHi: 'डैशबोर्ड' },
+  { href: '/portfolio', labelEn: 'Portfolio', labelHi: 'पोर्टफोलियो' },
+  { href: '/markets', labelEn: 'Markets', labelHi: 'मार्केट्स' },
+  { href: '/ai-analyzer', labelEn: 'AI Analyzer', labelHi: 'AI विश्लेषक' },
+  { href: '/case-studies', labelEn: 'Case Studies', labelHi: 'केस स्टडीज़' },
+  { href: '/analytics', labelEn: 'Analytics', labelHi: 'एनालिटिक्स' },
+  { href: '/leaderboard', labelEn: 'Leaderboard', labelHi: 'लीडरबोर्ड' },
 ]
 
 export function TopNav() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const { user, logout } = useAuth()
+  const { t } = useLanguage()
   const router = useRouter()
 
   const initials = user
@@ -50,14 +53,16 @@ export function TopNav() {
                     active ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground',
                   )}
                 >
-                  {link.label}
+                  {t(link.labelEn, link.labelHi)}
                 </Link>
               )
             })}
           </nav>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <LanguageToggle />
+
           <button
             className="hidden size-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground sm:flex"
             aria-label="Notifications"
@@ -71,13 +76,14 @@ export function TopNav() {
             <span className="flex size-7 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
               {initials}
             </span>
-            <span className="hidden text-sm font-medium sm:inline">{user?.username || 'Profile'}</span>
+            <span className="hidden text-sm font-medium sm:inline">{user?.username || t('Profile', 'प्रोफाइल')}</span>
           </Link>
           {user && (
             <button
               onClick={handleLogout}
               className="hidden size-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-secondary hover:text-foreground sm:flex"
               aria-label="Logout"
+              title={t('Logout', 'लॉगआउट')}
             >
               <LogOut className="size-4" />
             </button>
@@ -106,13 +112,13 @@ export function TopNav() {
                   active ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground',
                 )}
               >
-                {link.label}
+                {t(link.labelEn, link.labelHi)}
               </Link>
             )
           })}
           {user && (
             <button onClick={handleLogout} className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground text-left">
-              Logout
+              {t('Logout', 'लॉगआउट')}
             </button>
           )}
         </nav>

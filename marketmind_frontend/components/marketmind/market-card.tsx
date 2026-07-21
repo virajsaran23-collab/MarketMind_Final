@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Sparkline } from './sparkline'
 import { type Asset, formatCurrency, formatPct } from '@/lib/market-data'
+import { useLanguage } from '@/lib/language-context'
 import { api } from '@/lib/api'
 import { cn } from '@/lib/utils'
 
@@ -28,6 +29,7 @@ export function MarketCard({
   asset: Asset
   onTrade: (asset: Asset, mode: 'buy' | 'sell') => void
 }) {
+  const { t } = useLanguage()
   const positive = asset.change >= 0
   const [sparkData, setSparkData] = useState<number[]>(() =>
     asset.spark && asset.spark.length > 0
@@ -90,14 +92,14 @@ export function MarketCard({
           className="h-9 flex-1 bg-success text-success-foreground hover:bg-success/90"
           onClick={() => onTrade(asset, 'buy')}
         >
-          Buy
+          {t('Buy', 'खरीदें')}
         </Button>
         <Button
           variant="outline"
           className="h-9 flex-1"
           onClick={() => onTrade(asset, 'sell')}
         >
-          Sell
+          {t('Sell', 'बेचें')}
         </Button>
       </div>
     </Card>

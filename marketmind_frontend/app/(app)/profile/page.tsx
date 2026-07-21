@@ -1,12 +1,13 @@
 'use client'
 
 import Link from 'next/link'
-import { Brain, Target, Flame, Trophy, BookOpen, ShieldAlert, TrendingUp, CheckCircle2 } from 'lucide-react'
+import { Brain, Target, Flame, Trophy, BookOpen, ShieldAlert, CheckCircle2 } from 'lucide-react'
 import { useEffect, useMemo, useState, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { ProgressRing } from '@/components/marketmind/progress-ring'
 import { formatCurrency } from '@/lib/market-data'
+import { useLanguage } from '@/lib/language-context'
 import { api } from '@/lib/api'
 import { useAuth, checkChallengeCompletions } from '@/lib/auth-context'
 import { cn } from '@/lib/utils'
@@ -19,27 +20,28 @@ const BADGE_RANKS: Record<string, number> = {
   'Market Legend': 5,
 }
 
-const ALL_BADGES = [
-  { name: 'Value Investor', desc: 'Held quality assets through volatility', icon: BookOpen, rank: 2 },
-  { name: 'Trend Hunter', desc: 'Caught 3 momentum moves early', icon: Flame, rank: 3 },
-  { name: 'Event Strategist', desc: 'Positioned ahead of a major event', icon: Target, rank: 4 },
-  { name: 'Market Legend', desc: 'Conquered the stock market with top performance', icon: Trophy, rank: 5 },
-]
-
-function getRiskLabel(score: number) {
-  if (score >= 75) return { label: 'High Risk', color: 'text-destructive' }
-  if (score >= 50) return { label: 'Moderate Risk', color: 'text-yellow-400' }
-  if (score >= 25) return { label: 'Low-Moderate', color: 'text-blue-400' }
-  return { label: 'Conservative', color: 'text-success' }
-}
-
 export default function ProfilePage() {
-  const { user, profile, refresh: refreshAuth, showToast } = useAuth()
+  const { user, profile, showToast } = useAuth()
+  const { t } = useLanguage()
   const [challenges, setChallenges] = useState<any[]>([])
   const [completions, setCompletions] = useState<any[]>([])
   const [loadingChallenges, setLoadingChallenges] = useState(true)
   const [riskScore, setRiskScore] = useState<number>(profile?.risk_score ?? 30)
   const [accuracy, setAccuracy] = useState<number>(profile?.accuracy ?? 0)
+
+  const ALL_BADGES = useMemo(() => [
+    { name: t('Value Investor', 'वैल्यू निवेशक'), desc: t('Held quality assets through volatility', 'अस्थिरता के बावजूद गुणवत्ता वाली संपत्तियों को बनाए रखा'), icon: BookOpen, rank: 2 },
+    { name: t('Trend Hunter', 'ट्रेंड शिकारी'), desc: t('Caught 3 momentum moves early', '3 मोमेंटम चालों को समय पर पहचाना'), icon: Flame, rank: 3 },
+    { name: t('Event Strategist', 'इवेंट रणनीतिकार'), desc: t('Positioned ahead of a major event', 'बड़ी घटना से पहले स्थिति बनाई'), icon: Target, rank: 4 },
+    { name: t('Market Legend', 'मार्केट लेजेंड'), desc: t('Conquered the stock market with top performance', 'शीर्ष प्रदर्शन के साथ शेयर बाज़ार में विजय प्राप्त की'), icon: Trophy, rank: 5 },
+  ], [t])
+
+  const getRiskLabel = (score: number) => {
+    if (score >= 75) return { label: t('High Risk', 'उच्च जोखिम'), color: 'text-destructive' }
+    if (score >= 50) return { label: t('Moderate Risk', 'मध्यम जोखिम'), color: 'text-yellow-400' }
+    if (score >= 25) return { label: t('Low-Moderate', 'कम-मध्यम'), color: 'text-blue-400' }
+    return { label: t('Conservative', 'संरक्षित'), color: 'text-success' }
+  }
 
   const fetchChallenges = useCallback(async () => {
     try {
@@ -61,7 +63,6 @@ export default function ProfilePage() {
     fetchChallenges()
   }, [fetchChallenges])
 
-  // Keep risk/accuracy in sync with auth profile
   useEffect(() => {
     if (profile?.risk_score !== undefined) setRiskScore(profile.risk_score)
     if (profile?.accuracy !== undefined) setAccuracy(profile.accuracy)
@@ -81,7 +82,7 @@ export default function ProfilePage() {
     ? (user.first_name?.[0] || user.username[0]).toUpperCase() + (user.last_name?.[0] || '').toUpperCase()
     : 'YO'
 
-  const displayName = user ? (user.first_name ? `${user.first_name} ${user.last_name}`.trim() : user.username) : 'Your Account'
+  const displayName = user ? (user.first_name ? `${user.first_name} ${user.last_name}`.trim() : user.username) : t('Your Account', 'आपका खाता')
   const handle = user ? `@${user.username}` : '@you'
   const riskInfo = getRiskLabel(riskScore)
 
@@ -96,7 +97,7 @@ export default function ProfilePage() {
             </span>
             <div className="pb-1">
               <h1 className="text-xl font-semibold">{displayName}</h1>
-              <p className="text-sm text-muted-foreground">{handle} · Joined 2026</p>
+              <p className="text-sm text-muted-foreground">{handle} · {t('Joined 2026', '2026 में शामिल हुए')}</p>
             </div>
           </div>
           <Badge variant="default" className="self-start sm:self-auto">{profile?.badge || 'Market Rookie'}</Badge>
@@ -105,50 +106,49 @@ export default function ProfilePage() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
-          <CardHeader><CardTitle>Account snapshot</CardTitle></CardHeader>
+          <CardHeader><CardTitle>{t('Account snapshot', 'खाता स्नैपशॉट')}</CardTitle></CardHeader>
           <CardContent className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             <div>
-              <p className="text-xs text-muted-foreground">Portfolio</p>
+              <p className="text-xs text-muted-foreground">{t('Portfolio', 'पोर्टफोलियो')}</p>
               <p className="mt-1 text-lg font-semibold tabular-nums">{formatCurrency(profile?.portfolio_value || 0, true)}</p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Simulations</p>
+              <p className="text-xs text-muted-foreground">{t('Simulations', 'सिमुलेशन')}</p>
               <p className="mt-1 text-lg font-semibold tabular-nums">{profile?.simulations_completed || 0}</p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Learning score</p>
+              <p className="text-xs text-muted-foreground">{t('Learning score', 'सीखने का स्कोर')}</p>
               <p className="mt-1 text-lg font-semibold tabular-nums">{(profile?.learning_score || 0).toLocaleString()}</p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Global rank</p>
+              <p className="text-xs text-muted-foreground">{t('Global rank', 'वैश्विक रैंक')}</p>
               <p className="mt-1 text-lg font-semibold tabular-nums">#{profile?.global_rank || '—'}</p>
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader><CardTitle>Portfolio accuracy</CardTitle></CardHeader>
+          <CardHeader><CardTitle>{t('Portfolio accuracy', 'पोर्टफोलियो सटीकता')}</CardTitle></CardHeader>
           <CardContent className="flex flex-col items-center gap-2 py-2">
             <ProgressRing
               value={accuracy}
               label={`${accuracy}%`}
-              sublabel="profitable trades ratio"
+              sublabel={t('profitable trades ratio', 'लाभप्रद व्यापार अनुपात')}
               color="var(--chart-2)"
             />
             <p className="flex items-center gap-2 text-xs text-muted-foreground">
-              <Brain className="size-4" />Based on your trade P&amp;L history
+              <Brain className="size-4" />{t('Based on your trade P&L history', 'आपके व्यापार लाभ और हानि इतिहास पर आधारित')}
             </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Risk Score Card */}
       <div className="mt-6">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ShieldAlert className="size-5" />
-              Risk Score
+              {t('Risk Score', 'जोखिम स्कोर')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -156,7 +156,7 @@ export default function ProfilePage() {
               <div className="flex flex-col items-center gap-1">
                 <span className={cn('text-4xl font-bold tabular-nums', riskInfo.color)}>{riskScore}</span>
                 <span className={cn('text-sm font-medium', riskInfo.color)}>{riskInfo.label}</span>
-                <span className="text-xs text-muted-foreground">out of 100</span>
+                <span className="text-xs text-muted-foreground">{t('out of 100', '100 में से')}</span>
               </div>
               <div className="flex-1">
                 <div className="relative h-3 w-full overflow-hidden rounded-full bg-secondary">
@@ -169,13 +169,13 @@ export default function ProfilePage() {
                   />
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-muted-foreground sm:grid-cols-4">
-                  <div className="flex items-center gap-1"><span className="size-2 rounded-full bg-success inline-block" />Conservative (0–24)</div>
-                  <div className="flex items-center gap-1"><span className="size-2 rounded-full bg-blue-400 inline-block" />Low-Moderate (25–49)</div>
-                  <div className="flex items-center gap-1"><span className="size-2 rounded-full bg-yellow-400 inline-block" />Moderate (50–74)</div>
-                  <div className="flex items-center gap-1"><span className="size-2 rounded-full bg-destructive inline-block" />High Risk (75–100)</div>
+                  <div className="flex items-center gap-1"><span className="size-2 rounded-full bg-success inline-block" />{t('Conservative', 'संरक्षित')} (0–24)</div>
+                  <div className="flex items-center gap-1"><span className="size-2 rounded-full bg-blue-400 inline-block" />{t('Low-Moderate', 'कम-मध्यम')} (25–49)</div>
+                  <div className="flex items-center gap-1"><span className="size-2 rounded-full bg-yellow-400 inline-block" />{t('Moderate', 'मध्यम')} (50–74)</div>
+                  <div className="flex items-center gap-1"><span className="size-2 rounded-full bg-destructive inline-block" />{t('High Risk', 'उच्च जोखिम')} (75–100)</div>
                 </div>
                 <p className="mt-2 text-xs text-muted-foreground">
-                  Calculated from portfolio concentration, diversification, trading frequency, and cash buffer.
+                  {t('Calculated from portfolio concentration, diversification, trading frequency, and cash buffer.', 'पोर्टफोलियो एकाग्रता, विविधता, व्यापार आवृत्ति और नकदी बफर से गणना की गई।')}
                 </p>
               </div>
             </div>
@@ -185,7 +185,7 @@ export default function ProfilePage() {
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
         <Card>
-          <CardHeader><CardTitle>Badges earned</CardTitle></CardHeader>
+          <CardHeader><CardTitle>{t('Badges earned', 'अर्जित बैज')}</CardTitle></CardHeader>
           <CardContent className="space-y-3">
             {ALL_BADGES.map((b) => {
               const currentRank = BADGE_RANKS[profile?.badge || 'Market Rookie'] || 1
@@ -211,7 +211,7 @@ export default function ProfilePage() {
                       <p className="text-sm font-medium">{b.name}</p>
                       {!isUnlocked && (
                         <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
-                          Locked
+                          {t('Locked', 'लॉक')}
                         </span>
                       )}
                     </div>
@@ -226,26 +226,25 @@ export default function ProfilePage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
-              <span>Active tasks</span>
+              <span>{t('Active tasks', 'सक्रिय कार्य')}</span>
               <button
                 onClick={fetchChallenges}
                 className="text-xs text-muted-foreground hover:text-foreground transition-colors"
               >
-                Refresh
+                {t('Refresh', 'रीफ्रेश')}
               </button>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {loadingChallenges ? (
-              <div className="text-sm text-muted-foreground">Loading tasks…</div>
+              <div className="text-sm text-muted-foreground">{t('Loading tasks...', 'कार्य लोड हो रहे हैं...')}</div>
             ) : challenges.length === 0 ? (
-              <div className="text-sm text-muted-foreground">No active tasks yet. Complete a trade to unlock daily goals.</div>
+              <div className="text-sm text-muted-foreground">{t('No active tasks yet. Complete a trade to unlock daily goals.', 'अभी कोई सक्रिय कार्य नहीं हैं। दैनिक लक्ष्यों को अनलॉक करने के लिए एक व्यापार पूरा करें।')}</div>
             ) : (
               <>
-                {/* Daily tasks section */}
                 {dailyTasks.length > 0 && (
                   <div>
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Daily</p>
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t('Daily', 'दैनिक')}</p>
                     <div className="space-y-2">
                       {dailyTasks.map((item) => {
                         const { challenge, status, progress } = item
@@ -269,14 +268,14 @@ export default function ProfilePage() {
                               </div>
                               <div className="flex flex-col items-end gap-1 shrink-0">
                                 <Badge variant={completed ? 'muted' : 'outline'}>
-                                  {completed ? 'Complete' : 'Pending'}
+                                  {completed ? t('Complete', 'पूर्ण') : t('Pending', 'लंबित')}
                                 </Badge>
-                                <span className="text-xs text-muted-foreground">+{challenge.token_reward} tokens</span>
+                                <span className="text-xs text-muted-foreground">+{challenge.token_reward} {t('tokens', 'टोकन')}</span>
                               </div>
                             </div>
                             <div className="mt-2">
                               <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
-                                <span>Today's progress</span>
+                                <span>{t("Today's progress", 'आज की प्रगति')}</span>
                                 <span>{progressLabel}</span>
                               </div>
                               <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-secondary">
@@ -293,10 +292,9 @@ export default function ProfilePage() {
                   </div>
                 )}
 
-                {/* Achievement tasks section */}
                 {achievementTasks.length > 0 && (
                   <div>
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Achievements</p>
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t('Achievements', 'उपलब्धियां')}</p>
                     <div className="space-y-2">
                       {achievementTasks.map((item) => {
                         const { challenge, status, progress } = item
@@ -322,15 +320,15 @@ export default function ProfilePage() {
                               </div>
                               <div className="flex flex-col items-end gap-1 shrink-0">
                                 <Badge variant={completed ? 'muted' : 'outline'}>
-                                  {completed ? 'Done' : 'Pending'}
+                                  {completed ? t('Done', 'पूर्ण') : t('Pending', 'लंबित')}
                                 </Badge>
-                                <span className="text-xs text-muted-foreground">+{challenge.token_reward} tokens</span>
+                                <span className="text-xs text-muted-foreground">+{challenge.token_reward} {t('tokens', 'टोकन')}</span>
                               </div>
                             </div>
                             {showProgress && (
                               <div className="mt-2">
                                 <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
-                                  <span>Progress</span>
+                                  <span>{t('Progress', 'प्रगति')}</span>
                                   <span>{progressLabel}</span>
                                 </div>
                                 <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-secondary">
@@ -356,16 +354,16 @@ export default function ProfilePage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BookOpen className="size-5 text-primary" />
-              <span>Case studies completed</span>
+              <span>{t('Case studies completed', 'पूर्ण की गई केस स्टडीज़')}</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {completions.length === 0 ? (
               <div className="py-8 text-center text-sm text-muted-foreground">
                 <BookOpen className="mx-auto size-8 opacity-40 mb-2" />
-                <p>No case studies completed yet.</p>
+                <p>{t('No case studies completed yet.', 'अभी कोई केस स्टडी पूर्ण नहीं हुई है।')}</p>
                 <Link href="/case-studies" className="mt-3 inline-flex text-xs font-semibold text-primary hover:underline">
-                  Browse Case Studies &rarr;
+                  {t('Browse Case Studies →', 'केस स्टडीज़ देखें →')}
                 </Link>
               </div>
             ) : (
@@ -376,7 +374,7 @@ export default function ProfilePage() {
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">{item.title}</p>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        Score: <span className="font-semibold text-foreground">{item.score}/{item.total_questions}</span>
+                        {t('Score:', 'स्कोर:')} <span className="font-semibold text-foreground">{item.score}/{item.total_questions}</span>
                       </p>
                     </div>
                   </div>

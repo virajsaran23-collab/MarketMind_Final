@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react'
 import { Trophy, RefreshCw } from 'lucide-react'
 import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { formatCurrency } from '@/lib/market-data'
+import { useLanguage } from '@/lib/language-context'
 import { api } from '@/lib/api'
 import { useAuth } from '@/lib/auth-context'
 import { cn } from '@/lib/utils'
@@ -18,6 +18,7 @@ const BADGE_COLOR: Record<string, string> = {
 }
 
 export default function LeaderboardPage() {
+  const { t } = useLanguage()
   const [rows, setRows] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const { user, profile } = useAuth()
@@ -36,15 +37,23 @@ export default function LeaderboardPage() {
 
   const hasCurrentUser = user ? rows.some((row) => row.handle === `@${user.username}`) : false
 
+  const badgeLabels: Record<string, string> = {
+    'Market Legend': t('Market Legend', 'मार्केट लेजेंड'),
+    'Event Strategist': t('Event Strategist', 'इवेंट रणनीतिकार'),
+    'Trend Hunter': t('Trend Hunter', 'ट्रेंड शिकारी'),
+    'Value Investor': t('Value Investor', 'वैल्यू निवेशक'),
+    'Market Rookie': t('Market Rookie', 'मार्केट नौसिखिया'),
+  }
+
   return (
     <div className="mx-auto w-full max-w-4xl space-y-6 px-4 py-8 sm:px-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Trophy className="size-6 text-yellow-400" />
-          <h1 className="text-2xl font-semibold tracking-tight">Leaderboard</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">{t('Leaderboard', 'लीडरबोर्ड')}</h1>
           {rows.length > 0 && (
             <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-muted-foreground">
-              {rows.length} trader{rows.length !== 1 ? 's' : ''}
+              {rows.length} {rows.length !== 1 ? t('traders', 'व्यापारी') : t('trader', 'व्यापारी')}
             </span>
           )}
         </div>
@@ -54,7 +63,7 @@ export default function LeaderboardPage() {
           className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:bg-secondary transition-colors disabled:opacity-50"
         >
           <RefreshCw className={cn('size-3', loading && 'animate-spin')} />
-          Refresh
+          {t('Refresh', 'रीफ्रेश')}
         </button>
       </div>
 
@@ -64,12 +73,12 @@ export default function LeaderboardPage() {
             <table className="w-full min-w-[560px] text-sm animate-pulse">
               <thead>
                 <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
-                  <th className="px-5 py-3 font-medium">Rank</th>
-                  <th className="px-5 py-3 font-medium">Trader</th>
-                  <th className="px-5 py-3 text-right font-medium">Portfolio</th>
-                  <th className="px-5 py-3 text-right font-medium">Tokens</th>
-                  <th className="px-5 py-3 text-right font-medium">Score</th>
-                  <th className="px-5 py-3 text-right font-medium">Accuracy</th>
+                  <th className="px-5 py-3 font-medium">{t('Rank', 'रैंक')}</th>
+                  <th className="px-5 py-3 font-medium">{t('Trader', 'व्यापारी')}</th>
+                  <th className="px-5 py-3 text-right font-medium">{t('Portfolio', 'पोर्टफोलियो')}</th>
+                  <th className="px-5 py-3 text-right font-medium">{t('Tokens', 'टोकन')}</th>
+                  <th className="px-5 py-3 text-right font-medium">{t('Score', 'स्कोर')}</th>
+                  <th className="px-5 py-3 text-right font-medium">{t('Accuracy', 'सटीकता')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -105,18 +114,18 @@ export default function LeaderboardPage() {
             </table>
           ) : rows.length === 0 ? (
             <div className="p-8 text-center text-sm text-muted-foreground">
-              No leaderboard entries yet. Make a trade to appear here.
+              {t('No leaderboard entries yet. Make a trade to appear here.', 'अभी कोई लीडरबोर्ड प्रविष्टियां नहीं हैं। यहां आने के लिए एक व्यापार करें।')}
             </div>
           ) : (
             <table className="w-full min-w-[560px] text-sm">
               <thead>
                 <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
-                  <th className="px-5 py-3 font-medium">Rank</th>
-                  <th className="px-5 py-3 font-medium">Trader</th>
-                  <th className="px-5 py-3 text-right font-medium">Portfolio</th>
-                  <th className="px-5 py-3 text-right font-medium">Tokens</th>
-                  <th className="px-5 py-3 text-right font-medium">Score</th>
-                  <th className="px-5 py-3 text-right font-medium">Accuracy</th>
+                  <th className="px-5 py-3 font-medium">{t('Rank', 'रैंक')}</th>
+                  <th className="px-5 py-3 font-medium">{t('Trader', 'व्यापारी')}</th>
+                  <th className="px-5 py-3 text-right font-medium">{t('Portfolio', 'पोर्टफोलियो')}</th>
+                  <th className="px-5 py-3 text-right font-medium">{t('Tokens', 'टोकन')}</th>
+                  <th className="px-5 py-3 text-right font-medium">{t('Score', 'स्कोर')}</th>
+                  <th className="px-5 py-3 text-right font-medium">{t('Accuracy', 'सटीकता')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -141,7 +150,7 @@ export default function LeaderboardPage() {
                             {row.name.slice(0, 2).toUpperCase()}
                           </span>
                           <div>
-                            <div className="font-medium">{isYou ? 'You' : row.name}</div>
+                            <div className="font-medium">{isYou ? t('You', 'आप') : row.name}</div>
                             <div className="text-xs text-muted-foreground">{row.handle}</div>
                           </div>
                         </div>
@@ -157,7 +166,7 @@ export default function LeaderboardPage() {
                         <div className="flex flex-col items-end gap-1">
                           <span className="tabular-nums font-medium">{row.learning_score.toLocaleString()}</span>
                           <span className={cn('rounded-full px-2 py-0.5 text-xs font-medium', BADGE_COLOR[row.badge] ?? 'bg-secondary text-muted-foreground')}>
-                            {row.badge}
+                            {badgeLabels[row.badge] || row.badge}
                           </span>
                         </div>
                       </td>
@@ -184,15 +193,15 @@ export default function LeaderboardPage() {
         <Card className="border border-border bg-secondary/40 p-4">
           <div className="flex flex-col gap-2 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-xs uppercase tracking-wide text-muted-foreground">Your current rank</p>
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">{t('Your current rank', 'आपकी वर्तमान रैंक')}</p>
               <p className="text-lg font-semibold text-foreground">#{profile.global_rank || '—'}</p>
             </div>
             <div>
-              <p className="text-xs uppercase tracking-wide text-muted-foreground">Trade accuracy</p>
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">{t('Trade accuracy', 'व्यापार सटीकता')}</p>
               <p className="text-lg font-semibold text-foreground">{profile.accuracy ?? 0}%</p>
             </div>
             <div>
-              <p className="text-xs uppercase tracking-wide text-muted-foreground">Score</p>
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">{t('Score', 'स्कोर')}</p>
               <p className="text-lg font-semibold text-foreground">{profile.learning_score?.toLocaleString() ?? 0}</p>
             </div>
           </div>
