@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-label="GameStop Short Squeeze Cover">
+  <defs>
+    <linearGradient id="bgGme" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#05140b" />
+      <stop offset="100%" stop-color="#0a2e19" />
+    </linearGradient>
+    <linearGradient id="greenGlow" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#22c55e" stop-opacity="0.1" />
+      <stop offset="100%" stop-color="#4ade80" stop-opacity="0.7" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" rx="24" fill="url(#bgGme)" />
+  <circle cx="400" cy="200" r="180" fill="#22c55e" opacity="0.08" />
+
+  <!-- Parabolic Chart Line -->
+  <path d="M 80 400 L 250 380 L 380 340 L 480 310 L 560 220 L 640 70 L 720 180" fill="none" stroke="#4ade80" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 80 400 L 250 380 L 380 340 L 480 310 L 560 220 L 640 70 L 720 180 L 720 460 L 80 460 Z" fill="url(#greenGlow)" />
+
+  <!-- Rocket Rocket Symbol -->
+  <g transform="translate(615, 30) scale(1.2)">
+    <path d="M 20 50 C 20 20 40 0 40 0 C 40 0 60 20 60 50 L 50 70 L 30 70 Z" fill="#fbbf24" stroke="#f59e0b" stroke-width="2" />
+    <polygon points="15,50 30,70 15,75" fill="#ef4444" />
+    <polygon points="65,50 50,70 65,75" fill="#ef4444" />
+    <circle cx="40" cy="35" r="8" fill="#1e293b" stroke="#f59e0b" stroke-width="2" />
+  </g>
+
+  <!-- Gaming Controller Contour -->
+  <g transform="translate(180, 160)" opacity="0.3" fill="none" stroke="#86efac" stroke-width="4">
+    <rect x="0" y="0" width="220" height="120" rx="40" />
+    <circle cx="50" cy="60" r="25" />
+    <circle cx="170" cy="60" r="25" />
+  </g>
+
+  <text x="400" y="460" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="32" font-weight="800" fill="#86efac" letter-spacing="1">GAMESTOP SHORT SQUEEZE</text>
+</svg>

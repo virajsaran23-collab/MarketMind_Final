@@ -20,6 +20,10 @@ urlpatterns = [
     path('case-studies/<str:study_id>/', views.case_study_detail),
     path('case-studies/<str:study_id>/complete/', views.complete_case_study),
 
+    path('math-modules/', views.math_modules_list),
+    path('math-modules/<str:slug>/', views.math_module_detail),
+    path('math-modules/<str:slug>/submit-quiz/', views.submit_math_quiz),
+
     path('leaderboard/', views.leaderboard),
 
     path('analytics/', views.analytics),

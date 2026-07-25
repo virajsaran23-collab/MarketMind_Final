@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-label="George Soros Bank of England Cover">
+  <defs>
+    <linearGradient id="bgSoros" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f091c" />
+      <stop offset="100%" stop-color="#241138" />
+    </linearGradient>
+    <linearGradient id="purpleGlow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#a855f7" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#ec4899" stop-opacity="0.2" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" rx="24" fill="url(#bgSoros)" />
+  <circle cx="200" cy="200" r="160" fill="#a855f7" opacity="0.08" />
+
+  <!-- British Pound Sign Cracking -->
+  <g transform="translate(320, 100)">
+    <text x="70" y="200" font-family="Georgia, serif" font-size="220" font-weight="bold" fill="url(#purpleGlow)" opacity="0.9">£</text>
+    <!-- Lightning Crack -->
+    <path d="M 120 40 L 100 110 L 140 140 L 90 220" fill="none" stroke="#ef4444" stroke-width="6" stroke-linecap="round" />
+  </g>
+
+  <!-- Trendline breaking peg -->
+  <path d="M 60 160 L 260 160 L 420 160 L 480 280 L 740 400" fill="none" stroke="#e879f9" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+  <line x1="60" y1="160" x2="440" y2="160" stroke="#f472b6" stroke-width="3" stroke-dasharray="8,8" />
+
+  <text x="400" y="460" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="30" font-weight="800" fill="#e9d5ff" letter-spacing="1">GEORGE SOROS &amp; BANK OF ENGLAND</text>
+</svg>

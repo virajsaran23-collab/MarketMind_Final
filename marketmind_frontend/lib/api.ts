@@ -81,4 +81,14 @@ export const api = {
     }),
 
   aiAnalyzer: () => request('/ai-analyzer/'),
+
+  mathModules: () => request('/math-modules/'),
+
+  mathModule: (slug: string) => request(`/math-modules/${slug}/`),
+
+  submitMathQuiz: (slug: string, answers: Record<string, string>) =>
+    request(`/math-modules/${slug}/submit-quiz/`, {
+      method: 'POST',
+      body: JSON.stringify({ answers }),
+    }),
 }

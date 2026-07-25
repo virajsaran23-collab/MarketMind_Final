@@ -31,6 +31,8 @@ class Asset(models.Model):
     sector = models.CharField(max_length=100, blank=True)
     last_price = models.FloatField(default=0)
     last_updated = models.DateTimeField(auto_now=True)
+    eps = models.FloatField(default=0.0)
+    shares_outstanding = models.FloatField(default=0.0)
 
     objects = AssetManager()
 
@@ -133,6 +135,46 @@ class CaseStudy(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class MathModule(models.Model):
+    DIFFICULTY_CHOICES = [
+        ('Beginner', 'Beginner'),
+        ('Intermediate', 'Intermediate'),
+        ('Advanced', 'Advanced'),
+    ]
+    slug = models.CharField(max_length=100, unique=True)
+    title = models.CharField(max_length=200)
+    concept_summary = models.TextField(blank=True)
+    difficulty = models.CharField(max_length=20, choices=DIFFICULTY_CHOICES, default='Beginner')
+    order = models.IntegerField(default=0)
+    badge_track = models.CharField(max_length=100, blank=True)
+    token_reward = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['order', 'title']
+
+    def __str__(self):
+        return self.title
+
+
+class UserMathModuleProgress(models.Model):
+    STATUS_CHOICES = [
+        ('not_started', 'Not Started'),
+        ('in_progress', 'In Progress'),
+        ('complete', 'Complete'),
+    ]
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='math_progress')
+    module = models.ForeignKey(MathModule, on_delete=models.CASCADE)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='not_started')
+    quiz_score = models.IntegerField(default=0)
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ('user', 'module')
+
+    def __str__(self):
+        return f"{self.user.username} - {self.module.slug} ({self.status})"
 
 
 class GameChallenge(models.Model):

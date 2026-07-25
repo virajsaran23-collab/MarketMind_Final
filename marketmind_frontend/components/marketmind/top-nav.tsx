@@ -17,6 +17,7 @@ const links = [
   { href: '/ai-analyzer', labelEn: 'AI Analyzer', labelHi: 'AI विश्लेषक' },
   { href: '/case-studies', labelEn: 'Case Studies', labelHi: 'केस स्टडीज़' },
   { href: '/analytics', labelEn: 'Analytics', labelHi: 'एनालिटिक्स' },
+  { href: '/market-math', labelEn: 'Market Math', labelHi: 'मार्केट गणित' },
   { href: '/leaderboard', labelEn: 'Leaderboard', labelHi: 'लीडरबोर्ड' },
 ]
 

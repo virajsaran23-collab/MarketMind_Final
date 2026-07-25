@@ -9,13 +9,23 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 import requests
 
-from .models import Asset, UserProfile, Holding, Trade, CaseStudy, LeaderboardEntry, GameChallenge, UserChallenge, PortfolioSnapshot
+from .models import (
+    Asset, UserProfile, Holding, Trade, CaseStudy, LeaderboardEntry,
+    GameChallenge, UserChallenge, PortfolioSnapshot, MathModule, UserMathModuleProgress,
+)
+from .math_modules import (
+    asset_foundation_defaults, build_ratio_lab_interactive,
+    build_ratio_lab_quiz, quiz_for_client, grade_ratio_lab_quiz, award_badge_track_bonus,
+    build_growth_lab_interactive, build_growth_lab_quiz, grade_growth_lab_quiz,
+    build_risk_lab_interactive, build_risk_lab_quiz, grade_risk_lab_quiz,
+    build_portfolio_lab_interactive, build_portfolio_lab_quiz, grade_portfolio_lab_quiz,
+)
 from .mentor import _normalize_text, build_portfolio_context, extract_symbols, fetch_news, fetch_quotes, generate_reply, summarize_market
 from .serializers import (
     AssetSerializer, UserProfileSerializer, HoldingSerializer,
     TradeSerializer, CaseStudySerializer, LeaderboardEntrySerializer,
     UserChallengeSerializer, RegisterSerializer, UserSerializer,
-    PortfolioSnapshotSerializer,
+    PortfolioSnapshotSerializer, MathModuleSerializer,
 )
 from .services.market_data import get_quote
 
@@ -319,14 +329,56 @@ def ensure_foundation_assets():
         if data['symbol'] in FOUNDATION_SYMBOLS:
             Asset.objects.get_or_create(
                 id=data['id'],
-                defaults={
-                    'symbol': data['symbol'],
-                    'name': data['name'],
-                    'exchange': data['exchange'],
-                    'category': data['category'],
-                    'sector': data['sector'],
-                }
+                defaults=asset_foundation_defaults(data),
             )
+
+    if not MathModule.objects.exists():
+        MATH_MODULES = [
+            {
+                'slug': 'ratio-percentage-lab',
+                'title': 'Ratio & Percentage Lab',
+                'concept_summary': (
+                    'Master three building blocks every market analyst uses daily: '
+                    'the P/E ratio (how much you pay per dollar of earnings), '
+                    'percentage gain/loss on your own positions, and market-cap classification '
+                    '(large, mid, and small cap). All examples use live prices from your portfolio '
+                    'when available.'
+                ),
+                'difficulty': 'Beginner',
+                'order': 1,
+                'badge_track': 'Quant Rookie',
+                'token_reward': 25,
+            },
+            {
+                'slug': 'growth-compounding-lab',
+                'title': 'Growth & Compounding Lab',
+                'concept_summary': 'Compound interest, Rule of 72, and CAGR using your portfolio snapshots.',
+                'difficulty': 'Beginner',
+                'order': 2,
+                'badge_track': 'Quant Rookie',
+                'token_reward': 25,
+            },
+            {
+                'slug': 'statistics-risk-lab',
+                'title': 'Statistics & Risk Lab',
+                'concept_summary': 'Volatility, moving averages, and correlation for assets you hold.',
+                'difficulty': 'Intermediate',
+                'order': 3,
+                'badge_track': 'Risk Analyst',
+                'token_reward': 30,
+            },
+            {
+                'slug': 'portfolio-math-lab',
+                'title': 'Portfolio Math Lab',
+                'concept_summary': 'Weighted returns and risk-return tradeoffs across your holdings.',
+                'difficulty': 'Intermediate',
+                'order': 4,
+                'badge_track': 'Ratio Master',
+                'token_reward': 30,
+            },
+        ]
+        for mod in MATH_MODULES:
+            MathModule.objects.get_or_create(slug=mod['slug'], defaults=mod)
 
 
 def fetch_and_create_asset(symbol):
@@ -516,6 +568,16 @@ def ensure_default_challenges():
             'sort_order': 3,
         },
         {
+            'slug': 'complete_math_module',
+            'name': 'Quant Rookie',
+            'description': 'Complete your first Market Math lab module.',
+            'category': 'achievement',
+            'token_reward': 20,
+            'target_value': 1,
+            'active': True,
+            'sort_order': 4,
+        },
+        {
             'slug': 'daily_trade',
             'name': 'Daily Trader',
             'description': 'Complete at least one trade today.',
@@ -562,6 +624,11 @@ def evaluate_challenge(user, challenge, user_challenge):
         profitable = sum(1 for t in buy_trades if t.asset.price > t.price)
         progress = min(profitable, challenge.target_value)
         complete = profitable >= challenge.target_value
+    elif challenge.slug == 'complete_math_module':
+        from .models import UserMathModuleProgress
+        math_count = UserMathModuleProgress.objects.filter(user=user, status='complete').count()
+        progress = min(math_count, challenge.target_value)
+        complete = math_count >= challenge.target_value
     else:
         progress = 0
         complete = False
@@ -1261,4 +1328,151 @@ def ai_analyzer(request):
     from .mentor import analyze_all_assets
     results = analyze_all_assets()
     return Response(results)
+
+
+def _get_module_progress_map(user):
+    if not user or not user.is_authenticated:
+        return {}
+    rows = UserMathModuleProgress.objects.filter(user=user).select_related('module')
+    return {row.module_id: row for row in rows}
+
+
+def _serialize_module_with_progress(module, progress_map):
+    data = MathModuleSerializer(module).data
+    progress = progress_map.get(module.id)
+    if progress:
+        data['status'] = progress.status
+        data['quiz_score'] = progress.quiz_score
+        data['completed_at'] = progress.completed_at.isoformat() if progress.completed_at else None
+    else:
+        data['status'] = 'not_started'
+        data['quiz_score'] = 0
+        data['completed_at'] = None
+    data['locked'] = False
+    return data
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def math_modules_list(request):
+    ensure_foundation_assets()
+    modules = MathModule.objects.all()
+    progress_map = _get_module_progress_map(request.user)
+    return Response([
+        _serialize_module_with_progress(m, progress_map) for m in modules
+    ])
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def math_module_detail(request, slug):
+    ensure_foundation_assets()
+    try:
+        module = MathModule.objects.get(slug=slug)
+    except MathModule.DoesNotExist:
+        return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    progress_map = _get_module_progress_map(request.user)
+    data = _serialize_module_with_progress(module, progress_map)
+
+    user = request.user if request.user.is_authenticated else None
+
+    if slug == 'ratio-percentage-lab':
+        data['interactive'] = build_ratio_lab_interactive(user)
+        data['quiz'] = quiz_for_client(build_ratio_lab_quiz(user))
+    elif slug == 'growth-compounding-lab':
+        data['interactive'] = build_growth_lab_interactive(user)
+        data['quiz'] = quiz_for_client(build_growth_lab_quiz(user))
+    elif slug == 'statistics-risk-lab':
+        data['interactive'] = build_risk_lab_interactive(user)
+        data['quiz'] = quiz_for_client(build_risk_lab_quiz(user))
+    elif slug == 'portfolio-math-lab':
+        data['interactive'] = build_portfolio_lab_interactive(user)
+        data['quiz'] = quiz_for_client(build_portfolio_lab_quiz(user))
+    else:
+        data['interactive'] = None
+        data['quiz'] = []
+
+    return Response(data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def submit_math_quiz(request, slug):
+    ensure_foundation_assets()
+    try:
+        module = MathModule.objects.get(slug=slug)
+    except MathModule.DoesNotExist:
+        return Response({'error': 'Module not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    answers = request.data.get('answers', {})
+    if not isinstance(answers, dict):
+        return Response({'error': 'answers must be an object'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if slug == 'ratio-percentage-lab':
+        score, total, passed, results = grade_ratio_lab_quiz(request.user, answers)
+    elif slug == 'growth-compounding-lab':
+        score, total, passed, results = grade_growth_lab_quiz(request.user, answers)
+    elif slug == 'statistics-risk-lab':
+        score, total, passed, results = grade_risk_lab_quiz(request.user, answers)
+    elif slug == 'portfolio-math-lab':
+        score, total, passed, results = grade_portfolio_lab_quiz(request.user, answers)
+    else:
+        return Response({'error': 'Unknown module slug'}, status=status.HTTP_400_BAD_REQUEST)
+
+    profile = UserProfile.objects.get_or_create(user=request.user)[0]
+    progress, _ = UserMathModuleProgress.objects.get_or_create(
+        user=request.user,
+        module=module,
+        defaults={'status': 'in_progress'},
+    )
+
+    was_complete = progress.status == 'complete'
+    track_bonus = 0
+
+    if passed and not was_complete:
+        progress.status = 'complete'
+        progress.quiz_score = score
+        progress.completed_at = timezone.now()
+        progress.save()
+
+        profile.bonus_tokens += module.token_reward
+        profile.learning_score += (score * 100) + 150
+        profile.simulations_completed += 1
+        track_bonus = award_badge_track_bonus(request.user, module.badge_track)
+        if track_bonus:
+            profile.bonus_tokens += track_bonus
+            profile.learning_score += track_bonus
+        update_user_badge(profile)
+        profile.save()
+        update_leaderboard_for_user(request.user)
+    elif passed and was_complete:
+        progress.quiz_score = max(progress.quiz_score, score)
+        progress.save()
+    elif not passed:
+        progress.status = 'in_progress'
+        progress.quiz_score = score
+        progress.save()
+
+    user_challenges = sync_user_challenges(request.user)
+
+    return Response({
+        'passed': passed,
+        'score': score,
+        'total': total,
+        'pass_threshold': 0.8,
+        'results': results,
+        'already_complete': was_complete,
+        'token_reward': module.token_reward if passed and not was_complete else 0,
+        'track_bonus': track_bonus if passed and not was_complete else 0,
+        'learning_score': profile.learning_score,
+        'bonus_tokens': profile.bonus_tokens,
+        'profile': UserProfileSerializer(profile).data,
+        'progress': {
+            'status': progress.status,
+            'quiz_score': progress.quiz_score,
+            'completed_at': progress.completed_at.isoformat() if progress.completed_at else None,
+        },
+        'challenges': UserChallengeSerializer(user_challenges, many=True).data,
+    })
 

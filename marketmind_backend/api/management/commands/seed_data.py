@@ -1031,6 +1031,734 @@ CASE_STUDIES = [
                 'explanation': 'Central banks hold thousands of tonnes of gold as a secure reserve asset with no counterparty risk, protecting national balance sheets.'
             }
         ]
+    },
+    {
+        'id': 'asian-financial-crisis',
+        'title': 'Asian Financial Crisis (1997)',
+        'description': 'Currency collapse, IMF bailouts, and contagion across Southeast Asia.',
+        'long_description': 'In the summer of 1997, Thailand devalued its currency, the baht, triggering a devastating financial contagion that swept across Southeast Asia. Nations including Indonesia, South Korea, Malaysia, and the Philippines saw their currencies and stock markets collapse as international investors fled. For years, these "Asian Tigers" had attracted hot foreign capital, but rapid credit expansion, fixed exchange rate pegs, and excessive short-term foreign borrowing created severe vulnerabilities. When Thailand could no longer defend its peg, the reversal was catastrophic. The IMF intervened with over $100 billion in bailout packages, attaching harsh austerity conditions that deepened recessions across the region, laying bare the dangers of unregulated capital flows and dollar-pegged currencies in emerging markets.',
+        'difficulty': 'Intermediate',
+        'read_time': '8 min',
+        'image': '/case-asian-crisis.png',
+        'tags': ['Emerging Markets', 'Currency Crisis', 'Contagion'],
+        'timeline': [
+            {'date': 'May 1997', 'event': 'Baht Under Attack', 'description': 'Speculative attacks on the Thai baht intensify as investors question its dollar peg.'},
+            {'date': 'Jul 2, 1997', 'event': 'Thailand Floats Baht', 'description': 'Thailand abandons the dollar peg. The baht immediately loses over 15%, triggering regional panic.'},
+            {'date': 'Aug–Sep 1997', 'event': 'Regional Contagion', 'description': 'Indonesian rupiah, Malaysian ringgit, and Philippine peso all collapse. Stock markets across Asia plunge.'},
+            {'date': 'Oct–Nov 1997', 'event': 'South Korea Crisis', 'description': 'South Korea\'s banking system nears collapse. IMF announces a $57 billion rescue package.'},
+            {'date': '1998', 'event': 'Indonesia Meltdown', 'description': 'Indonesian rupiah loses 80% of its value. GDP contracts 13.1%. President Suharto resigns amid social unrest.'}
+        ],
+        'stats': [
+            {'label': 'Thai Baht Decline', 'value': '-56% vs USD (1997)'},
+            {'label': 'Indonesian Rupiah Fall', 'value': '-80% vs USD (1998)'},
+            {'label': 'IMF Bailout Total', 'value': '$118 Billion'},
+            {'label': 'South Korea GDP Drop', 'value': '-5.5% (1998)'}
+        ],
+        'lessons': [
+            'Fixed exchange rate pegs create false security; when they break, the correction can be extreme and rapid.',
+            'Short-term foreign currency borrowing used to fund long-term domestic investments creates a dangerous maturity and currency mismatch.',
+            'IMF austerity conditions (rate hikes during a collapse) can deepen recessions — a lesson that reshaped crisis response doctrine.'
+        ],
+        'chart_data': [
+            {'date': 'Jan 97', 'value': 25.7},
+            {'date': 'Apr 97', 'value': 26.2},
+            {'date': 'Jul 97', 'value': 31.4},
+            {'date': 'Aug 97', 'value': 33.5},
+            {'date': 'Sep 97', 'value': 37.1},
+            {'date': 'Oct 97', 'value': 38.2},
+            {'date': 'Nov 97', 'value': 40.0},
+            {'date': 'Dec 97', 'value': 47.2},
+            {'date': 'Jan 98', 'value': 55.0},
+            {'date': 'Apr 98', 'value': 40.1},
+            {'date': 'Jul 98', 'value': 41.8},
+            {'date': 'Dec 98', 'value': 36.5}
+        ],
+        'quiz': [
+            {
+                'question': 'Which country\'s currency devaluation in July 1997 was the initial trigger for the Asian Financial Crisis?',
+                'options': ['South Korea', 'Indonesia', 'Thailand', 'Malaysia'],
+                'answer': 'Thailand',
+                'explanation': 'Thailand\'s decision to abandon the dollar peg and let the baht float freely on July 2, 1997, triggered a wave of currency attacks and capital flight across the region.'
+            },
+            {
+                'question': 'What type of exchange rate arrangement did many Asian nations maintain before the crisis, which made them vulnerable?',
+                'options': ['Free-floating exchange rates', 'Fixed dollar pegs', 'Gold standard', 'Barter-based exchange'],
+                'answer': 'Fixed dollar pegs',
+                'explanation': 'Countries like Thailand, Malaysia, and Indonesia maintained currencies pegged to the US dollar, which made them appear stable but required large foreign reserve buffers to defend.'
+            },
+            {
+                'question': 'Which international financial institution provided $118 billion in emergency loans to affected Asian nations?',
+                'options': ['World Bank', 'ASEAN Fund', 'International Monetary Fund (IMF)', 'Asian Development Bank'],
+                'answer': 'International Monetary Fund (IMF)',
+                'explanation': 'The IMF coordinated over $118 billion in bailout packages for Thailand, Indonesia, and South Korea, though with controversial austerity requirements attached.'
+            },
+            {
+                'question': 'What term describes the rapid spread of a financial crisis from one country to others through investor panic and capital flight?',
+                'options': ['Stagflation', 'Contagion', 'Deflation', 'Hysteresis'],
+                'answer': 'Contagion',
+                'explanation': 'Financial contagion occurs when a crisis in one market rapidly spreads to others, as investors treat similar economies as equally risky and withdraw capital simultaneously.'
+            },
+            {
+                'question': 'Approximately how much did the Indonesian rupiah lose against the US dollar in 1997-1998?',
+                'options': ['~15%', '~35%', '~80%', '~99%'],
+                'answer': '~80%',
+                'explanation': 'The Indonesian rupiah was one of the worst affected currencies, losing approximately 80% of its value against the USD at the peak of the crisis in early 1998.'
+            },
+            {
+                'question': 'Which economic vulnerability common to many Asian nations made them particularly exposed to a currency crisis?',
+                'options': ['High domestic savings rates', 'Short-term foreign currency borrowing to fund long-term local investments', 'Excessive gold reserves', 'High government budget surpluses'],
+                'answer': 'Short-term foreign currency borrowing to fund long-term local investments',
+                'explanation': 'Asian firms and banks borrowed in US dollars (short-term) to fund projects with long repayment horizons. When the dollar strengthened, repaying these debts became impossible.'
+            },
+            {
+                'question': 'Which country\'s leader resigned in 1998 amid economic collapse and widespread social unrest caused by the crisis?',
+                'options': ['Mahathir Mohamad (Malaysia)', 'Kim Dae-jung (South Korea)', 'Suharto (Indonesia)', 'Chavalit Yongchaiyudh (Thailand)'],
+                'answer': 'Suharto (Indonesia)',
+                'explanation': 'Indonesia\'s long-serving President Suharto resigned in May 1998 after 32 years in power, as the rupiah\'s collapse and IMF austerity triggered severe economic hardship and riots.'
+            },
+            {
+                'question': 'George Soros and other hedge funds have been blamed for accelerating the Asian crisis. What strategy did they employ?',
+                'options': ['Buying Asian equities in bulk', 'Short-selling Asian currencies to profit from their devaluation', 'Providing emergency loans to Asian governments', 'Purchasing long-term government bonds'],
+                'answer': 'Short-selling Asian currencies to profit from their devaluation',
+                'explanation': 'Speculative currency attacks involved borrowing and selling large quantities of the target currency, profiting when the currency falls after the peg breaks or confidence collapses.'
+            },
+            {
+                'question': 'What controversial policy did the IMF typically require as a condition for crisis bailouts, which critics argued deepened recessions?',
+                'options': ['Printing money to reflate the economy', 'Fiscal austerity and high interest rates', 'Imposing capital controls', 'Nationalizing all banks'],
+                'answer': 'Fiscal austerity and high interest rates',
+                'explanation': 'The IMF demanded spending cuts and high interest rates to restore investor confidence and stop currency outflows, but these policies deepened the economic downturns in crisis nations.'
+            },
+            {
+                'question': 'Malaysia took an unconventional approach during the crisis. What did it do that was criticized by the IMF at the time?',
+                'options': ['It sold all its gold reserves', 'It imposed capital controls to stop currency outflows', 'It devalued the ringgit by 90%', 'It defaulted on all foreign debt'],
+                'answer': 'It imposed capital controls to stop currency outflows',
+                'explanation': 'Malaysia\'s PM Mahathir imposed capital controls in September 1998, pegging the ringgit at 3.80 to the dollar and restricting foreign currency flows — a move later seen as having helped its recovery.'
+            }
+        ]
+    },
+    {
+        'id': 'rise-of-crypto',
+        'title': 'The Rise of Cryptocurrencies',
+        'description': 'From Bitcoin\'s genesis block to DeFi, NFTs, and the crypto market cycle.',
+        'long_description': 'In January 2009, a mysterious figure known only as Satoshi Nakamoto mined the first Bitcoin block, embedding the headline "Chancellor on Brink of Second Bailout for Banks" — a direct critique of the financial system being rescued after 2008. Bitcoin introduced blockchain technology: a decentralized, immutable public ledger secured by cryptography. Over the following decade, the crypto ecosystem exploded into thousands of tokens, Ethereum smart contracts, Decentralized Finance (DeFi) protocols, Non-Fungible Tokens (NFTs), and institutional-grade investments. Bitcoin went from being worth fractions of a cent in 2009 to a peak of $69,000 in 2021. However, the space has also been marked by spectacular bubbles, exchange collapses like FTX, and fierce regulatory scrutiny.',
+        'difficulty': 'Intermediate',
+        'read_time': '9 min',
+        'image': '/case-crypto.png',
+        'tags': ['Cryptocurrency', 'Blockchain', 'DeFi'],
+        'timeline': [
+            {'date': 'Jan 3, 2009', 'event': 'Bitcoin Genesis Block', 'description': 'Satoshi Nakamoto mines the first Bitcoin block, launching the world\'s first decentralized cryptocurrency.'},
+            {'date': '2017', 'event': 'ICO Bubble', 'description': 'Thousands of Initial Coin Offerings raise billions; Bitcoin hits $19,783. The bubble bursts as 2018 begins, losing 84%.'},
+            {'date': '2020', 'event': 'DeFi Summer', 'description': 'Decentralized Finance protocols launch, enabling permissionless lending, borrowing, and yield farming on Ethereum.'},
+            {'date': 'Nov 2021', 'event': 'All-Time High', 'description': 'Bitcoin reaches $69,000 ATH. Total crypto market cap peaks at $3 Trillion.'},
+            {'date': 'Nov 2022', 'event': 'FTX Collapse', 'description': 'Exchange FTX files for bankruptcy after misappropriating $8 billion of customer funds, destroying market confidence.'}
+        ],
+        'stats': [
+            {'label': 'Bitcoin ATH', 'value': '$69,000 (Nov 2021)'},
+            {'label': 'Peak Crypto Market Cap', 'value': '$3 Trillion'},
+            {'label': 'FTX Collapse Loss', 'value': '$8 Billion'},
+            {'label': 'Bitcoin\'s Jan 2009 Price', 'value': '$0.0009'}
+        ],
+        'lessons': [
+            'Blockchain technology enables trustless, permissionless transactions, but does not eliminate fraud or market irrationality.',
+            'Crypto markets exhibit extreme boom-bust cycles driven by speculation, leverage, and narrative momentum.',
+            'The collapse of centralized crypto intermediaries (FTX, Celsius) ironically reinforces the original case for truly decentralized finance.'
+        ],
+        'chart_data': [
+            {'date': 'Jan 17', 'value': 1000},
+            {'date': 'Dec 17', 'value': 19783},
+            {'date': 'Dec 18', 'value': 3200},
+            {'date': 'Dec 19', 'value': 7200},
+            {'date': 'Dec 20', 'value': 29300},
+            {'date': 'Apr 21', 'value': 63400},
+            {'date': 'Jul 21', 'value': 31600},
+            {'date': 'Nov 21', 'value': 69000},
+            {'date': 'Jun 22', 'value': 17700},
+            {'date': 'Dec 22', 'value': 16540},
+            {'date': 'Jan 24', 'value': 45000},
+            {'date': 'Mar 24', 'value': 73700}
+        ],
+        'quiz': [
+            {
+                'question': 'What was embedded in the very first Bitcoin block, hinting at its origins as a reaction to the financial system?',
+                'options': ['"Hello, World!"', '"Chancellor on Brink of Second Bailout for Banks"', '"One coin to rule them all"', '"Trust no one"'],
+                'answer': '"Chancellor on Brink of Second Bailout for Banks"',
+                'explanation': 'Satoshi embedded this January 3, 2009 UK newspaper headline in the Genesis Block as a message about why a trustless peer-to-peer financial system was needed.'
+            },
+            {
+                'question': 'What is the core technology underlying Bitcoin that makes it resistant to tampering?',
+                'options': ['Quantum encryption', 'A distributed public blockchain ledger', 'Central bank oversight', 'Private server clusters'],
+                'answer': 'A distributed public blockchain ledger',
+                'explanation': 'A blockchain is a chain of cryptographically linked blocks, each containing transaction data, stored across thousands of nodes — making it extremely difficult to alter past records.'
+            },
+            {
+                'question': 'What was Bitcoin\'s approximate all-time high price, reached in November 2021?',
+                'options': ['$19,783', '$31,600', '$45,000', '$69,000'],
+                'answer': '$69,000',
+                'explanation': 'Bitcoin reached its all-time high of approximately $69,000 in November 2021, during a period of broad institutional adoption and low interest rates.'
+            },
+            {
+                'question': 'What are "smart contracts" on the Ethereum blockchain?',
+                'options': ['Legal contracts notarized by a blockchain lawyer', 'Self-executing code stored on the blockchain that runs when conditions are met', 'NFT ownership documents', 'Encrypted emails between miners'],
+                'answer': 'Self-executing code stored on the blockchain that runs when conditions are met',
+                'explanation': 'Smart contracts eliminate the need for intermediaries by automatically executing predetermined rules (e.g., releasing funds when conditions are met) in a trustless manner.'
+            },
+            {
+                'question': 'What does "DeFi" stand for, and what does it enable?',
+                'options': ['Digital Finance — centralized banks on blockchain', 'Decentralized Finance — permissionless financial services without intermediaries', 'Derivative Finance — synthetic crypto options', 'Default Finance — government crypto programs'],
+                'answer': 'Decentralized Finance — permissionless financial services without intermediaries',
+                'explanation': 'DeFi protocols allow anyone to lend, borrow, trade, and earn yield on crypto assets directly using smart contracts, removing banks and brokers as middlemen.'
+            },
+            {
+                'question': 'What is "Bitcoin halving" and why does it matter?',
+                'options': ['When Bitcoin\'s price falls by 50%', 'The programmatic event that cuts the miner block reward in half every ~4 years', 'When exchanges split Bitcoin into smaller coins', 'A government regulation to limit Bitcoin ownership'],
+                'answer': 'The programmatic event that cuts the miner block reward in half every ~4 years',
+                'explanation': 'Every 210,000 blocks (~4 years), the number of new bitcoins rewarded per block halves. This reduces new supply creation, and historically has preceded major bull markets.'
+            },
+            {
+                'question': 'What caused the collapse of the FTX cryptocurrency exchange in November 2022?',
+                'options': ['A large-scale cyberattack', 'Misappropriation of $8 billion in customer funds to fund sister trading firm Alameda Research', 'Government seizure of its servers', 'A malfunction in its smart contracts'],
+                'answer': 'Misappropriation of $8 billion in customer funds to fund sister trading firm Alameda Research',
+                'explanation': 'FTX\'s founder Sam address customer deposits to fund Alameda Research. When these were discovered, a bank run collapsed the exchange in days.'
+            },
+            {
+                'question': 'What is an NFT (Non-Fungible Token)?',
+                'options': ['A type of stable cryptocurrency', 'A unique digital asset on the blockchain that proves ownership of a specific item', 'A government-issued digital currency', 'A hashed version of a Bitcoin transaction'],
+                'answer': 'A unique digital asset on the blockchain that proves ownership of a specific item',
+                'explanation': 'NFTs use blockchain to record ownership of a unique digital or physical item. Unlike Bitcoin, each NFT is one-of-a-kind and cannot be exchanged on a like-for-like basis.'
+            },
+            {
+                'question': 'What is "proof-of-work" (PoW) consensus in Bitcoin, and what is its main criticism?',
+                'options': ['A voting system used by Bitcoin holders to approve transactions', 'A mining process where computers compete to solve puzzles, consuming enormous amounts of electricity', 'A method where validators post bond collateral to confirm transactions', 'A verification process controlled by government nodes'],
+                'answer': 'A mining process where computers compete to solve puzzles, consuming enormous amounts of electricity',
+                'explanation': 'Bitcoin\'s PoW requires massive computational power, consuming as much electricity as many countries, which is its primary environmental criticism.'
+            },
+            {
+                'question': 'What is a "crypto winter" in the context of cryptocurrency markets?',
+                'options': ['A seasonal price dip in December', 'A prolonged bear market with 80%+ drops from peak and low activity', 'A government ban on crypto mining', 'A fork that creates a new coin from Bitcoin'],
+                'answer': 'A prolonged bear market with 80%+ drops from peak and low activity',
+                'explanation': 'Crypto winters are extended periods of dramatic price declines, low trading volume, and waning public interest — similar to those seen in 2018 and 2022 following speculative peaks.'
+            }
+        ]
+    },
+    {
+        'id': '2008-financial-crash',
+        'title': '2008 Global Financial Crisis',
+        'description': 'Subprime mortgages, Lehman collapse, TARP bailouts, and the Great Recession.',
+        'long_description': 'The 2008 Global Financial Crisis was the most severe credit freeze since 1929. Fueled by low interest rates and lax underwriting standards, Wall Street financial institutions created complex derivatives—Mortgage-Backed Securities (MBS) and Collateralized Debt Obligations (CDOs)—stuffed with risky subprime loans. Credit rating agencies stamped these toxic assets with top-tier AAA ratings. When housing prices began falling in 2006, subprime borrowers defaulted at record rates, causing catastrophic balance sheet losses across global investment banks. On September 15, 2008, 158-year-old Lehman Brothers declared bankruptcy, freezing interbank lending markets worldwide. The US government was forced to engineer a $700 billion TARP bailout, while the Federal Reserve launched quantitative easing and slashed rates to zero to prevent total systemic collapse.',
+        'difficulty': 'Advanced',
+        'read_time': '11 min',
+        'image': '/case-2008-crash.png',
+        'tags': ['Subprime', 'Banking', 'Systemic Risk'],
+        'timeline': [
+            {'date': '2004–2006', 'event': 'Subprime Housing Boom', 'description': 'Wall Street packages subprime mortgages into CDOs as US home prices reach record highs.'},
+            {'date': 'Feb 2007', 'event': 'Subprime Defaults Spike', 'description': 'HSBC and New Century Financial warn of surging losses on subprime mortgage loans.'},
+            {'date': 'Mar 2008', 'event': 'Bear Stearns Rescue', 'description': 'Federal Reserve backs JPMorgan\'s emergency acquisition of failing investment bank Bear Stearns.'},
+            {'date': 'Sep 15, 2008', 'event': 'Lehman Bankruptcy', 'description': 'Lehman Brothers files for Chapter 11 bankruptcy after failing to find a buyer, sparking global market panic.'},
+            {'date': 'Oct 2008', 'event': 'TARP & Global Bailouts', 'description': 'US Congress passes $700B TARP bailout as central banks globally coordinate interest rate cuts.'}
+        ],
+        'stats': [
+            {'label': 'S&P 500 Max Drawdown', 'value': '-56.8% (2007-09)'},
+            {'label': 'Lehman Debt at Bankruptcy', 'value': '$613 Billion'},
+            {'label': 'US Unemployment Peak', 'value': '10.0% (Oct 2009)'},
+            {'label': 'TARP Bailout Authorized', 'value': '$700 Billion'}
+        ],
+        'lessons': [
+            'Opaque financial derivatives (like CDOs) can hide systemic counterparty risk until credit markets freeze suddenly.',
+            'Conflict of interest in rating agencies (paid by debt issuers) can lead to widespread mispricing of risk.',
+            'Central bank liquidity operations and government bailouts become the lender of last resort when interbank trust collapses.'
+        ],
+        'chart_data': [
+            {'date': 'Oct 07', 'value': 1565},
+            {'date': 'Jan 08', 'value': 1400},
+            {'date': 'Mar 08', 'value': 1300},
+            {'date': 'Jun 08', 'value': 1280},
+            {'date': 'Sep 08', 'value': 1250},
+            {'date': 'Oct 08', 'value': 968},
+            {'date': 'Nov 08', 'value': 888},
+            {'date': 'Dec 08', 'value': 903},
+            {'date': 'Jan 09', 'value': 825},
+            {'date': 'Mar 09', 'value': 676},
+            {'date': 'Jun 09', 'value': 919},
+            {'date': 'Dec 09', 'value': 1115}
+        ],
+        'quiz': [
+            {
+                'question': 'Which 158-year-old investment bank\'s bankruptcy on September 15, 2008 triggered the acute phase of the financial crisis?',
+                'options': ['Bear Stearns', 'Lehman Brothers', 'Merrill Lynch', 'Goldman Sachs'],
+                'answer': 'Lehman Brothers',
+                'explanation': 'Lehman Brothers filed for Chapter 11 bankruptcy on September 15, 2008, causing credit markets worldwide to freeze instantaneously.'
+            },
+            {
+                'question': 'What type of high-risk home loans, issued to borrowers with low credit scores, triggered the financial meltdown?',
+                'options': ['Prime mortgages', 'Fixed-rate jumbo loans', 'Subprime mortgages', 'VA loans'],
+                'answer': 'Subprime mortgages',
+                'explanation': 'Subprime mortgages were granted to borrowers with poor credit histories. When housing prices fell, default rates exploded.'
+            },
+            {
+                'question': 'What derivative securities, built by pooling thousands of individual mortgages, were sold to investors globally as safe assets?',
+                'options': ['Credit Default Swaps (CDS)', 'Mortgage-Backed Securities (MBS) & CDOs', 'Treasury Inflation-Protected Securities', 'Exchange-Traded Funds (ETFs)'],
+                'answer': 'Mortgage-Backed Securities (MBS) & CDOs',
+                'explanation': 'Mortgage-Backed Securities and Collateralized Debt Obligations pooled loans into tranches. Ratings agencies falsely stamped top tranches as AAA safe.'
+            },
+            {
+                'question': 'What was the name of the $700 billion US government program passed by Congress in October 2008 to purchase toxic bank assets?',
+                'options': ['The CARES Act', 'Troubled Asset Relief Program (TARP)', 'The Dodd-Frank Act', 'The Recovery and Reinvestment Act'],
+                'answer': 'Troubled Asset Relief Program (TARP)',
+                'explanation': 'TARP authorized the US Treasury to inject capital directly into failing banks and buy troubled mortgage assets to stabilize the system.'
+            },
+            {
+                'question': 'What insurance contract allowed financial institutions to bet against or hedge mortgage defaults, which nearly destroyed insurance giant AIG?',
+                'options': ['Credit Default Swaps (CDS)', 'Reinsurance treaties', 'Annuities', 'Total return swaps'],
+                'answer': 'Credit Default Swaps (CDS)',
+                'explanation': 'AIG sold hundreds of billions of dollars in CDS insurance on mortgage bonds without holding sufficient cash collateral, requiring a $180B government bailout.'
+            },
+            {
+                'question': 'What unconventional monetary policy did the US Federal Reserve launch in late 2008, purchasing trillions in government and mortgage bonds?',
+                'options': ['Yield Curve Control', 'Quantitative Easing (QE)', 'Operation Twist', 'Negative Interest Rates'],
+                'answer': 'Quantitative Easing (QE)',
+                'explanation': 'QE involved the Fed creating new central bank reserves to buy long-term Treasuries and MBS, lowering long-term interest rates and injecting liquidity.'
+            },
+            {
+                'question': 'What was the approximate maximum percentage drawdown of the S&P 500 from its October 2007 peak to its March 2009 bottom?',
+                'options': ['-20.0%', '-33.5%', '-56.8%', '-75.0%'],
+                'answer': '-56.8%',
+                'explanation': 'The S&P 500 dropped by 56.8% from 1,565 in October 2007 to its bear market trough of 676 in March 2009.'
+            },
+            {
+                'question': 'Which major investment bank was saved from bankruptcy in March 2008 through a Fed-assisted emergency acquisition by JPMorgan Chase?',
+                'options': ['Bear Stearns', 'Lehman Brothers', 'Wachovia', 'Countrywide'],
+                'answer': 'Bear Stearns',
+                'explanation': 'Bear Stearns was on the brink of liquidity collapse in March 2008 before the Fed facilitated its emergency sale to JPMorgan at $2/share (later raised to $10).'
+            },
+            {
+                'question': 'What federal legislation was passed in 2010 to reform Wall Street regulation, enforce stress tests, and restrict proprietary bank trading?',
+                'options': ['The Glass-Steagall Act', 'The Gramm-Leach-Bliley Act', 'The Dodd-Frank Wall Street Reform Act', 'The Sarbanes-Oxley Act'],
+                'answer': 'The Dodd-Frank Wall Street Reform Act',
+                'explanation': 'Dodd-Frank (2010) created the Consumer Financial Protection Bureau (CFPB), mandated annual bank stress tests, and instituted the Volcker Rule.'
+            },
+            {
+                'question': 'What term describes the condition when banks stop lending money to each other due to fear that counterparty institutions are insolvent?',
+                'options': ['Credit freeze', 'Hyperinflation', 'Currency devaluation', 'Liquidity trap'],
+                'answer': 'Credit freeze',
+                'explanation': 'In September 2008, interbank borrowing rates (LIBOR) spiked and banks refused to lend to one another, causing a severe credit freeze.'
+            }
+        ]
+    },
+    {
+        'id': 'gamestop-short-squeeze',
+        'title': 'GameStop Short Squeeze (2021)',
+        'description': 'Reddit retail traders, hedge fund short squeezes, and the battle of WallStreetBets.',
+        'long_description': 'In January 2021, an unprecedented clash between retail investors and institutional Wall Street hedge funds unfolded around GameStop (GME), a struggling brick-and-mortar video game retailer. Retail traders on Reddit\'s r/WallStreetBets sub-community noticed that hedge funds, including Melvin Capital, had shorted more than 140% of GameStop\'s available stock float. Utilizing zero-commission trading apps like Robinhood and buying out-of-the-money call options to create a "gamma squeeze," millions of individual investors bought GME shares simultaneously. GameStop\'s stock price surged over 1,500% in two weeks, forcing hedge funds to cover short positions at multi-billion dollar losses. The incident highlighted the power of social media coordination in markets and raised intense scrutiny over trading platform restrictions, payment for order flow (PFOF), and clearinghouse margin calls.',
+        'difficulty': 'Intermediate',
+        'read_time': '8 min',
+        'image': '/case-gamestop.png',
+        'tags': ['Short Squeeze', 'Retail Trading', 'Market Structure'],
+        'timeline': [
+            {'date': 'Aug 2020', 'event': 'Ryan Cohen Buys Stake', 'description': 'Chewy co-founder Ryan Cohen reveals a 9% stake in GameStop, sparking initial retail interest.'},
+            {'date': 'Dec 2020', 'event': 'Excessive Short Interest Identified', 'description': 'Reddit users highlight that GME short interest exceeds 140% of public float.'},
+            {'date': 'Jan 22, 2021', 'event': 'The Gamma Squeeze', 'description': 'Retail call option buying triggers a massive short squeeze, driving GME from $40 to $150.'},
+            {'date': 'Jan 28, 2021', 'event': 'Trading Halts & Robinhood Freeze', 'description': 'GME hits an intraday high of $483. Brokerages restrict buying due to DTCC clearing margin demands.'},
+            {'date': 'Feb 2021', 'event': 'Congressional Hearings', 'description': 'US House Financial Services Committee holds hearings featuring Keith Gill (Roaring Kitty), Robinhood, and Melvin Capital.'}
+        ],
+        'stats': [
+            {'label': 'Peak Intraday Stock Price', 'value': '$483.00'},
+            {'label': 'Short Interest at Start', 'value': '140%+ of Float'},
+            {'label': 'Melvin Capital Loss', 'value': '-53% in Jan 2021'},
+            {'label': 'GME 1-Month Price Gain', 'value': '+1,700%+'}
+        ],
+        'lessons': [
+            'Extreme short interest (>100% of float) leaves short sellers vulnerable to infinite potential loss in a short squeeze.',
+            'Call option buying forces market makers to buy underlying shares (gamma squeeze), accelerating upward price momentum.',
+            'Clearinghouse margin requirements during hyper-volatility can force brokers to restrict trading, disrupting market access.'
+        ],
+        'chart_data': [
+            {'date': 'Dec 20', 'value': 16.1},
+            {'date': 'Jan 8', 'value': 17.7},
+            {'date': 'Jan 15', 'value': 35.5},
+            {'date': 'Jan 21', 'value': 43.0},
+            {'date': 'Jan 25', 'value': 76.8},
+            {'date': 'Jan 27', 'value': 347.5},
+            {'date': 'Jan 28', 'value': 483.0},
+            {'date': 'Feb 2', 'value': 90.0},
+            {'date': 'Feb 5', 'value': 63.8},
+            {'date': 'Feb 19', 'value': 40.6},
+            {'date': 'Mar 10', 'value': 265.0},
+            {'date': 'Mar 24', 'value': 120.3}
+        ],
+        'quiz': [
+            {
+                'question': 'What unusual market metric regarding GameStop\'s stock in late 2020 attracted retail traders looking for a short squeeze?',
+                'options': ['Dividend yield was over 20%', 'Short interest exceeded 140% of the total public float', 'The company had zero debt', 'The stock was unlisted'],
+                'answer': 'Short interest exceeded 140% of the total public float',
+                'explanation': 'Because institutional short sellers had shorted more shares than actually existed in the public float, any surge in buying power left short sellers unable to cover easily.'
+            },
+            {
+                'question': 'What online Reddit forum served as the primary gathering hub for retail traders coordinating around GameStop?',
+                'options': ['r/investing', 'r/WallStreetBets', 'r/stocks', 'r/crypto'],
+                'answer': 'r/WallStreetBets',
+                'explanation': 'r/WallStreetBets (WSB) became famous for meme stock discussions, viral DD posts, and aggressive option buying during the GME short squeeze.'
+            },
+            {
+                'question': 'What online streamer and analyst, known online as "Roaring Kitty" (Keith Gill), posted early deep-value analyses of GameStop?',
+                'options': ['DeepFuckingValue', 'BitBoy', 'Cathie Wood', 'Chamath Palihapitiya'],
+                'answer': 'DeepFuckingValue',
+                'explanation': 'Keith Gill (known on Reddit as DeepFuckingValue and YouTube as Roaring Kitty) shared detailed thesis posts demonstrating why GME was heavily undervalued and over-shorted.'
+            },
+            {
+                'question': 'What type of financial derivative buying by retail traders forced market makers to rapidly buy underlying GME shares to stay delta-neutral?',
+                'options': ['Put options', 'Out-of-the-money Call options (Gamma squeeze)', 'Futures contracts', 'Corporate bonds'],
+                'answer': 'Out-of-the-money Call options (Gamma squeeze)',
+                'explanation': 'A gamma squeeze happens when massive call buying forces options market makers to buy shares of the stock to hedge their risk, driving the stock price up even faster.'
+            },
+            {
+                'question': 'Which prominent hedge fund lost over 50% of its capital in January 2021 due to its short position in GameStop?',
+                'options': ['Citadel', 'Melvin Capital', 'Point72', 'Bridgewater Associates'],
+                'answer': 'Melvin Capital',
+                'explanation': 'Melvin Capital, managed by Gabe Plotkin, suffered a 53% loss in January 2021 due to massive short positions in GME and eventually shut down in 2022.'
+            },
+            {
+                'question': 'Why did retail trading platforms like Robinhood restrict buying of GME shares on January 28, 2021?',
+                'options': ['The SEC issued a cease-and-desist order', 'Clearinghouse (DTCC) margin deposit demands spiked by billions due to extreme volatility', 'GameStop went bankrupt', 'Robinhood servers crashed permanently'],
+                'answer': 'Clearinghouse (DTCC) margin deposit demands spiked by billions due to extreme volatility',
+                'explanation': 'The National Securities Clearing Corporation (NSCC/DTCC) hit Robinhood with a multi-billion dollar collateral call, forcing Robinhood to temporarily disable buying.'
+            },
+            {
+                'question': 'What was GameStop\'s peak intraday stock price reached on January 28, 2021?',
+                'options': ['$48.30', '$150.00', '$483.00', '$1,200.00'],
+                'answer': '$483.00',
+                'explanation': 'GameStop surged to an intraday high of $483.00 per share on January 28, 2021, up from under $5 just months prior.'
+            },
+            {
+                'question': 'What business model arrangement, where market makers pay brokerages for routing retail orders, drew heavy regulatory scrutiny after the crisis?',
+                'options': ['Payment for Order Flow (PFOF)', 'Dark Pool Arbitrage', 'High-Frequency Rebating', 'Commission Pooling'],
+                'answer': 'Payment for Order Flow (PFOF)',
+                'explanation': 'PFOF is the practice where market makers (like Citadel Securities) pay retail brokers (like Robinhood) to execute customer trades, raising questions about execution quality.'
+            },
+            {
+                'question': 'Which former Chewy co-founder acquired a major stake and joined GameStop\'s board, driving hopes for an e-commerce turnaround?',
+                'options': ['Ryan Cohen', 'Elon Musk', 'Peter Thiel', 'Jack Dorsey'],
+                'answer': 'Ryan Cohen',
+                'explanation': 'Ryan Cohen bought a large stake in late 2020 and became Chairman of GameStop in 2021, leading efforts to pivot the company toward digital retail.'
+            },
+            {
+                'question': 'What slang term did Reddit retail investors popularize to describe holding onto shares stubbornly despite intense price volatility?',
+                'options': ['Paper hands', 'Diamond hands', 'HODL mode', 'Bullish squeeze'],
+                'answer': 'Diamond hands',
+                'explanation': '"Diamond hands" refers to holding an investment through extreme volatility without panic selling, represented by the diamond and hands emojis.'
+            }
+        ]
+    },
+    {
+        'id': 'black-wednesday-soros',
+        'title': 'George Soros & Bank of England (1992)',
+        'description': 'How George Soros broke the British Pound on Black Wednesday.',
+        'long_description': 'On September 16, 1992, known as "Black Wednesday," billionaire investor George Soros and his Quantum Fund achieved one of the most famous trades in financial history by forcing the United Kingdom out of the European Exchange Rate Mechanism (ERM). Under the ERM, the UK government was legally obligated to maintain the British Pound\'s value within a tight band relative to the German Deutsche Mark. Soros recognized that Britain was suffering from high inflation and weak growth, making the pegged exchange rate artificially overvalued and unsustainable. Armed with this insight, Quantum Fund took a massive $10 billion short position against the Pound. Despite the Bank of England spending billions in foreign currency reserves and raising interest rates from 10% to 15% in a single day, they could not stem the selling. The UK government conceded defeat, withdrew from the ERM, and let the Pound float, netting Soros an estimated $1 billion profit in 24 hours.',
+        'difficulty': 'Intermediate',
+        'read_time': '9 min',
+        'image': '/case-soros-boe.png',
+        'tags': ['Currencies', 'Macro Trading', 'Central Banks'],
+        'timeline': [
+            {'date': 'Oct 1990', 'event': 'UK Joins ERM', 'description': 'Chancellor John Major enters the Pound into the European Exchange Rate Mechanism at 2.95 Deutsche Marks.'},
+            {'date': 'Mid 1992', 'event': 'Economic Strain Grows', 'description': 'High German interest rates force Britain to keep UK rates artificially high despite a domestic recession.'},
+            {'date': 'Sep 15, 1992', 'event': 'Soros Builds $10B Short', 'description': 'George Soros and Stanley Druckenmiller scale up massive short bets against Sterling.'},
+            {'date': 'Sep 16, 1992', 'event': 'Black Wednesday', 'description': 'Bank of England buys billions in Sterling and hikes rates to 15%. Panic selling dominates; UK exits ERM.'},
+            {'date': 'Late 1992', 'event': 'Pound Devalues 15%', 'description': 'British Pound floats freely, dropping 15% against the Mark. UK economy begins a strong export-led recovery.'}
+        ],
+        'stats': [
+            {'label': 'Soros\' Short Position Size', 'value': '$10 Billion'},
+            {'label': 'Soros Net Profit', 'value': '$1.0 Billion+'},
+            {'label': 'Bank of England Rate Hikes', 'value': '10% to 15% (1 Day)'},
+            {'label': 'Sterling Devaluation', 'value': '-15% vs Deutsche Mark'}
+        ],
+        'lessons': [
+            'Central banks cannot maintain an overvalued fixed exchange rate when market fundamentals strongly oppose it.',
+            'Asymmetric risk-reward setups occur when a peg can only break in one direction, offering short sellers huge upside with limited risk.',
+            'Macro hedge funds can mobilize capital larger than a central bank\'s active foreign exchange reserves.'
+        ],
+        'chart_data': [
+            {'date': 'Jan 92', 'value': 2.92},
+            {'date': 'Mar 92', 'value': 2.95},
+            {'date': 'May 92', 'value': 2.93},
+            {'date': 'Jul 92', 'value': 2.84},
+            {'date': 'Aug 92', 'value': 2.81},
+            {'date': 'Sep 15', 'value': 2.78},
+            {'date': 'Sep 16', 'value': 2.70},
+            {'date': 'Sep 17', 'value': 2.50},
+            {'date': 'Oct 92', 'value': 2.44},
+            {'date': 'Nov 92', 'value': 2.40},
+            {'date': 'Dec 92', 'value': 2.38},
+            {'date': 'Mar 93', 'value': 2.36}
+        ],
+        'quiz': [
+            {
+                'question': 'What was the European monetary agreement that bound European currencies within tight exchange bands before the Euro?',
+                'options': ['Bretton Woods System', 'European Exchange Rate Mechanism (ERM)', 'The Maastricht Treaty', 'Schengen Currency Accord'],
+                'answer': 'European Exchange Rate Mechanism (ERM)',
+                'explanation': 'The ERM was designed to reduce exchange rate variability among European currencies prior to the launch of the Euro.'
+            },
+            {
+                'question': 'What date in history is known as "Black Wednesday" when the UK was forced out of the ERM?',
+                'options': ['October 19, 1987', 'September 16, 1992', 'August 15, 1971', 'November 9, 1989'],
+                'answer': 'September 16, 1992',
+                'explanation': 'On September 16, 1992, overwhelming speculative selling forced the British government to suspend membership in the ERM.'
+            },
+            {
+                'question': 'How large was the short position taken by George Soros\' Quantum Fund against the British Pound?',
+                'options': ['$500 Million', '$1 Billion', '$10 Billion', '$50 Billion'],
+                'answer': '$10 Billion',
+                'explanation': 'Soros leveraged his fund\'s equity to build a massive $10 billion short position against Sterling, recognizing the peg was unviable.'
+            },
+            {
+                'question': 'How high did the Bank of England raise interest rates in a single day on Black Wednesday in a failed attempt to defend the Pound?',
+                'options': ['From 5% to 8%', 'From 10% to 15%', 'From 15% to 25%', 'From 20% to 30%'],
+                'answer': 'From 10% to 15%',
+                'explanation': 'The Bank of England announced rate hikes from 10% to 12% and then to 15% in a desperate bid to attract currency buyers, but market traders ignored it.'
+            },
+            {
+                'question': 'Approximately how much profit did George Soros and Quantum Fund net from the Black Wednesday trade?',
+                'options': ['$100 Million', '$500 Million', '$1 Billion+', '$5 Billion'],
+                'answer': '$1 Billion+',
+                'explanation': 'Soros netted over $1 billion in profit, earning him the title "The Man Who Broke the Bank of England."'
+            },
+            {
+                'question': 'Which German central bank official\'s public comments questioning the valuation of certain ERM currencies accelerated the crisis?',
+                'options': ['Helmut Kohl', 'Helmut Schlesinger (Bundesbank)', 'Mario Draghi', 'Jean-Claude Trichet'],
+                'answer': 'Helmut Schlesinger (Bundesbank)',
+                'explanation': 'Bundesbank President Helmut Schlesinger gave an interview hinting that devaluation of certain currencies (including Sterling) might be necessary.'
+            },
+            {
+                'question': 'What key macro trader partnered with George Soros at Quantum Fund to structure and execute the trade?',
+                'options': ['Paul Tudor Jones', 'Stanley Druckenmiller', 'Ray Dalio', 'Jim Simons'],
+                'answer': 'Stanley Druckenmiller',
+                'explanation': 'Stanley Druckenmiller was Soros\' lead portfolio manager who spotted the trade opportunity and recommended going all-in.'
+            },
+            {
+                'question': 'Why was the short bet against the UK Pound considered an "asymmetric trade"?',
+                'options': ['The UK government guaranteed all losses', 'The Pound could not rise above the ERM ceiling, so upside risk was capped while devaluation downside was huge', 'Option premiums were legally free', 'The Bank of England could not trade on Wednesdays'],
+                'answer': 'The Pound could not rise above the ERM ceiling, so upside risk was capped while devaluation downside was huge',
+                'explanation': 'Because Sterling was pinned at its lower ERM floor, it had virtually no room to appreciate, meaning short sellers risked little capital relative to massive devaluation gains.'
+            },
+            {
+                'question': 'What happened to the British economy in the years immediately following its exit from the ERM?',
+                'options': ['It suffered ten years of hyperinflation', 'The cheaper floating Pound boosted exports, triggering a long economic expansion', 'It declared sovereign bankruptcy', 'It adopted the German Mark as official currency'],
+                'answer': 'The cheaper floating Pound boosted exports, triggering a long economic expansion',
+                'explanation': 'Leaving the ERM allowed the UK to cut interest rates and let Sterling devalue by 15%, sparking a strong export-led economic boom.'
+            },
+            {
+                'question': 'What benchmark European currency served as the central anchor of the ERM exchange grid in 1992?',
+                'options': ['French Franc', 'German Deutsche Mark', 'Italian Lira', 'Swiss Franc'],
+                'answer': 'German Deutsche Mark',
+                'explanation': 'The German Deutsche Mark (DEM) was the strongest currency in Europe and served as the anchor against which other ERM currencies were pegged.'
+            }
+        ]
+    },
+    {
+        'id': 'silk-road-trade',
+        'title': 'The Silk Road: Birth of Global Trade',
+        'description': 'Ancient trade networks, merchant credit, paper currency, and early globalization.',
+        'long_description': 'Spanning thousands of miles from Xi\'an in China through Central Asia to Constantinople and Rome, the Silk Road was the ancient world\'s premier commercial artery. Beginning during China\'s Han Dynasty (130 BCE), merchant caravans transported prized goods including silk, spices, porcelain, glass, and precious metals. Operating across harsh deserts and politically fragmented regions presented severe security and financial risks. To navigate these dangers, merchants developed early financial innovations: letters of credit, bill of exchange mechanisms, merchant guilds, and the world\'s first paper money (*Jiaozi* in Song Dynasty China). The Silk Road proved that cross-border trade generates immense economic prosperity, demonstrating how trade routes laid the foundational concepts of international finance, foreign exchange, and supply chain logistics.',
+        'difficulty': 'Beginner',
+        'read_time': '7 min',
+        'image': '/case-silk-route.png',
+        'tags': ['Trade History', 'Currencies', 'Globalization'],
+        'timeline': [
+            {'date': '130 BCE', 'event': 'Han Dynasty Opens Route', 'description': 'Emperor Wu of Han sends envoy Zhang Qian west, opening formal trade routes between East and West.'},
+            {'date': '1st Century CE', 'event': 'Roman Trade Expansion', 'description': 'Roman elite demand Chinese silk, prompting silver drain concerns in the Roman Senate.'},
+            {'date': '8th Century CE', 'event': 'Tang Dynasty Golden Age', 'description': 'Caravan cities like Chang\'an and Samarkand flourish as cosmopolitan financial hubs.'},
+            {'date': '10th Century CE', 'event': 'First Paper Currency', 'description': 'Song Dynasty merchants invent Jiaozi paper notes to replace heavy strings of bronze coins.'},
+            {'date': '1453 CE', 'event': 'Ottoman Fall of Constantinople', 'description': 'Closure of land routes forces European explorers to seek sea routes, sparking the Age of Discovery.'}
+        ],
+        'stats': [
+            {'label': 'Total Network Length', 'value': '6,400+ Kilometers'},
+            {'label': 'Historical Duration', 'value': '1,500+ Years'},
+            {'label': 'Roman Annual Silk Import', 'value': '100M Sesterces'},
+            {'label': 'First Paper Money Year', 'value': '10th Century CE'}
+        ],
+        'lessons': [
+            'International trade expands economic prosperity by allowing regions to specialize in goods where they possess comparative advantage.',
+            'Financial innovations like letters of credit and paper money arose naturally to solve physical transport and security risks.',
+            'Trade route disruptions force structural economic pivots (e.g. land route closures birthed maritime exploration).'
+        ],
+        'chart_data': [
+            {'date': '200 BCE', 'value': 10},
+            {'date': '100 BCE', 'value': 35},
+            {'date': '1 CE', 'value': 75},
+            {'date': '200 CE', 'value': 90},
+            {'date': '400 CE', 'value': 60},
+            {'date': '700 CE', 'value': 140},
+            {'date': '900 CE', 'value': 180},
+            {'date': '1100 CE', 'value': 220},
+            {'date': '1300 CE', 'value': 260},
+            {'date': '1400 CE', 'value': 190},
+            {'date': '1453 CE', 'value': 40},
+            {'date': '1500 CE', 'value': 20}
+        ],
+        'quiz': [
+            {
+                'question': 'Which Chinese dynasty opened the formal overland trade routes known as the Silk Road around 130 BCE?',
+                'options': ['Tang Dynasty', 'Ming Dynasty', 'Han Dynasty', 'Qing Dynasty'],
+                'answer': 'Han Dynasty',
+                'explanation': 'Emperor Wu of the Han Dynasty dispatched imperial envoy Zhang Qian to establish diplomatic and trade ties with Central Asian kingdoms in 130 BCE.'
+            },
+            {
+                'question': 'What highly lucrative luxury item, whose production process was kept a imperial secret by China for centuries, gave the trade route its name?',
+                'options': ['Porcelain', 'Silk', 'Tea', 'Gunpowder'],
+                'answer': 'Silk',
+                'explanation': 'Silk woven from silkworm cocoons was extremely prized in Rome and Persia. China kept sericulture secret for centuries, making silk worth its weight in gold.'
+            },
+            {
+                'question': 'What paper currency, invented during China\'s Song Dynasty, became the world\'s first government-issued paper money?',
+                'options': ['Yuan', 'Jiaozi', 'Toman', 'Florin'],
+                'answer': 'Jiaozi',
+                'explanation': 'Merchants in Sichuan introduced Jiaozi paper notes in the 10th century to avoid lugging heavy strings of copper coins over long trade routes.'
+            },
+            {
+                'question': 'What financial instrument was developed by Silk Road traders to allow merchants to deposit money in one city and withdraw it in another?',
+                'options': ['Letters of credit / Bills of exchange', 'Stock options', 'Collateralized debt obligation', 'Central bank reserve notes'],
+                'answer': 'Letters of credit / Bills of exchange',
+                'explanation': 'Letters of credit allowed merchants to deposit bullion with trusted guild houses and travel without carrying heavy gold, reducing highway robbery risk.'
+            },
+            {
+                'question': 'Which famous Central Asian oasis city served as a primary trade, cultural, and financial hub along the Silk Road?',
+                'options': ['Samarkand', 'Cairo', 'Athens', 'Baghdad'],
+                'answer': 'Samarkand',
+                'explanation': 'Samarkand (in modern Uzbekistan) was a central crossroads city where Sogdian merchants managed trade between China, Persia, and Europe.'
+            },
+            {
+                'question': 'What historical event in 1453 effectively closed the traditional overland Silk Road, forcing Europeans to seek maritime trade routes?',
+                'options': ['The Mongol Conquests', 'The Fall of Constantinople to the Ottoman Empire', 'The Black Death pandemic', 'The Crusades'],
+                'answer': 'The Fall of Constantinople to the Ottoman Empire',
+                'explanation': 'When the Ottoman Empire conquered Constantinople in 1453 and imposed heavy taxes on overland trade, European nations sought ocean routes to Asia, sparking the Age of Discovery.'
+            },
+            {
+                'question': 'What economic principle explains why trade between distant regions created wealth even though total physical goods remained constant?',
+                'options': ['Marxist labor theory', 'Comparative Advantage & Trade gains', 'Mercantilist accumulation', 'Zero-sum economics'],
+                'answer': 'Comparative Advantage & Trade gains',
+                'explanation': 'Regions traded goods they could produce efficiently (e.g. Chinese silk for Roman glassware), increasing total utility and wealth for both sides.'
+            },
+            {
+                'question': 'What Roman currency drain concerned Roman senators like Pliny the Elder due to massive imports of Chinese silk?',
+                'options': ['Gold Aureus', 'Silver Denarius bullion drain', 'Copper As inflation', 'Paper scrip devaluation'],
+                'answer': 'Silver Denarius bullion drain',
+                'explanation': 'Pliny complained that Rome lost over 100 million sesterces of silver bullion annually to purchase luxury Eastern silk and spices.'
+            },
+            {
+                'question': 'What major disease pandemic was unintentionally transmitted along the Silk Road trade network in the 14th century?',
+                'options': ['Smallpox', 'The Black Death (Bubonic Plague)', 'Cholera', 'Spanish Flu'],
+                'answer': 'The Black Death (Bubonic Plague)',
+                'explanation': 'The Black Death spread along Silk Road trade routes and merchant ships from Asia to Europe in the 1340s, killing an estimated 30-60% of Europe\'s population.'
+            },
+            {
+                'question': 'What merchant guild system developed along trade routes to provide security, insurance, and dispute resolution for foreign traders?',
+                'options': ['Caravanserai and Merchant Guilds', 'Central Banks', 'Stock Exchanges', 'Investment Trusts'],
+                'answer': 'Caravanserai and Merchant Guilds',
+                'explanation': 'Caravanserais provided fortified roadside inns and market hubs where merchant guilds offered lodging, security, and financial exchange.'
+            }
+        ]
+    },
+    {
+        'id': 'opec-oil-embargo-1973',
+        'title': 'OPEC Oil Embargo (1973)',
+        'description': 'How Arab oil producers weaponized energy and created the first oil shock.',
+        'long_description': 'In October 1973, Arab members of OPEC declared an oil embargo against nations that supported Israel during the Yom Kippur War, including the United States, the Netherlands, and several Western European countries. The embargo reduced global oil supply by roughly 5%, but the psychological shock and panic buying drove oil prices from $3 to $12 per barrel in just months — a 300% surge. Western nations that had grown fat on cheap energy were suddenly exposed. Long queues formed at gas stations across America, the Nixon administration imposed a nationwide 55 mph speed limit, and the Dow Jones Industrial Average fell 45% over the following year. The crisis fundamentally redrew the geopolitics of energy, revealing that oil was both an economic lifeline and a geopolitical weapon, and forcing the West to pursue energy diversification, efficiency standards, and strategic petroleum reserves for the first time.',
+        'difficulty': 'Beginner',
+        'read_time': '6 min',
+        'image': '/case-opec-embargo.png',
+        'tags': ['Energy', 'Commodities', 'Geopolitics'],
+        'timeline': [
+            {'date': 'Oct 6, 1973', 'event': 'Yom Kippur War Begins', 'description': 'Egypt and Syria launch a surprise attack on Israel. Arab OPEC members prepare to use oil as leverage.'},
+            {'date': 'Oct 17, 1973', 'event': 'Embargo Declared', 'description': 'Arab OPEC members announce an oil embargo against the US, Netherlands, and others supporting Israel.'},
+            {'date': 'Nov 1973', 'event': 'Oil Price Quadruples', 'description': 'Oil prices surge from $3 to over $12 per barrel. US gas stations run dry; rationing begins.'},
+            {'date': 'Dec 1973', 'event': 'Nixon Energy Crisis Response', 'description': 'Nixon imposes 55 mph speed limits, daylight saving extensions, and creates the Department of Energy.'},
+            {'date': 'Mar 1974', 'event': 'Embargo Lifted', 'description': 'The embargo ends after US negotiation of Israeli troop withdrawals, but oil prices never return to pre-crisis levels.'}
+        ],
+        'stats': [
+            {'label': 'Oil Price Increase', 'value': '+300% (Oct–Dec 1973)'},
+            {'label': 'US GDP Contraction', 'value': '-2.1% (1974)'},
+            {'label': 'US Inflation Rate', 'value': '12.3% (1974)'},
+            {'label': 'Dow Jones Drawdown', 'value': '-45% (1973–74)'}
+        ],
+        'lessons': [
+            'Commodity supply concentration gives producing nations enormous geopolitical leverage over consuming economies.',
+            'Energy price shocks transmit rapidly through inflation as transportation, manufacturing, and heating costs rise simultaneously.',
+            'The crisis forced the West to invest in energy diversification, efficiency standards (CAFE standards), and strategic petroleum reserves.'
+        ],
+        'chart_data': [
+            {'date': 'Jan 73', 'value': 2.9},
+            {'date': 'Apr 73', 'value': 3.2},
+            {'date': 'Jul 73', 'value': 3.5},
+            {'date': 'Oct 73', 'value': 5.1},
+            {'date': 'Nov 73', 'value': 8.3},
+            {'date': 'Dec 73', 'value': 11.6},
+            {'date': 'Jan 74', 'value': 12.0},
+            {'date': 'Apr 74', 'value': 11.5},
+            {'date': 'Jul 74', 'value': 11.2},
+            {'date': 'Oct 74', 'value': 11.0},
+            {'date': 'Jan 75', 'value': 11.3},
+            {'date': 'Jan 76', 'value': 12.4}
+        ],
+        'quiz': [
+            {
+                'question': 'Which military conflict triggered the OPEC Arab oil embargo of 1973?',
+                'options': ['The Vietnam War', 'The Yom Kippur War', 'The Iran-Iraq War', 'The Six-Day War'],
+                'answer': 'The Yom Kippur War',
+                'explanation': 'Egypt and Syria launched a surprise attack on Israel on October 6, 1973 (Yom Kippur). Arab OPEC nations used the oil embargo to pressure Western nations supporting Israel.'
+            },
+            {
+                'question': 'By approximately how much did OPEC reduce global oil supply during the 1973 embargo?',
+                'options': ['~1%', '~5%', '~25%', '~50%'],
+                'answer': '~5%',
+                'explanation': 'The physical supply reduction was only about 5%, but panic buying and psychological shock amplified the price impact to a 300% surge, showing how commodity markets can overreact to supply disruptions.'
+            },
+            {
+                'question': 'What was the approximate oil price increase between October and December 1973?',
+                'options': ['+50%', '+100%', '+200%', '+300%'],
+                'answer': '+300%',
+                'explanation': 'Oil prices rose from approximately $3 to over $12 per barrel in just a few months — a roughly 300% increase that shocked the global economy.'
+            },
+            {
+                'question': 'What speed limit did the Nixon administration impose across the US in response to the oil crisis?',
+                'options': ['45 mph', '55 mph', '65 mph', '70 mph'],
+                'answer': '55 mph',
+                'explanation': 'To reduce fuel consumption, the Emergency Highway Energy Conservation Act of 1974 imposed a national 55 mph speed limit on US highways.'
+            },
+            {
+                'question': 'What term describes the combination of high inflation and economic stagnation that the oil shock helped create in the 1970s?',
+                'options': ['Hyperinflation', 'Deflation', 'Stagflation', 'Reflation'],
+                'answer': 'Stagflation',
+                'explanation': 'Stagflation — simultaneous high inflation and low growth — became the defining economic challenge of the 1970s, partly caused by energy price shocks.'
+            },
+            {
+                'question': 'What long-term policy measure did the US create specifically to protect against future oil supply disruptions?',
+                'options': ['OPEC membership', 'Strategic Petroleum Reserve (SPR)', 'Oil price controls', 'Nationalization of oil companies'],
+                'answer': 'Strategic Petroleum Reserve (SPR)',
+                'explanation': 'The US created the Strategic Petroleum Reserve in 1975, storing hundreds of millions of barrels of crude oil in underground salt caverns to buffer against future supply shocks.'
+            },
+            {
+                'question': 'Which economic sectors were hit hardest by the 1973 oil price shock?',
+                'options': ['Technology and banking', 'Transportation, manufacturing, and agriculture', 'Healthcare and education', 'Real estate and mining'],
+                'answer': 'Transportation, manufacturing, and agriculture',
+                'explanation': 'Oil is a core input for transportation fuel, industrial machinery, and fertilizers (natural gas-derived). When oil prices quadrupled, production costs across these sectors surged dramatically.'
+            },
+            {
+                'question': 'What was the approximate fall in the Dow Jones Industrial Average from 1973 to 1974 during the oil shock?',
+                'options': ['-10%', '-25%', '-45%', '-70%'],
+                'answer': '-45%',
+                'explanation': 'The combination of energy shock, inflation, and recession caused the Dow Jones to fall approximately 45% from early 1973 to late 1974.'
+            },
+            {
+                'question': 'Which nations were specifically targeted by the Arab OPEC oil embargo in 1973?',
+                'options': ['China and Japan', 'United States, Netherlands, and Israel-supporting Western nations', 'UK and France', 'Soviet Union and Eastern Europe'],
+                'answer': 'United States, Netherlands, and Israel-supporting Western nations',
+                'explanation': 'The embargo specifically targeted the US, the Netherlands, Portugal, and other Western nations that had supplied arms or support to Israel during the Yom Kippur War.'
+            },
+            {
+                'question': 'What does OPEC stand for?',
+                'options': ['Organization of Petroleum Exporting Countries', 'Oil Price Economic Committee', 'Organization of Petroleum Energy Control', 'Oil Producing Eastern Countries'],
+                'answer': 'Organization of Petroleum Exporting Countries',
+                'explanation': 'OPEC (Organization of Petroleum Exporting Countries) was founded in 1960 by Iran, Iraq, Kuwait, Saudi Arabia, and Venezuela to coordinate oil production and pricing policies.'
+            }
+        ]
     }
 ]
 
@@ -1048,23 +1776,80 @@ class Command(BaseCommand):
         from api.views import CURATED_ASSETS, FOUNDATION_SYMBOLS
         count = 0
         for data in CURATED_ASSETS:
+
             if data['symbol'] in FOUNDATION_SYMBOLS:
+                from api.math_modules import asset_foundation_defaults
                 _, created = Asset.objects.update_or_create(
                     id=data['id'],
-                    defaults={
-                        'symbol': data['symbol'],
-                        'name': data['name'],
-                        'exchange': data['exchange'],
-                        'category': data['category'],
-                        'sector': data['sector'],
-                    }
+                    defaults=asset_foundation_defaults(data),
                 )
                 if created:
                     count += 1
         self.stdout.write(f'  Foundation assets: {count} new, {len(FOUNDATION_SYMBOLS)} total')
 
+        self.stdout.write('Seeding math modules...')
+        from api.math_modules import asset_foundation_defaults
+        from api.models import MathModule
+        for data in CURATED_ASSETS:
+            if data['symbol'] in FOUNDATION_SYMBOLS:
+                Asset.objects.update_or_create(
+                    id=data['id'],
+                    defaults=asset_foundation_defaults(data),
+                )
+
+        MATH_MODULES = [
+            {
+                'slug': 'ratio-percentage-lab',
+                'title': 'Ratio & Percentage Lab',
+                'concept_summary': (
+                    'Master three building blocks every market analyst uses daily: '
+                    'the P/E ratio (how much you pay per dollar of earnings), '
+                    'percentage gain/loss on your own positions, and market-cap classification '
+                    '(large, mid, and small cap). All examples use live prices from your portfolio '
+                    'when available.'
+                ),
+                'difficulty': 'Beginner',
+                'order': 1,
+                'badge_track': 'Quant Rookie',
+                'token_reward': 25,
+            },
+            {
+                'slug': 'growth-compounding-lab',
+                'title': 'Growth & Compounding Lab',
+                'concept_summary': 'Compound interest, Rule of 72, and CAGR using your portfolio snapshots.',
+                'difficulty': 'Beginner',
+                'order': 2,
+                'badge_track': 'Quant Rookie',
+                'token_reward': 25,
+            },
+            {
+                'slug': 'statistics-risk-lab',
+                'title': 'Statistics & Risk Lab',
+                'concept_summary': 'Volatility, moving averages, and correlation for assets you hold.',
+                'difficulty': 'Intermediate',
+                'order': 3,
+                'badge_track': 'Risk Analyst',
+                'token_reward': 30,
+            },
+            {
+                'slug': 'portfolio-math-lab',
+                'title': 'Portfolio Math Lab',
+                'concept_summary': 'Weighted returns and risk-return tradeoffs across your holdings.',
+                'difficulty': 'Intermediate',
+                'order': 4,
+                'badge_track': 'Ratio Master',
+                'token_reward': 30,
+            },
+        ]
+        for mod in MATH_MODULES:
+            MathModule.objects.update_or_create(slug=mod['slug'], defaults=mod)
+        self.stdout.write(f'  Math modules: {len(MATH_MODULES)}')
+
         self.stdout.write('Seeding case studies...')
+        # Clear all existing case studies first so stale entries are removed
+        deleted_count, _ = CaseStudy.objects.all().delete()
+        self.stdout.write(f'  Removed {deleted_count} old case study records')
         for cs in CASE_STUDIES:
-            CaseStudy.objects.update_or_create(id=cs['id'], defaults={k: v for k, v in cs.items() if k != 'id'})
+            CaseStudy.objects.create(**cs)
 
         self.stdout.write(self.style.SUCCESS('Seed complete!'))

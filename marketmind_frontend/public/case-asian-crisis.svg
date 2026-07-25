@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-label="Asian Financial Crisis Cover">
+  <defs>
+    <linearGradient id="bgAsian" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#09141e" />
+      <stop offset="100%" stop-color="#190a14" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" rx="24" fill="url(#bgAsian)" />
+  <circle cx="300" cy="200" r="160" fill="#0284c7" opacity="0.08" />
+
+  <!-- Currency symbols THB, IDR, KRW -->
+  <text x="140" y="160" font-family="Inter, sans-serif" font-size="28" font-weight="700" fill="#38bdf8" opacity="0.4">THB</text>
+  <text x="560" y="140" font-family="Inter, sans-serif" font-size="28" font-weight="700" fill="#f43f5e" opacity="0.4">IDR</text>
+  <text x="620" y="280" font-family="Inter, sans-serif" font-size="28" font-weight="700" fill="#fb923c" opacity="0.4">KRW</text>
+
+  <!-- Crashing Asian Dragon graph line -->
+  <path d="M 80 160 L 220 170 L 320 140 L 400 320 L 500 280 L 720 440" fill="none" stroke="#f43f5e" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+  <line x1="80" y1="140" x2="720" y2="140" stroke="#0284c7" stroke-width="2" stroke-dasharray="6,6" opacity="0.5" />
+
+  <text x="400" y="460" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="30" font-weight="800" fill="#e0f2fe" letter-spacing="1">ASIAN FINANCIAL CRISIS (1997)</text>
+</svg>

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Asset, UserProfile, Holding, Trade, CaseStudy, LeaderboardEntry, GameChallenge, UserChallenge, PortfolioSnapshot
+from .models import Asset, UserProfile, Holding, Trade, CaseStudy, LeaderboardEntry, GameChallenge, UserChallenge, PortfolioSnapshot, MathModule, UserMathModuleProgress
 
 
 class AssetSerializer(serializers.ModelSerializer):
@@ -9,7 +9,7 @@ class AssetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Asset
-        fields = ['id', 'symbol', 'name', 'exchange', 'category', 'sector', 'price', 'change']
+        fields = ['id', 'symbol', 'name', 'exchange', 'category', 'sector', 'price', 'change', 'eps', 'shares_outstanding']
 
     def get_price(self, obj):
         return obj.price
@@ -93,6 +93,14 @@ class CaseStudySerializer(serializers.ModelSerializer):
                 return {'score': record.score, 'total_questions': record.total_questions}
         return None
 
+
+class MathModuleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MathModule
+        fields = [
+            'slug', 'title', 'concept_summary', 'difficulty',
+            'order', 'badge_track', 'token_reward',
+        ]
 
 
 class GameChallengeSerializer(serializers.ModelSerializer):
