@@ -4,10 +4,20 @@
  * AI Finance Buddy "Prof. Algo" — animated SVG portrait.
  * A friendly turquoise‑blue robot mentor inspired by Pokémon professor aesthetics.
  */
-export function AIBuddyPortrait({ size = 120, speaking = false }: { size?: number; speaking?: boolean }) {
+export function AIBuddyPortrait({
+  size = 120,
+  speaking = false,
+  floating = true,
+  className = ''
+}: {
+  size?: number
+  speaking?: boolean
+  floating?: boolean
+  className?: string
+}) {
   return (
     <div
-      className="relative shrink-0"
+      className={`relative shrink-0 ${floating ? 'animate-float' : ''} ${className}`}
       style={{ width: size, height: size }}
     >
       {/* Ambient glow */}
@@ -41,14 +51,22 @@ export function AIBuddyPortrait({ size = 120, speaking = false }: { size?: numbe
         <g>
           <ellipse cx="47" cy="44" rx="6" ry="6.5" fill="#0f172a" />
           <ellipse cx="47" cy="43" rx="4" ry="4.5" fill="#00B4D8">
-            {speaking && <animate attributeName="ry" values="4.5;2;4.5" dur="0.3s" repeatCount="indefinite" />}
+            {speaking ? (
+              <animate attributeName="ry" values="4.5;2;4.5" dur="0.3s" repeatCount="indefinite" />
+            ) : (
+              <animate attributeName="ry" values="4.5;4.5;0.2;4.5" keyTimes="0;0.94;0.97;1" dur="4s" repeatCount="indefinite" />
+            )}
           </ellipse>
           <ellipse cx="45.5" cy="42" rx="1.5" ry="1.5" fill="white" opacity="0.8" />
         </g>
         <g>
           <ellipse cx="73" cy="44" rx="6" ry="6.5" fill="#0f172a" />
           <ellipse cx="73" cy="43" rx="4" ry="4.5" fill="#00B4D8">
-            {speaking && <animate attributeName="ry" values="4.5;2;4.5" dur="0.3s" repeatCount="indefinite" />}
+            {speaking ? (
+              <animate attributeName="ry" values="4.5;2;4.5" dur="0.3s" repeatCount="indefinite" />
+            ) : (
+              <animate attributeName="ry" values="4.5;4.5;0.2;4.5" keyTimes="0;0.94;0.97;1" dur="4s" repeatCount="indefinite" />
+            )}
           </ellipse>
           <ellipse cx="71.5" cy="42" rx="1.5" ry="1.5" fill="white" opacity="0.8" />
         </g>

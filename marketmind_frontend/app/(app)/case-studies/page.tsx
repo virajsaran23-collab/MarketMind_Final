@@ -165,32 +165,32 @@ export default function CaseStudiesPage() {
       {/* ── Prof. Algo Floating Panel ────────────────────────────── */}
       <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
         {algoOpen && (
-          <div className="w-80 sm:w-96 rounded-2xl border border-slate-700/80 bg-slate-900/95 backdrop-blur-xl shadow-2xl shadow-black/40 overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-300">
+          <div className="w-80 sm:w-96 rounded-2xl border border-slate-200 bg-white/95 backdrop-blur-xl shadow-xl overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-300">
             {/* Panel header */}
-            <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-800/80 bg-slate-950/60">
-              <AIBuddyPortrait size={38} speaking={algoLoading} />
+            <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-100 bg-[#ecfeff]/90">
+              <AIBuddyPortrait size={38} speaking={algoLoading} floating={false} />
               <div className="flex-1 min-w-0">
-                <div className="text-xs font-extrabold text-[#00B4D8] uppercase tracking-wider">Prof. Algo</div>
-                <div className="text-[11px] text-slate-400">Your Adaptive Study Guide</div>
+                <div className="text-xs font-extrabold text-[#0891b2] uppercase tracking-wider">Prof. Algo</div>
+                <div className="text-[11px] text-slate-500 font-semibold">Your Adaptive Study Guide</div>
               </div>
-              <button onClick={() => setAlgoOpen(false)} className="text-slate-500 hover:text-slate-300 transition-colors text-lg leading-none">×</button>
+              <button onClick={() => setAlgoOpen(false)} className="text-slate-400 hover:text-slate-600 transition-colors text-lg leading-none font-bold">×</button>
             </div>
             {/* Messages */}
-            <div className="p-3 space-y-2.5 max-h-64 overflow-y-auto">
+            <div className="p-3 space-y-2.5 max-h-64 overflow-y-auto bg-white/50">
               {algoMessages.map((msg, i) => (
                 <div key={i} className={cn('flex gap-2', msg.role === 'user' ? 'justify-end' : 'justify-start')}>
                   {msg.role === 'algo' && (
                     <div className="shrink-0 mt-0.5">
-                      <div className="size-6 rounded-full bg-[#00B4D8]/20 flex items-center justify-center border border-[#00B4D8]/30">
+                      <div className="size-6 rounded-full bg-[#00B4D8]/10 flex items-center justify-center border border-[#00B4D8]/20">
                         <BrainCircuit className="size-3.5 text-[#00B4D8]" />
                       </div>
                     </div>
                   )}
                   <div className={cn(
-                    'max-w-[85%] rounded-2xl px-3 py-2 text-xs leading-relaxed',
+                    'max-w-[85%] rounded-2xl px-3 py-2 text-xs leading-relaxed font-medium',
                     msg.role === 'user'
-                      ? 'bg-gradient-to-r from-[#00B4D8] to-[#0891b2] text-white rounded-br-sm'
-                      : 'bg-slate-800/80 text-slate-200 border border-slate-700/50 rounded-bl-sm'
+                      ? 'bg-gradient-to-r from-[#00B4D8] to-[#0891b2] text-white rounded-br-sm shadow-[0_2px_4px_rgba(0,180,216,0.15)]'
+                      : 'bg-slate-100 text-slate-800 border border-slate-200/80 rounded-bl-sm'
                   )}>
                     {msg.text}
                   </div>
@@ -199,11 +199,11 @@ export default function CaseStudiesPage() {
               {algoLoading && (
                 <div className="flex gap-2 justify-start">
                   <div className="shrink-0 mt-0.5">
-                    <div className="size-6 rounded-full bg-[#00B4D8]/20 flex items-center justify-center border border-[#00B4D8]/30">
+                    <div className="size-6 rounded-full bg-[#00B4D8]/10 flex items-center justify-center border border-[#00B4D8]/20">
                       <Loader2 className="size-3 text-[#00B4D8] animate-spin" />
                     </div>
                   </div>
-                  <div className="bg-slate-800/80 border border-slate-700/50 rounded-2xl rounded-bl-sm px-3 py-2">
+                  <div className="bg-slate-100 border border-slate-200/80 rounded-2xl rounded-bl-sm px-3 py-2">
                     <div className="flex gap-1 items-center">
                       <span className="size-1.5 rounded-full bg-[#00B4D8] animate-bounce" style={{ animationDelay: '0ms' }} />
                       <span className="size-1.5 rounded-full bg-[#00B4D8] animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -215,30 +215,30 @@ export default function CaseStudiesPage() {
               <div ref={el => { if (el) algoScrollRef.current = el }} />
             </div>
             {/* Quick suggestions */}
-            <div className="px-3 pb-2 flex flex-wrap gap-1.5">
+            <div className="px-3 pb-2.5 pt-1.5 flex flex-wrap gap-1.5 bg-white/50">
               {['Suggest a topic for me', 'What should I study first?', 'Explain market bubbles'].map(q => (
                 <button
                   key={q}
                   onClick={() => { setAlgoDraft(q) }}
-                  className="text-[10px] px-2 py-1 rounded-full border border-slate-700/60 bg-slate-800/50 text-slate-400 hover:text-[#00B4D8] hover:border-[#00B4D8]/40 transition-all"
+                  className="text-[10px] px-2.5 py-1 rounded-full border border-slate-200 bg-slate-50 text-slate-600 hover:bg-[#00B4D8]/15 hover:text-[#00B4D8] hover:border-[#00B4D8]/30 transition-all font-bold cursor-pointer"
                 >
                   {q}
                 </button>
               ))}
             </div>
             {/* Input */}
-            <div className="flex gap-2 px-3 pb-3">
+            <div className="flex gap-2 px-3 pb-3 bg-white/50">
               <input
                 value={algoDraft}
                 onChange={e => setAlgoDraft(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && sendAlgoMessage()}
                 placeholder="Ask Prof. Algo anything…"
-                className="flex-1 rounded-xl border border-slate-700/80 bg-slate-800/60 px-3 py-2 text-xs text-slate-200 placeholder:text-slate-500 outline-none focus:border-[#00B4D8]/60"
+                className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-800 placeholder:text-slate-400 outline-none focus:border-[#00B4D8] focus:bg-white transition-all font-medium"
               />
               <button
                 onClick={sendAlgoMessage}
                 disabled={algoLoading || !algoDraft.trim()}
-                className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-r from-[#00B4D8] to-[#0891b2] text-white disabled:opacity-50 hover:opacity-90 transition-all"
+                className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-r from-[#00B4D8] to-[#0891b2] text-white disabled:opacity-50 hover:opacity-90 transition-all cursor-pointer"
               >
                 <Send className="size-3.5" />
               </button>
@@ -249,9 +249,9 @@ export default function CaseStudiesPage() {
         {/* Floating trigger button */}
         <button
           onClick={algoOpen ? () => setAlgoOpen(false) : openAlgoPanel}
-          className="flex items-center gap-2.5 rounded-2xl bg-gradient-to-r from-[#00B4D8] to-[#0891b2] px-4 py-2.5 shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:-translate-y-0.5 transition-all duration-200"
+          className="flex items-center gap-2.5 rounded-2xl bg-gradient-to-r from-[#00B4D8] to-[#0891b2] px-4 py-2.5 shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
         >
-          <AIBuddyPortrait size={32} speaking={false} />
+          <AIBuddyPortrait size={32} speaking={false} floating={false} />
           <div className="text-left">
             <div className="text-xs font-bold text-white">Prof. Algo</div>
             <div className="text-[10px] text-cyan-100">{algoOpen ? 'Close panel' : 'Ask me anything!'}</div>

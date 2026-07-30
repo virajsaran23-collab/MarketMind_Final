@@ -250,123 +250,189 @@ export function OnboardingGame({
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col bg-slate-950/95 backdrop-blur-md">
+    <div 
+      className="fixed inset-0 z-[100] flex flex-col bg-gradient-to-br from-[#E0F2FE] via-[#ECFDF5] to-[#FFF9C4] bg-[radial-gradient(#cbd5e1_1.2px,transparent_1.2px)] [background-size:24px_24px] select-none overflow-hidden"
+      onClick={handleTap}
+    >
+      <style>{`
+        @keyframes algo-wiggle {
+          0%, 100% { transform: rotate(0deg) scale(1); }
+          25% { transform: rotate(-3deg) scale(1.02); }
+          75% { transform: rotate(3deg) scale(1.02); }
+        }
+        .animate-wiggle {
+          animation: algo-wiggle 0.5s ease-in-out;
+        }
+        .cartoon-bubble {
+          border: 4px solid #0F172A;
+          box-shadow: 8px 8px 0px 0px rgba(15,23,42,0.1);
+        }
+        .cartoon-btn {
+          border: 3px solid #0F172A;
+          box-shadow: 4px 4px 0px 0px rgba(15,23,42,0.1);
+          transition: all 0.1s ease;
+        }
+        .cartoon-btn:hover {
+          transform: translate(-2px, -2px);
+          box-shadow: 6px 6px 0px 0px rgba(15,23,42,0.1);
+        }
+        .cartoon-btn:active {
+          transform: translate(2px, 2px);
+          box-shadow: 2px 2px 0px 0px rgba(15,23,42,0.1);
+        }
+        @keyframes pop-in {
+          0% { transform: scale(0.95); opacity: 0; }
+          100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop {
+          animation: pop-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+      `}</style>
+
       {/* Top status bar */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800/60">
+      <div className="flex items-center justify-between px-4 py-3 bg-white/75 backdrop-blur-md border-b-3 border-[#0F172A] relative z-10">
         <div className="flex items-center gap-2">
-          <Sparkles className="size-4 text-[#00B4D8]" />
-          <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">MarketMind Onboarding</span>
+          <div className="bg-[#00B4D8]/20 p-1 rounded-lg border border-[#00B4D8]">
+            <Sparkles className="size-4 text-[#00B4D8]" />
+          </div>
+          <span className="text-xs sm:text-sm font-extrabold text-[#0F172A] uppercase tracking-wider">
+            Prof. Algo's Finance Lab 🤖
+          </span>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 text-xs font-mono text-[#00B4D8]">
-            <Zap className="size-3.5" />
+          <div className="flex items-center gap-1.5 text-xs font-extrabold text-amber-600 bg-amber-50 border-2 border-amber-200 px-3 py-1 rounded-full shadow-[2px_2px_0px_0px_rgba(245,158,11,0.2)]">
+            <Zap className="size-3.5 fill-amber-500 text-amber-500" />
             <span>{score * 50} XP</span>
           </div>
-          <div className="h-1.5 w-24 rounded-full bg-slate-800">
+          <div className="h-3 w-20 sm:w-28 rounded-full bg-slate-100 border-2 border-[#0F172A] overflow-hidden">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-[#00B4D8] to-[#38bdf8] transition-all duration-500"
+              className="h-full bg-[#00B4D8] border-r-2 border-[#0F172A] transition-all duration-500"
               style={{ width: `${Math.min(100, ((step + 1) / dialogue.current.length) * 100)}%` }}
             />
           </div>
         </div>
       </div>
 
-      {/* Scene area */}
-      <div className="flex-1 flex flex-col items-center justify-center overflow-hidden px-4">
-        {/* Background ambience */}
-        <div className="pointer-events-none absolute top-1/4 left-1/2 size-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#00B4D8]/8 blur-3xl" />
-
-        {/* Avatar */}
-        <div className={cn(
-          'mb-6 transition-transform duration-500',
-          !done ? 'scale-105' : 'scale-100'
-        )}>
-          <AIBuddyPortrait size={140} speaking={!done && current?.speaker === 'algo'} />
-        </div>
-
-        {/* Rank Reveal Animation */}
-        {showRankReveal && level && (
-          <div className="mb-6 animate-in zoom-in-50 fade-in duration-700 flex flex-col items-center gap-2">
-            <div className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#00B4D8]/20 to-[#38bdf8]/20 border border-[#00B4D8]/30 px-5 py-3 shadow-lg shadow-cyan-500/10">
-              <Trophy className="size-6 text-yellow-400" />
-              <div>
-                <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Your Rank</div>
-                <div className="text-lg font-extrabold text-white">{RANK_TITLES[level]}</div>
-              </div>
-            </div>
-            <div className="flex items-center gap-4 text-xs font-mono text-slate-400 mt-1">
-              <span className="flex items-center gap-1"><Star className="size-3 text-yellow-400" /> {RANK_XP[level]} XP</span>
-              <span>Rank #{RANK_POSITION[level]}</span>
-            </div>
+      {/* Scene Area / Main Content */}
+      <div className="flex-1 flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12 max-w-5xl mx-auto w-full px-4 py-4 md:py-8 overflow-y-auto relative z-10">
+        
+        {/* Robot Container on right (desktop) / top (mobile) */}
+        <div className="w-40 h-40 md:w-56 md:h-56 flex flex-col items-center justify-center relative order-1 md:order-2 shrink-0">
+          {/* Glowing Digital Pedestal */}
+          <div className="absolute bottom-2 w-32 h-6 bg-[#00B4D8]/20 border-2 border-dashed border-[#00B4D8] rounded-full blur-[1px] animate-pulse" />
+          
+          {/* Wiggling Robot Portrait on dialogue change */}
+          <div key={step} className="animate-wiggle z-10">
+            <AIBuddyPortrait size={160} speaking={!done && current?.speaker === 'algo'} className="drop-shadow-[0_8px_16px_rgba(0,180,216,0.3)]" />
           </div>
-        )}
-      </div>
-
-      {/* Dialogue box at bottom */}
-      <div
-        className="relative border-t border-slate-800/60 bg-slate-900/80 backdrop-blur-sm px-4 py-5 sm:px-8 max-h-[45vh] overflow-y-auto"
-        onClick={handleTap}
-      >
-        <div ref={scrollRef}>
-          {/* Speaker label */}
-          {current?.speaker === 'algo' && (
-            <div className="mb-2 flex items-center gap-2">
-              <span className="text-xs font-extrabold text-[#00B4D8] uppercase tracking-widest">Prof. Algo</span>
-              <span className="size-2 rounded-full bg-[#00B4D8] animate-pulse" />
-            </div>
-          )}
-          {current?.speaker === 'narrator' && (
-            <div className="mb-2">
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">System</span>
-            </div>
-          )}
-
-          {/* Typewriter text */}
-          <p className={cn(
-            'text-sm sm:text-base leading-relaxed font-normal min-h-[3rem]',
-            current?.speaker === 'narrator' ? 'text-slate-400 italic font-mono text-xs' : 'text-slate-200'
-          )}>
-            {displayed}
-            {!done && <span className="inline-block w-0.5 h-4 bg-[#00B4D8] ml-0.5 animate-pulse" />}
-          </p>
-
-          {/* Choices */}
-          {showChoices && current?.choices && (
-            <div className="mt-5 flex flex-col gap-2.5 animate-in fade-in slide-in-from-bottom-4 duration-400">
-              {current.choices.map((choice) => (
-                <button
-                  key={choice.value}
-                  onClick={(e) => { e.stopPropagation(); handleChoice(choice) }}
-                  className="w-full text-left rounded-xl border border-slate-700/80 bg-slate-800/60 px-4 py-3 text-sm font-medium text-slate-200 hover:border-[#00B4D8]/60 hover:bg-[#00B4D8]/10 hover:text-white transition-all duration-200 group"
-                >
-                  <span className="group-hover:translate-x-1 inline-block transition-transform">{choice.label}</span>
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Tap to continue indicator */}
-          {done && !current?.choices && !isLastStep && !current?.autoAdvance && (
-            <div className="mt-4 flex items-center gap-1.5 text-xs text-slate-500 animate-pulse">
-              <ChevronRight className="size-3.5" />
-              <span>Tap to continue…</span>
-            </div>
-          )}
-
-          {/* Final CTA */}
-          {showFinalCTA && (
-            <div className="mt-5 animate-in fade-in zoom-in-95 duration-500">
-              <button
-                onClick={(e) => { e.stopPropagation(); handleComplete() }}
-                className="w-full sm:w-auto rounded-xl bg-gradient-to-r from-[#00B4D8] to-[#0891b2] px-8 py-3 text-sm font-bold text-white shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2"
-              >
-                <Sparkles className="size-4" />
-                Begin My First Case Study
-                <ChevronRight className="size-4" />
-              </button>
-            </div>
-          )}
         </div>
+
+        {/* Cartoon Speech Bubble on left (desktop) / bottom (mobile) */}
+        <div 
+          className="relative flex-1 bg-white rounded-[2rem] p-6 md:p-8 cartoon-bubble max-w-2xl w-full order-2 md:order-1 animate-pop flex flex-col justify-between"
+          onClick={(e) => {
+            // Prevent overlay handleTap from firing twice when clicking bubble content
+            e.stopPropagation();
+            handleTap();
+          }}
+        >
+          {/* Speech Bubble Tail pointing to robot */}
+          {/* Desktop Tail (points right) */}
+          <div className="hidden md:block absolute right-[-14px] top-1/2 -translate-y-1/2 w-6 h-6 bg-white border-r-4 border-t-4 border-[#0F172A] rotate-45 z-0" />
+          {/* Mobile Tail (points up) */}
+          <div className="block md:hidden absolute left-1/2 -translate-x-1/2 top-[-14px] w-6 h-6 bg-white border-l-4 border-t-4 border-[#0F172A] rotate-45 z-0" />
+
+          <div className="relative z-10">
+            {/* Speaker Label */}
+            {current?.speaker === 'algo' && (
+              <div className="mb-3 inline-flex items-center gap-1.5 bg-[#00B4D8] text-white border-2 border-[#0F172A] px-3.5 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider shadow-[2px_2px_0px_0px_#0F172A]">
+                <span>Prof. Algo</span>
+                <span className="size-2 rounded-full bg-white animate-ping" />
+              </div>
+            )}
+            {current?.speaker === 'narrator' && (
+              <div className="mb-3 inline-flex items-center gap-1.5 bg-slate-500 text-white border-2 border-[#0F172A] px-3.5 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider shadow-[2px_2px_0px_0px_#0F172A]">
+                <span>System</span>
+              </div>
+            )}
+
+            {/* Typewriter Dialogue Text */}
+            <p className={cn(
+              'text-base md:text-lg leading-relaxed font-bold text-slate-800 min-h-[4.5rem]',
+              current?.speaker === 'narrator' ? 'text-slate-500 italic font-mono text-sm' : 'text-slate-800'
+            )}>
+              {displayed}
+              {!done && <span className="inline-block w-1 h-5 bg-[#00B4D8] ml-0.5 animate-pulse align-middle" />}
+            </p>
+
+            {/* Rank Reveal inside dialogue */}
+            {showRankReveal && level && (
+              <div className="mt-4 flex flex-col items-center gap-2.5 p-4 bg-amber-50 rounded-2xl border-3 border-[#0F172A] shadow-[4px_4px_0px_0px_rgba(15,23,42,0.1)] animate-pop">
+                <div className="size-16 bg-yellow-400 rounded-full flex items-center justify-center border-3 border-[#0F172A] animate-bounce shadow-md">
+                  <Trophy className="size-8 text-white fill-yellow-100" />
+                </div>
+                <div className="text-center">
+                  <div className="text-xs font-extrabold text-slate-500 uppercase tracking-widest">Your Rank Assigned!</div>
+                  <div className="text-xl font-black text-[#0F172A] mt-0.5">{RANK_TITLES[level]}</div>
+                </div>
+                <div className="flex items-center gap-5 text-xs font-bold text-slate-700 mt-1 font-mono">
+                  <span className="flex items-center gap-1 bg-white border-2 border-slate-200 px-2 py-0.5 rounded-lg"><Star className="size-3.5 text-yellow-500 fill-yellow-500" /> {RANK_XP[level]} XP</span>
+                  <span className="bg-white border-2 border-slate-200 px-2 py-0.5 rounded-lg">Rank #{RANK_POSITION[level]}</span>
+                </div>
+              </div>
+            )}
+
+            {/* Choices */}
+            {showChoices && current?.choices && (
+              <div className="mt-6 flex flex-col gap-3 animate-pop">
+                {current.choices.map((choice, i) => (
+                  <button
+                    key={choice.value}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleChoice(choice);
+                    }}
+                    className="w-full text-left rounded-2xl bg-[#ECFEFF] hover:bg-[#CFFAFE] text-slate-800 py-3.5 px-5 text-sm md:text-base font-bold cartoon-btn border-3 border-[#0F172A] flex items-center gap-3 group cursor-pointer"
+                  >
+                    <span className="size-7 rounded-full bg-[#00B4D8] border-2 border-[#0F172A] text-white flex items-center justify-center text-xs font-black group-hover:scale-110 transition-transform shrink-0">
+                      {String.fromCharCode(65 + i)}
+                    </span>
+                    <span className="flex-1 leading-snug">{choice.label}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="mt-6">
+            {/* Tap to continue indicator */}
+            {done && !current?.choices && !isLastStep && !current?.autoAdvance && (
+              <div className="flex items-center gap-1.5 text-xs md:text-sm font-extrabold text-slate-500 animate-pulse cursor-pointer">
+                <ChevronRight className="size-4 text-[#00B4D8]" />
+                <span>Tap anywhere to continue...</span>
+              </div>
+            )}
+
+            {/* Final CTA */}
+            {showFinalCTA && (
+              <div className="animate-pop">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleComplete();
+                  }}
+                  className="w-full sm:w-auto rounded-2xl bg-[#00E5FF] hover:bg-[#00B4D8] text-[#0F172A] text-base md:text-lg font-black px-8 py-3.5 border-4 border-[#0F172A] shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:translate-y-[-2px] active:translate-y-[2px] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Sparkles className="size-5 fill-yellow-200" />
+                  Begin My First Case Study
+                  <ChevronRight className="size-5" />
+                </button>
+              </div>
+            )}
+          </div>
+
+        </div>
+
       </div>
     </div>
   )
