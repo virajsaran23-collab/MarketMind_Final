@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import Link from 'next/link'
 import { 
   Clock, 
@@ -8,12 +8,19 @@ import {
   ArrowRight, 
   SlidersHorizontal, 
   Sparkles, 
-  HelpCircle
+  HelpCircle,
+  BrainCircuit,
+  Send,
+  Loader2,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { CaseStudyImage } from '@/components/marketmind/case-study-image'
+import { AIBuddyPortrait } from '@/components/marketmind/ai-buddy-portrait'
 import { useLanguage } from '@/lib/language-context'
+import { useAuth } from '@/lib/auth-context'
 import { api } from '@/lib/api'
 import { cn } from '@/lib/utils'
 
@@ -25,11 +32,19 @@ const DIFF_COLOR: Record<string, string> = {
 
 export default function CaseStudiesPage() {
   const { t } = useLanguage()
+  const { experienceLevel } = useAuth()
   const [studies, setStudies] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedDifficulty, setSelectedDifficulty] = useState('All')
   const [selectedTag, setSelectedTag] = useState('All')
+
+  // Prof. Algo adaptive chat panel
+  const [algoOpen, setAlgoOpen] = useState(false)
+  const [algoDraft, setAlgoDraft] = useState('')
+  const [algoMessages, setAlgoMessages] = useState<{ role: 'algo' | 'user'; text: string }[]>([])
+  const [algoLoading, setAlgoLoading] = useState(false)
+  const algoScrollRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     setIsLoading(true)
@@ -38,6 +53,56 @@ export default function CaseStudiesPage() {
       .catch(() => {})
       .finally(() => setIsLoading(false))
   }, [])
+
+  // Auto-set difficulty filter from user's experience level on first load
+  useEffect(() => {
+    if (experienceLevel && selectedDifficulty === 'All') {
+      const diffMap: Record<string, string> = {
+        beginner: 'Beginner',
+        intermediate: 'Intermediate',
+        advanced: 'Advanced',
+      }
+      if (diffMap[experienceLevel]) {
+        setSelectedDifficulty(diffMap[experienceLevel])
+      }
+    }
+  }, [experienceLevel])
+
+  // Send message to Prof. Algo
+  const sendAlgoMessage = async () => {
+    const text = algoDraft.trim()
+    if (!text || algoLoading) return
+    setAlgoDraft('')
+    setAlgoMessages(prev => [...prev, { role: 'user', text }])
+    setAlgoLoading(true)
+    try {
+      const data = await api.mentor(
+        `The user is on the Case Studies page and wants advice or a custom case study topic. Their experience level is: ${experienceLevel || 'unknown'}. User message: "${text}"`,
+        [],
+        []
+      )
+      const reply = data.reply || data.summary || 'I recommend starting with a Beginner-level case study on inflation!'
+      setAlgoMessages(prev => [...prev, { role: 'algo', text: reply }])
+    } catch {
+      setAlgoMessages(prev => [...prev, { role: 'algo', text: 'My neural link had a hiccup! Try searching for a topic in the filter above.' }])
+    } finally {
+      setAlgoLoading(false)
+    }
+  }
+
+  // Open Prof. Algo panel with a greeting
+  const openAlgoPanel = () => {
+    setAlgoOpen(true)
+    if (algoMessages.length === 0) {
+      const greetings: Record<string, string> = {
+        beginner: "Hello! 👋 I'm Prof. Algo. Since you're a Market Seedling, I suggest starting with the **2008 Financial Crisis** case study — it's beginner-friendly and very eye-opening! What topic interests you?",
+        intermediate: "Hey, Market Analyst! 📊 You're ready for deeper dives. Try the **Dot-Com Bubble** or **COVID-19 Market Impact** case studies. Got a specific topic you'd like me to curate for you?",
+        advanced: "Welcome back, Quant! 🧠 Your level demands precision. Explore **Black Monday 1987** or the **LTCM Collapse**. Want me to suggest a custom advanced deep-dive?",
+      }
+      const greeting = greetings[experienceLevel || 'beginner'] || greetings['beginner']
+      setAlgoMessages([{ role: 'algo', text: greeting }])
+    }
+  }
 
   const allTags = useMemo(() => {
     const tags = new Set<string>()
@@ -96,6 +161,131 @@ export default function CaseStudiesPage() {
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+
+      {/* ── Prof. Algo Floating Panel ────────────────────────────── */}
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+        {algoOpen && (
+          <div className="w-80 sm:w-96 rounded-2xl border border-slate-700/80 bg-slate-900/95 backdrop-blur-xl shadow-2xl shadow-black/40 overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-300">
+            {/* Panel header */}
+            <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-800/80 bg-slate-950/60">
+              <AIBuddyPortrait size={38} speaking={algoLoading} />
+              <div className="flex-1 min-w-0">
+                <div className="text-xs font-extrabold text-[#00B4D8] uppercase tracking-wider">Prof. Algo</div>
+                <div className="text-[11px] text-slate-400">Your Adaptive Study Guide</div>
+              </div>
+              <button onClick={() => setAlgoOpen(false)} className="text-slate-500 hover:text-slate-300 transition-colors text-lg leading-none">×</button>
+            </div>
+            {/* Messages */}
+            <div className="p-3 space-y-2.5 max-h-64 overflow-y-auto">
+              {algoMessages.map((msg, i) => (
+                <div key={i} className={cn('flex gap-2', msg.role === 'user' ? 'justify-end' : 'justify-start')}>
+                  {msg.role === 'algo' && (
+                    <div className="shrink-0 mt-0.5">
+                      <div className="size-6 rounded-full bg-[#00B4D8]/20 flex items-center justify-center border border-[#00B4D8]/30">
+                        <BrainCircuit className="size-3.5 text-[#00B4D8]" />
+                      </div>
+                    </div>
+                  )}
+                  <div className={cn(
+                    'max-w-[85%] rounded-2xl px-3 py-2 text-xs leading-relaxed',
+                    msg.role === 'user'
+                      ? 'bg-gradient-to-r from-[#00B4D8] to-[#0891b2] text-white rounded-br-sm'
+                      : 'bg-slate-800/80 text-slate-200 border border-slate-700/50 rounded-bl-sm'
+                  )}>
+                    {msg.text}
+                  </div>
+                </div>
+              ))}
+              {algoLoading && (
+                <div className="flex gap-2 justify-start">
+                  <div className="shrink-0 mt-0.5">
+                    <div className="size-6 rounded-full bg-[#00B4D8]/20 flex items-center justify-center border border-[#00B4D8]/30">
+                      <Loader2 className="size-3 text-[#00B4D8] animate-spin" />
+                    </div>
+                  </div>
+                  <div className="bg-slate-800/80 border border-slate-700/50 rounded-2xl rounded-bl-sm px-3 py-2">
+                    <div className="flex gap-1 items-center">
+                      <span className="size-1.5 rounded-full bg-[#00B4D8] animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="size-1.5 rounded-full bg-[#00B4D8] animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="size-1.5 rounded-full bg-[#00B4D8] animate-bounce" style={{ animationDelay: '300ms' }} />
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div ref={el => { if (el) algoScrollRef.current = el }} />
+            </div>
+            {/* Quick suggestions */}
+            <div className="px-3 pb-2 flex flex-wrap gap-1.5">
+              {['Suggest a topic for me', 'What should I study first?', 'Explain market bubbles'].map(q => (
+                <button
+                  key={q}
+                  onClick={() => { setAlgoDraft(q) }}
+                  className="text-[10px] px-2 py-1 rounded-full border border-slate-700/60 bg-slate-800/50 text-slate-400 hover:text-[#00B4D8] hover:border-[#00B4D8]/40 transition-all"
+                >
+                  {q}
+                </button>
+              ))}
+            </div>
+            {/* Input */}
+            <div className="flex gap-2 px-3 pb-3">
+              <input
+                value={algoDraft}
+                onChange={e => setAlgoDraft(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && sendAlgoMessage()}
+                placeholder="Ask Prof. Algo anything…"
+                className="flex-1 rounded-xl border border-slate-700/80 bg-slate-800/60 px-3 py-2 text-xs text-slate-200 placeholder:text-slate-500 outline-none focus:border-[#00B4D8]/60"
+              />
+              <button
+                onClick={sendAlgoMessage}
+                disabled={algoLoading || !algoDraft.trim()}
+                className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-r from-[#00B4D8] to-[#0891b2] text-white disabled:opacity-50 hover:opacity-90 transition-all"
+              >
+                <Send className="size-3.5" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Floating trigger button */}
+        <button
+          onClick={algoOpen ? () => setAlgoOpen(false) : openAlgoPanel}
+          className="flex items-center gap-2.5 rounded-2xl bg-gradient-to-r from-[#00B4D8] to-[#0891b2] px-4 py-2.5 shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:-translate-y-0.5 transition-all duration-200"
+        >
+          <AIBuddyPortrait size={32} speaking={false} />
+          <div className="text-left">
+            <div className="text-xs font-bold text-white">Prof. Algo</div>
+            <div className="text-[10px] text-cyan-100">{algoOpen ? 'Close panel' : 'Ask me anything!'}</div>
+          </div>
+          {algoOpen ? <ChevronDown className="size-3.5 text-white" /> : <ChevronUp className="size-3.5 text-white" />}
+        </button>
+      </div>
+
+      {/* ── Experience Level Banner ───────────────────────────────── */}
+      {experienceLevel && (
+        <div className="mb-6 flex flex-wrap items-center gap-3 rounded-2xl border border-[#00B4D8]/20 bg-[#00B4D8]/5 px-4 py-3">
+          <div className="flex items-center gap-2">
+            <BrainCircuit className="size-4 text-[#00B4D8]" />
+            <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+              Prof. Algo has set your difficulty to&nbsp;
+              <span className={cn('font-bold', {
+                'text-green-600 dark:text-green-400': experienceLevel === 'beginner',
+                'text-yellow-600 dark:text-yellow-400': experienceLevel === 'intermediate',
+                'text-red-600 dark:text-red-400': experienceLevel === 'advanced',
+              })}>
+                {experienceLevel.charAt(0).toUpperCase() + experienceLevel.slice(1)}
+              </span>
+              &nbsp;based on your onboarding assessment.
+            </span>
+          </div>
+          <button
+            onClick={() => setSelectedDifficulty('All')}
+            className="ml-auto text-xs font-medium text-[#00B4D8] hover:underline"
+          >
+            Show all levels
+          </button>
+        </div>
+      )}
+
       {/* Header section with Stats Card */}
       <div className="relative rounded-3xl overflow-hidden border border-border bg-card/20 p-6 sm:p-8 backdrop-blur-sm shadow-xl mb-10">
         <div className="pointer-events-none absolute -right-20 -top-20 size-64 rounded-full bg-primary/10 blur-3xl opacity-50" />

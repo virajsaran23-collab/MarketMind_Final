@@ -13,9 +13,6 @@ import {
   Sparkles,
   TrendingUp,
 } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
-import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { api } from '@/lib/api'
 import { type Asset, formatCurrency, formatPct } from '@/lib/market-data'
 import { cn } from '@/lib/utils'
@@ -286,164 +283,162 @@ export function MarketBuddy({ assets = [], holdings = [], portfolioValue, cash }
   }
 
   return (
-    <Card className="relative overflow-hidden border-primary/20 bg-[linear-gradient(180deg,rgba(17,24,39,0.96),rgba(15,23,42,0.92))] shadow-lg">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.14),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(34,197,94,0.1),transparent_32%)]" />
-      <div className="relative p-5">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <Badge variant="default" className="mb-3">
-              <BrainCircuit className="size-3.5 mr-1" />
-              Market Buddy
-            </Badge>
-            <h2 className="text-lg font-semibold tracking-tight">{t('Your trading mentor', 'आपका ट्रेडिंग मेंटर')}</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {t('I scan live prices, recent headlines, and your portfolio to help you buy with more context.', 'मैं लाइव कीमतों, हाल की सुर्खियों और आपके पोर्टफोलियो को स्कैन करता हूँ ताकि आप बेहतर समझ के साथ निर्णय ले सकें।')}
-            </p>
+    <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-md font-sans">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#00B4D8]/10 border border-[#00B4D8]/20 px-3 py-0.5 text-xs font-semibold text-[#00B4D8] mb-2">
+            <BrainCircuit className="size-3.5 text-[#00B4D8]" />
+            Market Buddy
+          </span>
+          <h2 className="text-lg font-bold text-slate-900 tracking-tight">{t('Your trading mentor', 'आपका ट्रेडिंग मेंटर')}</h2>
+          <p className="mt-1 text-xs text-slate-600">
+            {t('I scan live prices, recent headlines, and your portfolio to help you buy with more context.', 'मैं लाइव कीमतों, हाल की सुर्खियों और आपके पोर्टफोलियो को स्कैन करता हूँ ताकि आप बेहतर समझ के साथ निर्णय ले सकें।')}
+          </p>
+        </div>
+        <div className="rounded-xl border border-slate-200/80 bg-slate-50 px-3 py-1.5 text-right shadow-xs">
+          <div className="text-[10px] text-slate-500 uppercase font-semibold">{t('Source', 'स्रोत')}</div>
+          <div className="text-xs font-bold text-[#00B4D8] uppercase">{status === 'live' ? t('Live', 'लाइव') : t('Local', 'लोकल')}</div>
+        </div>
+      </div>
+
+      <div className="mt-5 grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
+        <div className="rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4">
+          <div className="flex items-center gap-2 text-xs font-bold text-slate-900">
+            <MessageSquare className="size-4 text-[#00B4D8]" />
+            {t('Chat with me', 'मुझसे बात करें')}
           </div>
-          <div className="rounded-2xl border border-border bg-card px-3 py-2 text-right">
-            <div className="text-xs text-muted-foreground">{t('Source', 'स्रोत')}</div>
-            <div className="text-sm font-semibold tabular-nums uppercase">{status === 'live' ? t('Live', 'लाइव') : t('Local', 'लोकल')}</div>
+          <div className="mt-3 max-h-72 space-y-3 overflow-y-auto pr-1">
+            {messages.map((message, index) => (
+              <div
+                key={`${message.role}-${index}`}
+                className={cn('max-w-[90%] rounded-2xl px-3.5 py-2.5 text-xs leading-relaxed font-normal shadow-xs', message.role === 'user' ? 'ml-auto bg-gradient-to-r from-[#00B4D8] to-[#0891b2] text-white font-medium' : 'bg-white border border-slate-200/80 text-slate-900')}
+              >
+                {message.content}
+              </div>
+            ))}
+            {loading && (
+              <div className="inline-flex items-center gap-2 rounded-xl border border-slate-200/80 bg-white px-3 py-2 text-xs text-slate-600">
+                <Loader2 className="size-3.5 animate-spin text-[#00B4D8]" />
+                {t('Loading live briefing...', 'लाइव ब्रीफिंग लोड हो रही है...')}
+              </div>
+            )}
+          </div>
+
+          <div className="mt-4 grid gap-2 sm:grid-cols-2">
+            {quickPrompts.map((prompt) => (
+              <button
+                key={prompt}
+                onClick={() => sendMessage(prompt)}
+                className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-left text-xs font-medium text-slate-700 hover:border-[#00B4D8]/50 hover:bg-cyan-50/50 hover:text-[#00B4D8] transition-all"
+              >
+                {prompt}
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+            <textarea
+              value={draft}
+              onChange={(event) => setDraft(event.target.value)}
+              onKeyDown={handleDraftKeyDown}
+              rows={2}
+              placeholder={t("Ask about a stock, a trade, or today's news...", "शेयर, व्यापार या आज के समाचार के बारे में पूछें...")}
+              className="min-h-20 flex-1 resize-none rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs outline-none focus:border-[#00B4D8] font-sans text-slate-900"
+            />
+            <button onClick={submitDraft} disabled={sending} className="h-auto min-h-20 px-4 sm:w-24 rounded-xl bg-gradient-to-r from-[#00B4D8] to-[#0891b2] text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-sm hover:opacity-95 transition-all">
+              {sending ? <Loader2 className="size-3.5 animate-spin" /> : <Send className="size-3.5" />}
+              {t('Send', 'भेजें')}
+            </button>
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-2 text-xs font-medium">
+            <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-slate-700">{t('Portfolio', 'पोर्टफोलियो')} <strong className="font-mono font-bold text-slate-900">{formatCurrency(effectivePortfolioValue || 0, true)}</strong></span>
+            {typeof effectiveCash === 'number' && <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-slate-700">{t('Cash', 'नकदी')} <strong className="font-mono font-bold text-slate-900">{formatCurrency(effectiveCash, true)}</strong></span>}
+            {cashRatio !== undefined && <span className={cn('rounded-full px-3 py-1 font-semibold border', cashRatio > 0.2 ? 'bg-cyan-50 text-[#00B4D8] border-cyan-100' : 'bg-amber-50 text-amber-700 border-amber-100')}>{cashRatio > 0.2 ? t('Flexible', 'लचीला') : t('Nearly deployed', 'लगभग तैनात')}</span>}
+          </div>
+
+          <div className="mt-4 rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-xs">
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-900">
+              <Sparkles className="size-3.5 text-[#00B4D8]" />
+              {t("Today's guidance", 'आज का मार्गदर्शन')}
+            </div>
+            <p className="mt-2 text-xs leading-relaxed text-slate-600 font-normal">{guidance}</p>
           </div>
         </div>
 
-        <div className="mt-5 grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
-          <div className="rounded-2xl border border-border bg-card/80 p-4">
-            <div className="flex items-center gap-2 text-sm font-medium">
-              <MessageSquare className="size-4 text-primary" />
-              {t('Chat with me', 'मुझसे बात करें')}
+        <div className="space-y-4">
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs">
+            <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-slate-900">
+                <TrendingUp className="size-3.5 text-[#00B4D8]" />
+                {t('Live prices', 'लाइव कीमतें')}
+              </div>
+              <span className="rounded-full bg-cyan-50 text-[#00B4D8] px-2.5 py-0.5 text-[10px] font-semibold border border-cyan-100">{t('Stocks', 'शेयर')}</span>
             </div>
-            <div className="mt-3 max-h-72 space-y-3 overflow-y-auto pr-1">
-              {messages.map((message, index) => (
-                <div
-                  key={`${message.role}-${index}`}
-                  className={cn('max-w-[90%] rounded-2xl px-3 py-2.5 text-sm leading-relaxed', message.role === 'user' ? 'ml-auto bg-primary text-primary-foreground' : 'bg-secondary text-foreground')}
-                >
-                  {message.content}
-                </div>
-              ))}
-              {loading && (
-                <div className="inline-flex items-center gap-2 rounded-2xl bg-secondary px-3 py-2 text-sm text-muted-foreground">
-                  <Loader2 className="size-4 animate-spin" />
-                  {t('Loading live briefing...', 'लाइव ब्रीफिंग लोड हो रही है...')}
+            <div className="mt-3 space-y-2">
+              {featured.length > 0 ? (
+                featured.map((asset) => (
+                  <div key={asset.symbol} className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/60 px-3 py-2 text-xs font-sans">
+                    <div>
+                      <div className="font-mono font-bold text-slate-900">{asset.symbol}</div>
+                      <div className="text-[11px] text-slate-500">{asset.name}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-mono font-bold text-slate-900 tabular-nums">{formatCurrency(asset.price)}</div>
+                      <div className={cn('flex items-center justify-end gap-0.5 text-[11px] font-semibold', asset.change >= 0 ? 'text-[#00B4D8]' : 'text-rose-600')}>
+                        {asset.change >= 0 ? <ArrowUpRight className="size-3" /> : <ArrowDownRight className="size-3" />}
+                        {formatPct(asset.change)}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="py-6 text-center text-xs text-slate-500 font-sans">
+                  {t('Loading live market prices...', 'लाइव बाज़ार कीमतें लोड हो रही हैं...')}
                 </div>
               )}
             </div>
-
-            <div className="mt-4 grid gap-2 sm:grid-cols-2">
-              {quickPrompts.map((prompt) => (
-                <button
-                  key={prompt}
-                  onClick={() => sendMessage(prompt)}
-                  className="rounded-xl border border-border bg-background px-3 py-2 text-left text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
-                >
-                  {prompt}
-                </button>
-              ))}
-            </div>
-
-            <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-              <textarea
-                value={draft}
-                onChange={(event) => setDraft(event.target.value)}
-                onKeyDown={handleDraftKeyDown}
-                rows={3}
-                placeholder={t("Ask about a stock, a trade, or today's news...", "शेयर, व्यापार या आज के समाचार के बारे में पूछें...")}
-                className="min-h-24 flex-1 resize-none rounded-2xl border border-border bg-background px-4 py-3 text-sm outline-none transition-colors focus:border-primary"
-              />
-              <Button onClick={submitDraft} disabled={sending} className="h-auto min-h-24 px-4 sm:w-28 flex items-center justify-center gap-1.5">
-                {sending ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
-                {t('Send', 'भेजें')}
-              </Button>
-            </div>
-
-            <div className="mt-4 flex flex-wrap gap-2">
-              <Badge variant="muted">{t('Portfolio', 'पोर्टफोलियो')} {formatCurrency(effectivePortfolioValue || 0, true)}</Badge>
-              {typeof effectiveCash === 'number' && <Badge variant="muted">{t('Cash', 'नकदी')} {formatCurrency(effectiveCash, true)}</Badge>}
-              {cashRatio !== undefined && <Badge variant={cashRatio > 0.2 ? 'success' : 'warning'}>{cashRatio > 0.2 ? t('Flexible', 'लचीला') : t('Nearly deployed', 'लगभग तैनात')}</Badge>}
-            </div>
-
-            <div className="mt-4 rounded-2xl border border-border bg-background/80 p-4">
-              <div className="flex items-center gap-2 text-sm font-medium">
-                <Sparkles className="size-4 text-primary" />
-                {t("Today's guidance", 'आज का मार्गदर्शन')}
-              </div>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{guidance}</p>
-            </div>
           </div>
 
-          <div className="space-y-5">
-            <div className="rounded-2xl border border-border bg-card/80 p-4">
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2 text-sm font-medium">
-                  <TrendingUp className="size-4 text-primary" />
-                  {t('Live prices', 'लाइव कीमतें')}
-                </div>
-                <Badge variant="muted">{t('Stocks', 'शेयर')}</Badge>
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs">
+            <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-slate-900">
+                <Newspaper className="size-3.5 text-[#00B4D8]" />
+                {t('Latest news', 'नवीनतम समाचार')}
               </div>
-              <div className="mt-4 space-y-3">
-                {featured.length > 0 ? (
-                  featured.map((asset) => (
-                    <div key={asset.symbol} className="flex items-center justify-between rounded-xl bg-secondary/60 px-3 py-2.5">
-                      <div>
-                        <div className="text-sm font-medium">{asset.symbol}</div>
-                        <div className="text-xs text-muted-foreground">{asset.name}</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-sm font-semibold tabular-nums">{formatCurrency(asset.price)}</div>
-                        <div className={cn('flex items-center justify-end gap-1 text-xs font-medium', asset.change >= 0 ? 'text-success' : 'text-destructive')}>
-                          {asset.change >= 0 ? <ArrowUpRight className="size-3.5" /> : <ArrowDownRight className="size-3.5" />}
-                          {formatPct(asset.change)}
-                        </div>
-                      </div>
+              <span className="rounded-full bg-cyan-50 text-[#00B4D8] px-2 py-0.5 text-[10px] font-semibold border border-cyan-100">{news.length}</span>
+            </div>
+            <div className="mt-3 space-y-2">
+              {news.length > 0 ? (
+                news.map((item) => (
+                  <a
+                    key={item.title}
+                    href={item.link || '#'}
+                    target={item.link ? '_blank' : undefined}
+                    rel={item.link ? 'noreferrer' : undefined}
+                    className={cn('block rounded-xl border border-slate-100 bg-slate-50/60 p-2.5 text-xs font-sans transition-all hover:border-[#00B4D8]/40 hover:bg-cyan-50/40', item.link && 'hover:bg-cyan-50/50')}
+                  >
+                    <div className="font-semibold text-slate-900 leading-snug">{item.title}</div>
+                    <div className="mt-1 text-[10px] text-slate-500">
+                      {item.publisher || 'MarketMind'}{item.published_at ? ` · ${new Date(item.published_at).toLocaleString()}` : ''}
                     </div>
-                  ))
-                ) : (
-                  <div className="rounded-xl border border-dashed border-border py-8 text-center text-sm text-muted-foreground">
-                    {t('Loading live market prices...', 'लाइव बाज़ार कीमतें लोड हो रही हैं...')}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-border bg-card/80 p-4">
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2 text-sm font-medium">
-                  <Newspaper className="size-4 text-primary" />
-                  {t('Latest news', 'नवीनतम समाचार')}
+                  </a>
+                ))
+              ) : (
+                <div className="py-6 text-center text-xs text-slate-500 font-sans">
+                  {t('No headlines available right now.', 'अभी कोई मुख्य समाचार उपलब्ध नहीं है।')}
                 </div>
-                <Badge variant="muted">{news.length}</Badge>
-              </div>
-              <div className="mt-4 space-y-3">
-                {news.length > 0 ? (
-                  news.map((item) => (
-                    <a
-                      key={item.title}
-                      href={item.link || '#'}
-                      target={item.link ? '_blank' : undefined}
-                      rel={item.link ? 'noreferrer' : undefined}
-                      className={cn('block rounded-xl border border-border px-3 py-2.5 transition-colors', item.link ? 'hover:border-primary/40 hover:bg-secondary/50' : 'bg-secondary/30')}
-                    >
-                      <div className="text-sm font-medium">{item.title}</div>
-                      <div className="mt-1 text-xs text-muted-foreground">
-                        {item.publisher || 'MarketMind'}{item.published_at ? ` · ${new Date(item.published_at).toLocaleString()}` : ''}
-                      </div>
-                    </a>
-                  ))
-                ) : (
-                  <div className="rounded-xl border border-dashed border-border py-8 text-center text-sm text-muted-foreground">
-                    {t('No headlines available right now.', 'अभी कोई मुख्य समाचार उपलब्ध नहीं है।')}
-                  </div>
-                )}
-              </div>
+              )}
             </div>
           </div>
-        </div>
-
-        <div className="mt-5 flex items-center gap-2 text-xs text-muted-foreground">
-          <ShieldCheck className="size-3.5" />
-          {t('Educational guidance only. Use it as a second opinion before you trade.', 'केवल शैक्षणिक मार्गदर्शन। व्यापार करने से पहले इसे दूसरी राय के रूप में उपयोग करें।')}
         </div>
       </div>
-    </Card>
+
+      <div className="mt-4 flex items-center gap-2 text-xs text-slate-500 font-medium">
+        <ShieldCheck className="size-3.5 text-[#00B4D8]" />
+        {t('Educational guidance only. Use it as a second opinion before you trade.', 'केवल शैक्षणिक मार्गदर्शन। व्यापार करने से पहले इसे दूसरी राय के रूप में उपयोग करें।')}
+      </div>
+    </div>
   )
+
 }

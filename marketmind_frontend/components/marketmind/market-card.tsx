@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { ArrowUpRight, ArrowDownRight } from 'lucide-react'
-import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { Sparkline } from './sparkline'
 import { type Asset, formatCurrency, formatPct } from '@/lib/market-data'
 import { useLanguage } from '@/lib/language-context'
@@ -52,23 +50,23 @@ export function MarketCard({
   }, [asset.id, asset.price, asset.change])
 
   return (
-    <Card className="flex flex-col p-4 transition-all hover:border-primary/40 hover:shadow-md">
+    <div className="flex flex-col rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm hover:shadow-md hover:border-[#00B4D8]/40 transition-all duration-200">
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <span className="flex size-10 items-center justify-center rounded-xl bg-secondary text-sm font-semibold">
+          <span className="flex size-10 items-center justify-center rounded-xl bg-[#00B4D8]/10 text-xs font-bold text-[#00B4D8] border border-[#00B4D8]/20">
             {asset.symbol.slice(0, 2)}
           </span>
           <div>
-            <div className="font-semibold leading-tight">{asset.name}</div>
-            <div className="text-xs text-muted-foreground">{asset.symbol}</div>
+            <div className="font-semibold text-sm text-slate-900 leading-tight">{asset.name}</div>
+            <div className="text-xs font-mono text-slate-500 mt-0.5">{asset.symbol}</div>
           </div>
         </div>
         <span
           className={cn(
-            'inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-xs font-medium',
+            'inline-flex items-center gap-0.5 rounded-full px-2.5 py-0.5 text-xs font-semibold',
             positive
-              ? 'bg-success/15 text-success'
-              : 'bg-destructive/15 text-destructive',
+              ? 'bg-cyan-50 text-[#00B4D8] border border-cyan-100'
+              : 'bg-rose-50 text-rose-600 border border-rose-100',
           )}
         >
           {positive ? (
@@ -80,28 +78,29 @@ export function MarketCard({
         </span>
       </div>
 
-      <div className="mt-4 flex items-end justify-between gap-2">
-        <div className="text-xl font-semibold tabular-nums">
+      <div className="mt-4 flex items-end justify-between gap-2 border-t border-slate-100 pt-3">
+        <div className="font-mono text-xl font-bold tabular-nums text-slate-900">
           {formatCurrency(asset.price)}
         </div>
         <Sparkline data={sparkData} positive={positive} width={96} height={36} />
       </div>
 
       <div className="mt-4 flex gap-2">
-        <Button
-          className="h-9 flex-1 bg-success text-success-foreground hover:bg-success/90"
+        <button
+          className="h-9 flex-1 rounded-xl bg-gradient-to-r from-[#00B4D8] to-[#0891b2] text-xs font-semibold text-white shadow-sm hover:opacity-95 transition-all"
           onClick={() => onTrade(asset, 'buy')}
         >
           {t('Buy', 'खरीदें')}
-        </Button>
-        <Button
-          variant="outline"
-          className="h-9 flex-1"
+        </button>
+        <button
+          className="h-9 flex-1 rounded-xl border border-slate-200 bg-white text-xs font-medium text-slate-700 hover:bg-slate-50 transition-all"
           onClick={() => onTrade(asset, 'sell')}
         >
           {t('Sell', 'बेचें')}
-        </Button>
+        </button>
       </div>
-    </Card>
+    </div>
   )
 }
+
+

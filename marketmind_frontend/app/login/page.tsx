@@ -31,6 +31,12 @@ export default function LoginPage() {
       } else {
         await api.register(form)
         await refresh()
+        // Mark as new user so dashboard shows onboarding game
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('MM_NEW_USER', 'true')
+          localStorage.removeItem('MM_ONBOARDED')
+          localStorage.removeItem('MM_EXPERIENCE_LEVEL')
+        }
       }
       router.push('/dashboard')
     } catch (e: any) {

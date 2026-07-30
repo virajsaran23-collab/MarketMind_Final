@@ -11,14 +11,11 @@ import {
   ArrowRight,
   Clock,
   Sparkles,
+  CheckCircle2,
 } from 'lucide-react'
 import { LandingHeader } from '@/components/marketmind/landing-header'
-import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { buttonVariants } from '@/components/ui/button'
 import { CaseStudyImage } from '@/components/marketmind/case-study-image'
 import { useLanguage } from '@/lib/language-context'
-import { cn } from '@/lib/utils'
 
 export default function LandingPage() {
   const { t } = useLanguage()
@@ -83,67 +80,73 @@ export default function LandingPage() {
   ]
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-cyan-100 selection:text-cyan-900">
       <LandingHeader />
 
       {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="pointer-events-none absolute -top-40 left-1/2 size-[640px] -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" />
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
-          <div className="relative">
-            <Badge variant="default" className="mb-5">
-              <Sparkles className="size-3 mr-1" />
-              {t('Learn by doing, not by reading', 'पढ़कर नहीं, करके सीखें')}
-            </Badge>
-            <h1 className="text-balance text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
+      <section className="relative overflow-hidden py-16 sm:py-24">
+        {/* Soft Ambient Glow */}
+        <div className="pointer-events-none absolute -top-40 left-1/2 size-[640px] -translate-x-1/2 rounded-full bg-[#00B4D8]/10 blur-3xl" />
+        <div className="pointer-events-none absolute top-1/2 -right-40 size-[400px] rounded-full bg-[#38bdf8]/10 blur-3xl" />
+
+        <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16">
+          <div className="relative space-y-6">
+            <div className="inline-flex items-center gap-2 rounded-full bg-[#00B4D8]/10 px-3.5 py-1.5 text-xs font-semibold text-[#00B4D8] border border-[#00B4D8]/20 shadow-xs">
+              <Sparkles className="size-3.5 text-[#00B4D8]" />
+              <span>{t('Learn by doing, not by reading', 'पढ़कर नहीं, करके सीखें')}</span>
+            </div>
+
+            <h1 className="text-balance text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl text-slate-900 leading-[1.1]">
               {t('Learn the Stock Market by Playing It', 'शेयर बाज़ार को खेल-खेल में सीखें')}
             </h1>
-            <p className="mt-5 max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground">
+
+            <p className="max-w-xl text-base sm:text-lg leading-relaxed text-slate-600 font-normal">
               {t(
-                'Invest virtual money, react to real-world events, and understand how markets move — all in one immersive simulation platform.',
+                'Invest virtual money, react to real-world events, and understand how markets move — all in one simple, interactive simulation platform.',
                 'आभासी पैसे का निवेश करें, वास्तविक दुनिया की घटनाओं पर प्रतिक्रिया दें और समझें कि बाज़ार कैसे बदलता है - सब एक ही सिमुलेशन प्लेटफॉर्म पर।'
               )}
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+
+            <div className="flex flex-col gap-3.5 sm:flex-row pt-2">
               <Link
                 href="/dashboard"
-                className={cn(buttonVariants(), 'h-12 px-6 text-base')}
+                className="h-12 px-7 text-sm font-semibold flex items-center justify-center rounded-xl bg-gradient-to-r from-[#00B4D8] to-[#0891b2] text-white shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:-translate-y-0.5 transition-all duration-200"
               >
                 {t('Start Investing', 'निवेश शुरू करें')}
-                <ArrowRight className="size-4 ml-1" />
+                <ArrowRight className="size-4 ml-2" />
               </Link>
               <Link
                 href="/case-studies"
-                className={cn(
-                  buttonVariants({ variant: 'outline' }),
-                  'h-12 px-6 text-base'
-                )}
+                className="h-12 px-6 text-sm font-semibold flex items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all duration-200"
               >
                 {t('Explore Case Studies', 'केस स्टडीज़ देखें')}
               </Link>
             </div>
-            <dl className="mt-10 grid max-w-md grid-cols-3 gap-6">
+
+            <dl className="grid max-w-md grid-cols-3 gap-6 pt-6 border-t border-slate-100">
               {stats.map((s) => (
                 <div key={s.l}>
-                  <dt className="text-2xl font-semibold tracking-tight">
+                  <dt className="font-mono text-2xl font-bold text-[#00B4D8] tracking-tight">
                     {s.v}
                   </dt>
-                  <dd className="text-sm text-muted-foreground">{s.l}</dd>
+                  <dd className="text-xs text-slate-500 font-medium mt-1">{s.l}</dd>
                 </div>
               ))}
             </dl>
           </div>
 
           <div className="relative animate-float">
-            <div className="absolute inset-0 -z-10 rounded-3xl bg-primary/20 blur-2xl" />
-            <Image
-              src="/hero-dashboard.png"
-              alt="MarketMind dashboard preview showing stock charts, commodities, and portfolio growth"
-              width={720}
-              height={560}
-              priority
-              className="w-full rounded-3xl border border-border shadow-2xl"
-            />
+            <div className="absolute inset-0 -z-10 rounded-3xl bg-[#00B4D8]/15 blur-2xl" />
+            <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-2 shadow-2xl shadow-slate-200">
+              <Image
+                src="/hero-dashboard.png"
+                alt="MarketMind dashboard preview showing stock charts, commodities, and portfolio growth"
+                width={720}
+                height={560}
+                priority
+                className="w-full rounded-xl border border-slate-100"
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -151,33 +154,37 @@ export default function LandingPage() {
       {/* Features */}
       <section
         id="features"
-        className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:py-24"
+        className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:py-24 border-t border-slate-100"
       >
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+          <span className="text-xs font-bold text-[#00B4D8] uppercase tracking-widest">
+            {t('Interactive Features', 'इंटरैक्टिव सुविधाएं')}
+          </span>
+          <h2 className="text-balance text-3xl font-extrabold tracking-tight sm:text-4xl text-slate-900 mt-2">
             {t('Everything you need to master the markets', 'बाज़ार में महारत हासिल करने के लिए सब कुछ')}
           </h2>
-          <p className="mt-4 text-pretty text-muted-foreground">
+          <p className="mt-3 text-base text-slate-600">
             {t(
               'A complete learning environment built around real decisions and real consequences.',
               'वास्तविक निर्णयों और परिणामों पर आधारित एक संपूर्ण शिक्षण वातावरण।'
             )}
           </p>
         </div>
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+
+        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {features.map((f) => (
-            <Card
+            <div
               key={f.title}
-              className="p-6 transition-all hover:border-primary/40 hover:shadow-md"
+              className="group rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm hover:shadow-xl hover:border-[#00B4D8]/40 hover:-translate-y-1 transition-all duration-300"
             >
-              <span className="flex size-11 items-center justify-center rounded-xl bg-primary/15 text-primary">
-                <f.icon className="size-5.5" />
+              <span className="flex size-12 items-center justify-center rounded-xl bg-[#00B4D8]/10 text-[#00B4D8] group-hover:bg-gradient-to-tr group-hover:from-[#00B4D8] group-hover:to-[#0891b2] group-hover:text-white transition-all duration-300">
+                <f.icon className="size-6" />
               </span>
-              <h3 className="mt-5 text-lg font-semibold">{f.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              <h3 className="mt-5 text-lg font-bold text-slate-900">{f.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-slate-600 font-normal">
                 {f.description}
               </p>
-            </Card>
+            </div>
           ))}
         </div>
       </section>
@@ -185,55 +192,54 @@ export default function LandingPage() {
       {/* Case studies preview */}
       <section
         id="case-studies"
-        className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:py-24"
+        className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:py-24 border-t border-slate-100 bg-slate-50/50"
       >
         <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
           <div className="max-w-2xl">
-            <Badge variant="default" className="mb-4">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#00B4D8]/10 px-3 py-1 text-xs font-semibold text-[#00B4D8] border border-[#00B4D8]/20 mb-3">
+              <CheckCircle2 className="size-3.5" />
               {t('The differentiator', 'मुख्य विशेषता')}
-            </Badge>
-            <h2 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+            </span>
+            <h2 className="text-balance text-3xl font-extrabold tracking-tight sm:text-4xl text-slate-900">
               {t("Learn from history's biggest market moments", 'इतिहास के सबसे बड़े बाज़ार क्षणों से सीखें')}
             </h2>
-            <p className="mt-4 text-pretty text-muted-foreground">
-              {t(
-                'Step into pivotal economic events and make the calls. See how your decisions would have played out.',
-                'महत्वपूर्ण आर्थिक घटनाओं में कदम रखें और निर्णय लें। देखें कि आपके फैसले कैसे रंग लाते।'
-              )}
-            </p>
           </div>
           <Link
             href="/case-studies"
-            className={cn(buttonVariants({ variant: 'outline' }), 'h-10 px-4')}
+            className="h-10 px-4 text-xs font-semibold flex items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition-all shadow-xs"
           >
             {t('View all', 'सभी देखें')}
-            <ArrowRight className="size-4 ml-1" />
+            <ArrowRight className="size-4 ml-1.5" />
           </Link>
         </div>
 
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {caseStudies.map((cs: any) => (
             <Link
               key={cs.id}
               href={`/case-studies/${cs.id}`}
-              className="group overflow-hidden rounded-2xl border border-border bg-card transition-all hover:border-primary/40 hover:shadow-md"
+              className="group rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-xl hover:border-[#00B4D8]/40 hover:-translate-y-1 transition-all duration-300 overflow-hidden"
             >
               <CaseStudyImage
                 src={cs.image}
                 alt={cs.title}
                 seed={cs.id}
-                className="aspect-[16/10] overflow-hidden rounded-none"
+                className="aspect-[16/10] border-b border-slate-100"
               />
-              <div className="p-4">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Badge variant="muted">{cs.difficulty}</Badge>
+              <div className="p-5">
+                <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
+                  <span className="rounded-full bg-cyan-50 text-[#00B4D8] px-2.5 py-0.5 font-semibold border border-cyan-100">
+                    {cs.difficulty}
+                  </span>
                   <span className="inline-flex items-center gap-1">
                     <Clock className="size-3" />
                     {cs.read_time}
                   </span>
                 </div>
-                <h3 className="mt-3 font-semibold leading-snug">{cs.title}</h3>
-                <p className="mt-1.5 line-clamp-2 text-sm text-muted-foreground">
+                <h3 className="mt-3 font-bold text-sm leading-snug text-slate-900 group-hover:text-[#00B4D8] transition-colors">
+                  {cs.title}
+                </h3>
+                <p className="mt-1.5 line-clamp-2 text-xs text-slate-600 font-normal leading-relaxed">
                   {cs.description}
                 </p>
               </div>
@@ -244,13 +250,12 @@ export default function LandingPage() {
 
       {/* CTA */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:py-24">
-        <Card className="relative overflow-hidden p-10 text-center sm:p-16">
-          <div className="pointer-events-none absolute -right-20 -top-20 size-72 rounded-full bg-primary/15 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-24 -left-20 size-72 rounded-full bg-success/10 blur-3xl" />
-          <h2 className="relative text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+        <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-gradient-to-b from-white via-cyan-50/30 to-white p-10 text-center sm:p-16 shadow-xl shadow-cyan-500/5">
+          <div className="pointer-events-none absolute -right-20 -top-20 size-72 rounded-full bg-[#00B4D8]/10 blur-3xl" />
+          <h2 className="relative text-balance text-3xl font-extrabold tracking-tight sm:text-4xl text-slate-900">
             {t('Start building real investing intuition today', 'आज ही निवेश की वास्तविक समझ विकसित करना शुरू करें')}
           </h2>
-          <p className="relative mx-auto mt-4 max-w-xl text-pretty text-muted-foreground">
+          <p className="relative mx-auto mt-4 max-w-xl text-sm sm:text-base text-slate-600 font-normal">
             {t(
               'Join thousands of learners using MarketMind to understand markets through hands-on simulation — completely risk-free.',
               'सिमुलेशन के माध्यम से बाज़ार को समझने के लिए MarketMind का उपयोग करने वाले हज़ारों शिक्षार्थियों से जुड़ें - पूरी तरह से जोखिम मुक्त।'
@@ -259,22 +264,23 @@ export default function LandingPage() {
           <div className="relative mt-8 flex justify-center">
             <Link
               href="/dashboard"
-              className={cn(buttonVariants(), 'h-12 px-7 text-base')}
+              className="h-12 px-8 text-sm font-semibold flex items-center justify-center rounded-xl bg-gradient-to-r from-[#00B4D8] to-[#0891b2] text-white shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:-translate-y-0.5 transition-all duration-200"
             >
               {t('Start Investing', 'निवेश शुरू करें')}
-              <ArrowRight className="size-4 ml-1" />
+              <ArrowRight className="size-4 ml-2" />
             </Link>
           </div>
-        </Card>
+        </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-8 sm:flex-row sm:px-6">
-          <div className="flex items-center gap-4">
-            <h2 className="font-semibold tracking-tight">MarketMind</h2>
+      <footer className="border-t border-slate-200/80 bg-white py-8">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 sm:flex-row sm:px-6 text-xs text-slate-500 font-medium">
+          <div className="flex items-center gap-2">
+            <span className="flex size-6 items-center justify-center rounded-lg bg-[#00B4D8] text-white text-xs font-bold">M</span>
+            <span className="font-bold text-slate-900 text-sm">MarketMind</span>
           </div>
-          <p className="text-sm text-muted-foreground">
+          <p>
             © {new Date().getFullYear()} MarketMind. {t('Educational simulation only.', 'केवल शैक्षणिक सिमुलेशन हेतु।')}
           </p>
         </div>
@@ -282,3 +288,5 @@ export default function LandingPage() {
     </div>
   )
 }
+
+

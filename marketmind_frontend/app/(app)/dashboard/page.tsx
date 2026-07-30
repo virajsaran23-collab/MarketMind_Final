@@ -7,19 +7,46 @@ import { StatCard } from '@/components/marketmind/stat-card'
 import { PortfolioChart } from '@/components/marketmind/portfolio-chart'
 import { MarketGrid } from '@/components/marketmind/market-grid'
 import { MarketBuddy } from '@/components/marketmind/market-buddy'
+import { OnboardingGame } from '@/components/marketmind/onboarding-game'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button'
 import { formatCurrency, formatPct } from '@/lib/market-data'
 import { useLanguage } from '@/lib/language-context'
+import { useAuth, type ExperienceLevel } from '@/lib/auth-context'
 import { api } from '@/lib/api'
 import { cn } from '@/lib/utils'
 
 export default function DashboardPage() {
   const { t } = useLanguage()
+  const { user, onboarded, completeOnboarding, showToast } = useAuth()
   const [portfolioData, setPortfolioData] = useState<any>(null)
   const [stocks, setStocks] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [showOnboarding, setShowOnboarding] = useState(false)
+
+  // Detect first-time users: only show onboarding if MM_NEW_USER is set and not yet onboarded
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const isNewUser = localStorage.getItem('MM_NEW_USER') === 'true'
+    if (isNewUser && !onboarded) {
+      setShowOnboarding(true)
+    }
+  }, [onboarded])
+
+  const handleOnboardingComplete = (level: ExperienceLevel) => {
+    completeOnboarding(level)
+    setShowOnboarding(false)
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('MM_NEW_USER')
+    }
+    const levelLabels: Record<ExperienceLevel, string> = {
+      beginner: '🌱 Market Seedling',
+      intermediate: '📊 Market Analyst',
+      advanced: '🧠 Market Quant',
+    }
+    showToast('Rank Assigned! 🎉', `You are now a ${levelLabels[level]}. Good luck, Trader!`, 'success')
+  }
 
   const refreshData = useCallback((showSkeleton = false) => {
     if (showSkeleton) {
@@ -148,17 +175,26 @@ export default function DashboardPage() {
   const watchlist = stocks.slice(0, 4)
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="text-sm text-muted-foreground">{t('Welcome back', 'वापसी पर आपका स्वागत है')}</p>
-          <h1 className="text-2xl font-semibold tracking-tight">{t('Dashboard', 'डैशबोर्ड')}</h1>
+    <>
+      {/* Onboarding Game Overlay — shown for first-time users */}
+      {showOnboarding && (
+        <OnboardingGame
+          userName={user?.first_name || user?.username || ''}
+          onComplete={handleOnboardingComplete}
+        />
+      )}
+
+      <div className="space-y-6">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-sm text-muted-foreground">{t('Welcome back', 'वापसी पर आपका स्वागत है')}</p>
+            <h1 className="text-2xl font-semibold tracking-tight">{t('Dashboard', 'डैशबोर्ड')}</h1>
+          </div>
+          <Link href="/markets" className={cn(buttonVariants(), 'h-10 px-4')}>
+            {t('Trade Markets', 'बाज़ार में व्यापार करें')}
+            <ArrowRight className="size-4 ml-1" />
+          </Link>
         </div>
-        <Link href="/markets" className={cn(buttonVariants(), 'h-10 px-4')}>
-          {t('Trade Markets', 'बाज़ार में व्यापार करें')}
-          <ArrowRight className="size-4 ml-1" />
-        </Link>
-      </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label={t('Portfolio Value', 'पोर्टफोलियो मूल्य')} value={formatCurrency(stats.value)} change={stats.day_change_pct} icon={Wallet} />
@@ -216,5 +252,6 @@ export default function DashboardPage() {
         <MarketGrid assets={watchlist} />
       </div>
     </div>
+    </>
   )
 }

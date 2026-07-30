@@ -29,7 +29,7 @@ export function Sparkline({
     .join(' ')
 
   const areaPath = `${linePath} L${width},${height} L0,${height} Z`
-  const color = positive ? 'var(--success)' : 'var(--destructive)'
+  const color = positive ? '#00B4D8' : '#f43f5e'
   const gradId = `spark-${positive ? 'up' : 'down'}-${width}-${height}`
 
   return (
@@ -43,7 +43,7 @@ export function Sparkline({
     >
       <defs>
         <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity="0.28" />
+          <stop offset="0%" stopColor={color} stopOpacity="0.3" />
           <stop offset="100%" stopColor={color} stopOpacity="0" />
         </linearGradient>
       </defs>
@@ -59,3 +59,4 @@ export function Sparkline({
     </svg>
   )
 }
+

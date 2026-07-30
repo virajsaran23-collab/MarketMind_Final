@@ -19,10 +19,15 @@ type Profile = {
 
 type Toast = { id: string; title: string; desc: string; type?: 'success' | 'info' }
 
+export type ExperienceLevel = 'beginner' | 'intermediate' | 'advanced'
+
 type AuthCtx = {
   user: User | null
   profile: Profile | null
   loading: boolean
+  onboarded: boolean
+  experienceLevel: ExperienceLevel | null
+  completeOnboarding: (level: ExperienceLevel) => void
   login: (username: string, password: string) => Promise<void>
   logout: () => Promise<void>
   refresh: () => Promise<void>
@@ -82,6 +87,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
   const [toasts, setToasts] = useState<Toast[]>([])
+  const [onboarded, setOnboarded] = useState(() => {
+    if (typeof window !== 'undefined') return localStorage.getItem('MM_ONBOARDED') === 'true'
+    return false
+  })
+  const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel | null>(() => {
+    if (typeof window !== 'undefined') return (localStorage.getItem('MM_EXPERIENCE_LEVEL') as ExperienceLevel) || null
+    return null
+  })
+
+  const completeOnboarding = useCallback((level: ExperienceLevel) => {
+    setOnboarded(true)
+    setExperienceLevel(level)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('MM_ONBOARDED', 'true')
+      localStorage.setItem('MM_EXPERIENCE_LEVEL', level)
+    }
+  }, [])
 
   const showToast = useCallback((title: string, desc: string, type: 'success' | 'info' = 'success') => {
     const id = Math.random().toString(36).substring(2, 9)
@@ -138,7 +160,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, login, logout, refresh, showToast }}>
+    <AuthContext.Provider value={{ user, profile, loading, onboarded, experienceLevel, completeOnboarding, login, logout, refresh, showToast }}>
       {children}
       <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none">
         {toasts.map((toast) => (
