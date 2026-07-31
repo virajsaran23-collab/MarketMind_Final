@@ -3,6 +3,245 @@ from api.models import Asset, CaseStudy
 
 CASE_STUDIES = [
     {
+        'id': 'lemonade-stand',
+        'title': 'The Great Lemonade Stand (What is a Stock?)',
+        'description': 'Learn what a stock and dividend are with Timmy\'s lemonade business!',
+        'long_description': 'Timmy has a small lemonade stand, but he wants to build a bigger stand with a fancy automatic squeezer so he can sell to the whole neighborhood! To raise $100 for the equipment, Timmy creates 10 "Shares" of his lemonade business and sells each share to his friends for $10. When the stand sells 500 cups of lemonade in the summer and earns $200 in profit, Timmy pays each shareholder a $10 bonus (called a Dividend!). This is exactly how real companies like Apple, Disney, and Nike raise money from investors by selling stocks.',
+        'difficulty': 'Beginner',
+        'read_time': '3 min',
+        'image': '/case-lemonade.png',
+        'tags': ['Stocks 101', 'Dividends', 'Investing Basics'],
+        'timeline': [
+            {'date': 'Day 1', 'event': 'The Big Idea', 'description': 'Timmy wants to expand his lemonade stand but needs $100 for a machine.'},
+            {'date': 'Day 3', 'event': 'Selling Shares', 'description': 'Timmy sells 10 shares of stock for $10 each to his friends to raise $100.'},
+            {'date': 'Day 10', 'event': 'Grand Opening', 'description': 'The new machine squeezes lemons 5x faster! Sales explode across town.'},
+            {'date': 'Day 30', 'event': 'Dividend Day', 'description': 'Timmy earns $200 profit and rewards every shareholder with a $10 dividend payout!'}
+        ],
+        'stats': [
+            {'label': 'Money Raised', 'value': '$100'},
+            {'label': 'Total Shares', 'value': '10 Shares'},
+            {'label': 'Cups Sold', 'value': '500 Cups'},
+            {'label': 'Dividend Paid', 'value': '$10 / Share'}
+        ],
+        'lessons': [
+            'A stock represents a small piece of ownership in a real company.',
+            'Companies sell stocks to raise money so they can grow, buy equipment, and create new products.',
+            'When a company earns profit, it can share those profits with stock owners through Dividends!'
+        ],
+        'chart_data': [
+            {'date': 'Week 1', 'value': 10},
+            {'date': 'Week 2', 'value': 25},
+            {'date': 'Week 3', 'value': 55},
+            {'date': 'Week 4', 'value': 100}
+        ],
+        'quiz': [
+            {
+                'question': 'What does buying a "Stock" in a company actually mean?',
+                'options': [
+                    'You own a tiny piece of that company!',
+                    'You are lending money to a bank',
+                    'You get free lemonade forever',
+                    'You become the CEO immediately'
+                ],
+                'answer': 'You own a tiny piece of that company!',
+                'explanation': 'A stock is a slice of ownership in a business. When you buy a stock, you become a partial owner!'
+            },
+            {
+                'question': 'Why did Timmy sell 10 shares of his lemonade business to his friends?',
+                'options': [
+                    'To raise $100 to buy a bigger squeezer and expand',
+                    'Because he wanted to close his stand',
+                    'To pay off a parking ticket',
+                    'Because he didn\'t like lemonade'
+                ],
+                'answer': 'To raise $100 to buy a bigger squeezer and expand',
+                'explanation': 'Companies sell stock to raise capital (money) from investors to grow their business.'
+            },
+            {
+                'question': 'When Timmy shared his summer profits with his stock owners, what was that bonus payout called?',
+                'options': [
+                    'A Dividend',
+                    'A Tax Refund',
+                    'A Subscription Fee',
+                    'An Interest Penalty'
+                ],
+                'answer': 'A Dividend',
+                'explanation': 'A dividend is cash paid by a company to its stock shareholders out of its earnings/profits.'
+            }
+        ]
+    },
+    {
+        'id': 'candy-craze',
+        'title': 'The Candy Craze (Supply, Demand & Price Bubbles)',
+        'description': 'Discover how supply and demand change prices when everyone wants the same toy or treat!',
+        'long_description': 'A new rare superhero chocolate bar called "MegaCrunch" arrives at the school cafeteria. At first, it costs $1. Suddenly, a famous cartoon character eats it on TV, and EVERY kid wants one! This creates HIGH DEMAND. But the cafeteria only has 5 chocolate bars left (LOW SUPPLY). Kids start bidding against each other, driving the price up to $15! However, two weeks later, the factory ships thousands of chocolate bars to stores (High Supply), and kids move on to a new fad. The price crashes back to $1. This teaches us how hype and scarcity create price bubbles.',
+        'difficulty': 'Beginner',
+        'read_time': '4 min',
+        'image': '/case-candy.png',
+        'tags': ['Supply & Demand', 'Bubbles', 'Smart Buying'],
+        'timeline': [
+            {'date': 'Week 1', 'event': 'The TV Hype', 'description': 'A viral TV show makes MegaCrunch chocolate super popular overnight.'},
+            {'date': 'Week 2', 'event': 'Price Spikes', 'description': 'With high demand and only 5 bars left, the price jumps from $1 to $15!'},
+            {'date': 'Week 3', 'event': 'Factory Restock', 'description': 'The factory produces 10,000 bars. Supply shoots up, satisfying everyone.'},
+            {'date': 'Week 4', 'event': 'Price Normalizes', 'description': 'The hype dies down and price returns to a fair $1.'}
+        ],
+        'stats': [
+            {'label': 'Start Price', 'value': '$1.00'},
+            {'label': 'Peak Hype Price', 'value': '$15.00'},
+            {'label': 'Bars Available at Peak', 'value': '5 Bars'},
+            {'label': 'Final Price', 'value': '$1.00'}
+        ],
+        'lessons': [
+            'High Demand + Low Supply = Prices Go UP!',
+            'High Supply + Low Demand = Prices Go DOWN!',
+            'Don\'t buy an asset at super high prices just because of excitement or hype (a "Bubble").'
+        ],
+        'chart_data': [
+            {'date': 'Day 1', 'value': 1},
+            {'date': 'Day 5', 'value': 5},
+            {'date': 'Day 10', 'value': 15},
+            {'date': 'Day 15', 'value': 8},
+            {'date': 'Day 20', 'value': 1}
+        ],
+        'quiz': [
+            {
+                'question': 'What happens to the price of a toy when LOTS of kids want it (High Demand), but there are only a few left (Low Supply)?',
+                'options': [
+                    'The price usually goes UP!',
+                    'The price goes down to zero',
+                    'The price never changes',
+                    'The toy disappears completely'
+                ],
+                'answer': 'The price usually goes UP!',
+                'explanation': 'When demand is higher than supply, sellers can charge more because buyers compete to get the few items available.'
+            },
+            {
+                'question': 'What is a "Market Bubble"?',
+                'options': [
+                    'When prices rise to super high levels driven by hype, then pop and drop back down',
+                    'A soap bubble blown at the stock exchange',
+                    'When a company sells sparkling water',
+                    'A type of bank account'
+                ],
+                'answer': 'When prices rise to super high levels driven by hype, then pop and drop back down',
+                'explanation': 'A market bubble happens when excitement drives prices way above true value before crashing back down.'
+            }
+        ]
+    },
+    {
+        'id': 'egg-basket',
+        'title': 'Don\'t Put All Eggs in One Basket (Diversification)',
+        'description': 'Learn why spreading your money across different investments protects your savings.',
+        'long_description': 'Farmer Joe carries all 20 of his eggs in one big red basket. On his walk to the market, he trips on a rock—and ALL 20 eggs crash and break! Meanwhile, Farmer Sarah puts 5 eggs in a fruit basket, 5 in a vegetable box, 5 in a flower basket, and 5 in a honey jar. When Sarah stumbles, she only drops the fruit basket (losing 5 eggs), but her other 15 eggs stay completely safe! In investing, this is called DIVERSIFICATION. By owning tech, food, gaming, and green energy stocks, one bad day in one sector won\'t ruin your entire portfolio.',
+        'difficulty': 'Beginner',
+        'read_time': '3 min',
+        'image': '/case-eggs.png',
+        'tags': ['Diversification', 'Risk Management', 'Safety'],
+        'timeline': [
+            {'date': 'Morning', 'event': 'Packing the Baskets', 'description': 'Farmer Joe puts all 20 eggs in 1 basket. Sarah splits hers into 4 different baskets.'},
+            {'date': 'Noon', 'event': 'The Bumpy Trail', 'description': 'A sudden storm makes the path slippery and bumpy.'},
+            {'date': 'Afternoon', 'event': 'The Trip & Fall', 'description': 'Joe loses all 20 eggs. Sarah only loses 5 eggs because her risk was spread out.'}
+        ],
+        'stats': [
+            {'label': 'Joe\'s Baskets', 'value': '1 Basket'},
+            {'label': 'Sarah\'s Baskets', 'value': '4 Baskets'},
+            {'label': 'Joe\'s Loss', 'value': '100% (20/20)'},
+            {'label': 'Sarah\'s Saved Eggs', 'value': '75% (15/20)'}
+        ],
+        'lessons': [
+            'Diversification means spreading your money across different companies and industries.',
+            'If one stock or industry drops, your other investments can balance it out.',
+            'Never put 100% of your savings into a single stock!'
+        ],
+        'chart_data': [
+            {'date': 'Start', 'value': 20},
+            {'date': 'Joe (1 Basket)', 'value': 0},
+            {'date': 'Sarah (4 Baskets)', 'value': 15}
+        ],
+        'quiz': [
+            {
+                'question': 'What does "Diversification" mean in investing?',
+                'options': [
+                    'Spreading investments across different companies and sectors to lower risk',
+                    'Buying only 1 stock and holding it forever',
+                    'Keeping all your money in a shoe box',
+                    'Selling all your stocks as soon as it rains'
+                ],
+                'answer': 'Spreading investments across different companies and sectors to lower risk',
+                'explanation': 'Diversification protects you by ensuring you aren\'t relying on just one company or industry to succeed.'
+            },
+            {
+                'question': 'If you invest in Video Games, Shoes, Solar Power, and Food, what happens if game sales slow down for a month?',
+                'options': [
+                    'Your shoes, solar, and food investments help protect your overall portfolio value!',
+                    'You lose all your money instantly',
+                    'The bank takes your money',
+                    'Nothing happens to any company'
+                ],
+                'answer': 'Your shoes, solar, and food investments help protect your overall portfolio value!',
+                'explanation': 'Because your investments are diversified, losses in one sector are cushioned by performance in other sectors.'
+            }
+        ]
+    },
+    {
+        'id': 'magic-snowball',
+        'title': 'The Magic Snowball (Compound Interest)',
+        'description': 'See how your savings can grow exponentially over time when interest earns interest!',
+        'long_description': 'Imagine making a small snowball at the top of a snowy hill and pushing it down. As it rolls down the hill, it picks up more snow. The bigger it gets, the MORE snow it collects on every single turn! By the bottom of the hill, it\'s a giant, powerful snowman! This is Compound Interest. When you invest money, you earn interest or investment returns. In the next year, you earn returns on your original money PLUS the returns you already earned! Starting early is the super-power of investing.',
+        'difficulty': 'Beginner',
+        'read_time': '3 min',
+        'image': '/case-snowball.png',
+        'tags': ['Compound Interest', 'Long-Term', 'Super Growth'],
+        'timeline': [
+            {'date': 'Year 1', 'event': 'Small Snowball', 'description': 'You start with $100. You earn 10% ($10). Total = $110.'},
+            {'date': 'Year 2', 'event': 'Growing Bigger', 'description': 'You earn 10% on $110 ($11). Total = $121!'},
+            {'date': 'Year 5', 'event': 'Snowballing Effect', 'description': 'Your money is growing faster every year without you adding extra cash.'},
+            {'date': 'Year 20', 'event': 'Giant Snowman!', 'description': 'Your initial $100 has grown into a massive $672 thanks to compounding!'}
+        ],
+        'stats': [
+            {'label': 'Starting Money', 'value': '$100'},
+            {'label': 'Year 5 Value', 'value': '$161'},
+            {'label': 'Year 10 Value', 'value': '$259'},
+            {'label': 'Year 20 Value', 'value': '$672'}
+        ],
+        'lessons': [
+            'Compound interest means earning interest on your interest!',
+            'The earlier you start investing, the bigger your snowball grows over time.',
+            'Patience is one of the most profitable skills in financial learning.'
+        ],
+        'chart_data': [
+            {'date': 'Year 0', 'value': 100},
+            {'date': 'Year 5', 'value': 161},
+            {'date': 'Year 10', 'value': 259},
+            {'date': 'Year 15', 'value': 417},
+            {'date': 'Year 20', 'value': 672}
+        ],
+        'quiz': [
+            {
+                'question': 'What is "Compound Interest"?',
+                'options': [
+                    'Earning interest on your original money PLUS on the interest you already earned!',
+                    'A fee you pay to open a bank account',
+                    'Interest that decreases every year',
+                    'Buying double ice cream at the store'
+                ],
+                'answer': 'Earning interest on your original money PLUS on the interest you already earned!',
+                'explanation': 'Compounding makes your money grow like a snowball because your earnings generate their own future earnings.'
+            },
+            {
+                'question': 'What is the secret superpower to growing a giant investment snowball?',
+                'options': [
+                    'Starting early and giving your money time to compound!',
+                    'Checking stock prices 50 times every hour',
+                    'Selling everything whenever prices change',
+                    'Spending all your profits immediately'
+                ],
+                'answer': 'Starting early and giving your money time to compound!',
+                'explanation': 'Time is the key ingredient to compounding growth. The earlier you begin, the bigger your snowball gets!'
+            }
+        ]
+    },
+    {
         'id': 'russia-ukraine',
         'title': 'Russia–Ukraine Conflict',
         'description': 'Impact on oil prices, defense stocks, and global markets.',

@@ -32,10 +32,50 @@ const DIFF_COLOR: Record<string, string> = {
 
 const FALLBACK_STUDIES = [
   {
+    id: 'lemonade-stand',
+    title: 'The Great Lemonade Stand (What is a Stock?)',
+    description: 'Learn what a stock and dividend are with Timmy\'s lemonade business!',
+    long_description: 'Timmy has a small lemonade stand, but he wants to build a bigger stand with a fancy automatic squeezer so he can sell to the whole neighborhood! To raise $100 for the equipment, Timmy creates 10 "Shares" of his lemonade business and sells each share to his friends for $10. When the stand sells 500 cups of lemonade in the summer and earns $200 in profit, Timmy pays each shareholder a $10 bonus (called a Dividend!).',
+    difficulty: 'Beginner',
+    read_time: '3 min',
+    image: '/case-lemonade.png',
+    tags: ['Stocks 101', 'Dividends', 'Investing Basics'],
+  },
+  {
+    id: 'candy-craze',
+    title: 'The Candy Craze (Supply, Demand & Price Bubbles)',
+    description: 'Discover how supply and demand change prices when everyone wants the same toy or treat!',
+    long_description: 'A new rare superhero chocolate bar called "MegaCrunch" arrives at the school cafeteria. At first, it costs $1. Suddenly, a famous cartoon character eats it on TV, and EVERY kid wants one! This creates HIGH DEMAND.',
+    difficulty: 'Beginner',
+    read_time: '4 min',
+    image: '/case-candy.png',
+    tags: ['Supply & Demand', 'Bubbles', 'Smart Buying'],
+  },
+  {
+    id: 'egg-basket',
+    title: 'Don\'t Put All Eggs in One Basket (Diversification)',
+    description: 'Learn why spreading your money across different investments protects your savings.',
+    long_description: 'Farmer Joe carries all 20 of his eggs in one big red basket. On his walk to the market, he trips on a rock—and ALL 20 eggs crash and break! Meanwhile, Farmer Sarah splits her eggs into 4 baskets.',
+    difficulty: 'Beginner',
+    read_time: '3 min',
+    image: '/case-eggs.png',
+    tags: ['Diversification', 'Risk Management', 'Safety'],
+  },
+  {
+    id: 'magic-snowball',
+    title: 'The Magic Snowball (Compound Interest)',
+    description: 'See how your savings can grow exponentially over time when interest earns interest!',
+    long_description: 'Imagine making a small snowball at the top of a snowy hill and pushing it down. As it rolls down the hill, it picks up more snow. The bigger it gets, the MORE snow it collects on every single turn!',
+    difficulty: 'Beginner',
+    read_time: '3 min',
+    image: '/case-snowball.png',
+    tags: ['Compound Interest', 'Long-Term', 'Super Growth'],
+  },
+  {
     id: 'ai-boom',
     title: 'The AI Supercycle & Tech Valuation Boom',
     description: 'Generative AI surge, capital expenditure cycles, and chipmaker rallies.',
-    long_description: 'The rapid deployment of Large Language Models in 2023 sparked an unprecedented surge in demand for accelerated computing hardware and cloud infrastructure. Key Semiconductor and AI ecosystem leaders experienced astronomical revenue growth as global enterprises rushed to build AI capabilities.',
+    long_description: 'The rapid deployment of Large Language Models in 2023 sparked an unprecedented surge in demand for accelerated computing hardware and cloud infrastructure.',
     difficulty: 'Beginner',
     read_time: '7 min',
     image: '/case-russia-ukraine.png',
@@ -380,6 +420,32 @@ export default function CaseStudiesPage() {
               <div className="text-[10px] uppercase font-bold text-muted-foreground mt-0.5">{t('Advanced', 'उन्नत')}</div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* ── Featured Game Callout Banner ─────────────────────────────────── */}
+      <div className="mb-10 relative overflow-hidden rounded-3xl border border-[#00B4D8]/30 bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 p-6 sm:p-8 shadow-xl text-white">
+        <div className="pointer-events-none absolute -right-16 -top-16 size-64 rounded-full bg-[#00B4D8]/20 blur-3xl" />
+
+        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="space-y-2 text-center md:text-left">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#00B4D8]/40 bg-[#00B4D8]/10 px-3 py-1 text-xs font-bold text-[#00B4D8]">
+              <Sparkles className="size-3.5" /> Interactive Predictor Game
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+              Ready to Test Your Predictions in a Live Market Game? 🎮
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
+              Build your custom game portfolio, draw surprise market events, predict price movements with Prof. Algo, and win bonus tokens!
+            </p>
+          </div>
+
+          <Link
+            href="/predictor"
+            className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#00B4D8] to-[#0891b2] px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:-translate-y-0.5 transition-all shrink-0 cursor-pointer"
+          >
+            Play Event Predictor Game <ArrowRight className="size-4" />
+          </Link>
         </div>
       </div>
 

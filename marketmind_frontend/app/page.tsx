@@ -19,7 +19,40 @@ import { useLanguage } from '@/lib/language-context'
 
 export default function LandingPage() {
   const { t } = useLanguage()
-  const [caseStudies, setCaseStudies] = useState<any[]>([])
+  const [caseStudies, setCaseStudies] = useState<any[]>([
+    {
+      id: 'lemonade-stand',
+      title: 'The Great Lemonade Stand (What is a Stock?)',
+      description: 'Learn what a stock and dividend are with Timmy\'s lemonade business!',
+      difficulty: 'Beginner',
+      read_time: '3 min',
+      image: '/case-lemonade.png',
+    },
+    {
+      id: 'candy-craze',
+      title: 'The Candy Craze (Supply & Demand)',
+      description: 'Discover how supply and demand change prices when everyone wants the same treat!',
+      difficulty: 'Beginner',
+      read_time: '4 min',
+      image: '/case-candy.png',
+    },
+    {
+      id: 'egg-basket',
+      title: 'Don\'t Put All Eggs in One Basket',
+      description: 'Learn why spreading your money across different investments protects your savings.',
+      difficulty: 'Beginner',
+      read_time: '3 min',
+      image: '/case-eggs.png',
+    },
+    {
+      id: 'magic-snowball',
+      title: 'The Magic Snowball (Compound Interest)',
+      description: 'See how your savings grow exponentially over time when interest earns interest!',
+      difficulty: 'Beginner',
+      read_time: '3 min',
+      image: '/case-snowball.png',
+    },
+  ])
 
   useEffect(() => {
     async function loadCaseStudies() {
@@ -29,10 +62,12 @@ export default function LandingPage() {
         )
         if (res.ok) {
           const data = await res.json()
-          setCaseStudies(data)
+          if (Array.isArray(data) && data.length > 0) {
+            setCaseStudies(data)
+          }
         }
       } catch {
-        // Fallback or handle offline
+        // Fallback to initial state
       }
     }
     loadCaseStudies()

@@ -3,27 +3,28 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { Menu, X, Bell, LogOut } from 'lucide-react'
+import { Menu, X, Bell, LogOut, BookOpen, Gamepad2 } from 'lucide-react'
 import { Logo } from './logo'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/lib/auth-context'
 import { useLanguage } from '@/lib/language-context'
 import { LanguageToggle } from './language-toggle'
+import { FinanceGlossaryModal } from './finance-glossary-modal'
 
 const links = [
   { href: '/dashboard', labelEn: 'Dashboard', labelHi: 'डैशबोर्ड' },
+  { href: '/case-studies', labelEn: 'Case Studies 📚', labelHi: 'केस स्टडीज़ 📚' },
+  { href: '/predictor', labelEn: 'Predictor Game 🎮', labelHi: 'अनुमान गेम 🎮' },
   { href: '/portfolio', labelEn: 'Portfolio', labelHi: 'पोर्टफोलियो' },
   { href: '/markets', labelEn: 'Markets', labelHi: 'मार्केट्स' },
-  { href: '/ai-analyzer', labelEn: 'AI Analyzer', labelHi: 'AI विश्लेषक' },
-  { href: '/case-studies', labelEn: 'Case Studies', labelHi: 'केस स्टडीज़' },
   { href: '/analytics', labelEn: 'Analytics', labelHi: 'एनालिटिक्स' },
-  { href: '/market-math', labelEn: 'Market Math', labelHi: 'मार्केट गणित' },
-  { href: '/leaderboard', labelEn: 'Leaderboard', labelHi: 'लीडरबोर्ड' },
+  { href: '/leaderboard', labelEn: 'Leaderboard 🏆', labelHi: 'लीडरबोर्ड 🏆' },
 ]
 
 export function TopNav() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
+  const [glossaryOpen, setGlossaryOpen] = useState(false)
   const { user, logout } = useAuth()
   const { t } = useLanguage()
   const router = useRouter()
@@ -38,35 +39,48 @@ export function TopNav() {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/85 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
-        <div className="flex items-center gap-6">
-          <Logo />
+    <>
+      <FinanceGlossaryModal isOpen={glossaryOpen} onClose={() => setGlossaryOpen(false)} />
 
-          <nav className="hidden items-center gap-1 lg:flex">
-            {links.map((link) => {
-              const active = pathname === link.href || pathname.startsWith(link.href + '/')
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  id={link.href === '/case-studies' ? 'tour-nav-case-studies' : undefined}
-                  className={cn(
-                    'rounded-xl px-3 py-1.5 text-sm font-medium transition-all duration-200',
-                    active
-                      ? 'bg-[#00B4D8]/10 text-[#00B4D8] font-semibold'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70',
-                  )}
-                >
-                  {t(link.labelEn, link.labelHi)}
-                </Link>
-              )
-            })}
-          </nav>
-        </div>
+      <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/85 backdrop-blur-xl">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
+          <div className="flex items-center gap-6">
+            <Logo />
 
-        <div className="flex items-center gap-2 sm:gap-3">
-          <LanguageToggle />
+            <nav className="hidden items-center gap-1 lg:flex">
+              {links.map((link) => {
+                const active = pathname === link.href || pathname.startsWith(link.href + '/')
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    id={link.href === '/case-studies' ? 'tour-nav-case-studies' : undefined}
+                    className={cn(
+                      'rounded-xl px-3 py-1.5 text-xs font-semibold transition-all duration-200',
+                      active
+                        ? 'bg-[#00B4D8]/15 text-[#00B4D8] font-bold shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70',
+                    )}
+                  >
+                    {t(link.labelEn, link.labelHi)}
+                  </Link>
+                )
+              })}
+            </nav>
+          </div>
+
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Dictionary / Glossary Modal Trigger */}
+            <button
+              onClick={() => setGlossaryOpen(true)}
+              className="flex items-center gap-1.5 rounded-xl border border-[#00B4D8]/30 bg-[#00B4D8]/10 px-3 py-1.5 text-xs font-bold text-[#00B4D8] hover:bg-[#00B4D8]/20 transition-all shadow-sm"
+              title="Finance Dictionary & Terms"
+            >
+              <BookOpen className="size-4" />
+              <span className="hidden sm:inline">Dictionary 📖</span>
+            </button>
+
+            <LanguageToggle />
 
           <button
             className="hidden size-9 items-center justify-center rounded-xl border border-slate-200/80 bg-slate-50/80 text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors sm:flex"
@@ -139,6 +153,7 @@ export function TopNav() {
         </nav>
       )}
     </header>
+    </>
   )
 }
 

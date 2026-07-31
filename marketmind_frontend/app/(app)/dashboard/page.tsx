@@ -312,10 +312,15 @@ export default function DashboardPage() {
             <p className="text-sm text-muted-foreground">{t('Welcome back', 'वापसी पर आपका स्वागत है')}</p>
             <h1 className="text-2xl font-semibold tracking-tight">{t('Dashboard', 'डैशबोर्ड')}</h1>
           </div>
-          <Link href="/markets" className={cn(buttonVariants(), 'h-10 px-4')}>
-            {t('Trade Markets', 'बाज़ार में व्यापार करें')}
-            <ArrowRight className="size-4 ml-1" />
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link href="/predictor" className="h-10 px-4 text-xs font-bold flex items-center justify-center rounded-xl bg-[#00B4D8] text-white hover:bg-[#00B4D8]/90 transition-all shadow-md shadow-cyan-500/20">
+              🎮 Play Predictor Game
+            </Link>
+            <Link href="/markets" className={cn(buttonVariants({ variant: 'outline' }), 'h-10 px-4')}>
+              {t('Trade Markets', 'बाज़ार में व्यापार करें')}
+              <ArrowRight className="size-4 ml-1" />
+            </Link>
+          </div>
         </div>
 
       <div id="tour-stats" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
