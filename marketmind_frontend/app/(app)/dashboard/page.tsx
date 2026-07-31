@@ -33,18 +33,17 @@ export default function DashboardPage() {
   const [tempLevel, setTempLevel] = useState<ExperienceLevel | null>(null)
   const router = useRouter()
 
-  // Detect first-time users: only show onboarding if MM_NEW_USER is set and not yet onboarded
+  // Detect first-time users: only show onboarding if MM_NEW_USER is set
   useEffect(() => {
     if (typeof window === 'undefined') return
     const isNewUser = localStorage.getItem('MM_NEW_USER') === 'true'
-    const hasOnboarded = localStorage.getItem('MM_ONBOARDED') === 'true'
-    if (isNewUser && !hasOnboarded && !onboarded) {
+    if (isNewUser) {
       setShowOnboarding(true)
       // Consume MM_NEW_USER immediately so refreshing or re-entering never shows it again
       localStorage.removeItem('MM_NEW_USER')
       localStorage.setItem('MM_ONBOARDED', 'true')
     }
-  }, [onboarded])
+  }, [user])
 
   // Detect post-case study return guide
   useEffect(() => {
