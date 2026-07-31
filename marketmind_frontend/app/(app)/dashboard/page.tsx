@@ -2,12 +2,15 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Wallet, Banknote, TrendingUp, Percent, ArrowRight } from 'lucide-react'
 import { StatCard } from '@/components/marketmind/stat-card'
 import { PortfolioChart } from '@/components/marketmind/portfolio-chart'
 import { MarketGrid } from '@/components/marketmind/market-grid'
 import { MarketBuddy } from '@/components/marketmind/market-buddy'
 import { OnboardingGame } from '@/components/marketmind/onboarding-game'
+import { OnboardingTour } from '@/components/marketmind/onboarding-tour'
+import { AIBuddyPortrait } from '@/components/marketmind/ai-buddy-portrait'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button'
@@ -24,28 +27,87 @@ export default function DashboardPage() {
   const [stocks, setStocks] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [showOnboarding, setShowOnboarding] = useState(false)
+  const [showTour, setShowTour] = useState(false)
+  const [showMilestone, setShowMilestone] = useState(false)
+  const [showPostCaseTour, setShowPostCaseTour] = useState(false)
+  const [tempLevel, setTempLevel] = useState<ExperienceLevel | null>(null)
+  const router = useRouter()
 
   // Detect first-time users: only show onboarding if MM_NEW_USER is set and not yet onboarded
   useEffect(() => {
     if (typeof window === 'undefined') return
     const isNewUser = localStorage.getItem('MM_NEW_USER') === 'true'
-    if (isNewUser && !onboarded) {
+    const hasOnboarded = localStorage.getItem('MM_ONBOARDED') === 'true'
+    if (isNewUser && !hasOnboarded && !onboarded) {
       setShowOnboarding(true)
+      // Consume MM_NEW_USER immediately so refreshing or re-entering never shows it again
+      localStorage.removeItem('MM_NEW_USER')
+      localStorage.setItem('MM_ONBOARDED', 'true')
     }
   }, [onboarded])
 
-  const handleOnboardingComplete = (level: ExperienceLevel) => {
-    completeOnboarding(level)
-    setShowOnboarding(false)
+  // Detect post-case study return guide
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const isPostCaseGuide = localStorage.getItem('MM_CASE_STUDY_COMPLETED_GUIDE') === 'true'
+    if (isPostCaseGuide && !showOnboarding && !showTour && !showMilestone) {
+      setShowPostCaseTour(true)
+    }
+  }, [showOnboarding, showTour, showMilestone])
+
+  const handlePostCaseTourComplete = () => {
+    setShowPostCaseTour(false)
     if (typeof window !== 'undefined') {
+      localStorage.removeItem('MM_CASE_STUDY_COMPLETED_GUIDE')
+    }
+  }
+
+  // Detect 5+ holdings milestone
+  useEffect(() => {
+    if (typeof window === 'undefined' || !portfolioData?.holdings) return
+    const holdingsCount = portfolioData.holdings.length
+    const milestoneDone = localStorage.getItem('MM_MILESTONE_5_DONE') === 'true'
+    if (holdingsCount >= 5 && !milestoneDone && !showTour && !showOnboarding && !showPostCaseTour) {
+      setShowMilestone(true)
+    }
+  }, [portfolioData?.holdings, showTour, showOnboarding, showPostCaseTour])
+
+  const handleGoToCaseStudies = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('MM_MILESTONE_5_DONE', 'true')
+    }
+    setShowMilestone(false)
+    router.push('/case-studies')
+  }
+
+  const handleDiagnosticComplete = (level: ExperienceLevel) => {
+    setTempLevel(level)
+    setShowOnboarding(false)
+    completeOnboarding(level)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('MM_ONBOARDED', 'true')
       localStorage.removeItem('MM_NEW_USER')
     }
+    setTimeout(() => {
+      setShowTour(true)
+    }, 300)
+  }
+
+  const handleTourComplete = () => {
+    setShowTour(false)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('MM_ONBOARDED', 'true')
+      localStorage.removeItem('MM_NEW_USER')
+    }
+    const currentLvl = tempLevel || 'beginner'
+    completeOnboarding(currentLvl)
     const levelLabels: Record<ExperienceLevel, string> = {
       beginner: '🌱 Market Seedling',
       intermediate: '📊 Market Analyst',
       advanced: '🧠 Market Quant',
     }
-    showToast('Rank Assigned! 🎉', `You are now a ${levelLabels[level]}. Good luck, Trader!`, 'success')
+    showToast('Rank Assigned! 🎉', `You are now a ${levelLabels[currentLvl]}. Good luck, Trader!`, 'success')
+    setTempLevel(null)
   }
 
   const refreshData = useCallback((showSkeleton = false) => {
@@ -180,8 +242,69 @@ export default function DashboardPage() {
       {showOnboarding && (
         <OnboardingGame
           userName={user?.first_name || user?.username || ''}
-          onComplete={handleOnboardingComplete}
+          onComplete={handleDiagnosticComplete}
         />
+      )}
+
+      {/* Onboarding Tour Overlay — runs after diagnostic */}
+      {showTour && (
+        <OnboardingTour
+          onClose={handleTourComplete}
+        />
+      )}
+
+      {/* Post Case Study Stock Guide Overlay — runs after completing a case study */}
+      {showPostCaseTour && (
+        <OnboardingTour
+          mode="post-case-study"
+          onClose={handlePostCaseTourComplete}
+        />
+      )}
+
+      {/* Milestone Modal — triggered when user buys 5+ stocks */}
+      {showMilestone && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/65 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+          <div className="relative max-w-lg w-full bg-white rounded-3xl p-6 sm:p-8 border-4 border-[#0F172A] shadow-[8px_8px_0px_0px_rgba(15,23,42,0.2)] flex flex-col items-center text-center select-none">
+            <div className="relative mb-4">
+              <div className="absolute bottom-0 w-24 h-4 bg-[#00B4D8]/20 rounded-full blur-[1px] animate-pulse" />
+              <AIBuddyPortrait size={110} speaking={true} floating={true} />
+            </div>
+
+            <div className="inline-flex items-center gap-1.5 bg-[#00B4D8] text-white border-2 border-[#0F172A] px-3.5 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider shadow-[2px_2px_0px_0px_#0F172A] mb-3">
+              <span>Prof. Algo</span>
+            </div>
+
+            <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+              {t('Phenomenal Progress, Trader! 🌟', 'शानदार प्रगति, ट्रेडर! 🌟')}
+            </h3>
+
+            <p className="mt-3 text-xs sm:text-sm font-bold text-slate-600 leading-relaxed">
+              {t(
+                "Bzzzt! Excellent work! You've successfully built a diversified portfolio with 5+ stock positions! 🚀 You're progressing fast. Now let's dive into deeper market wisdom — head over to the Case Studies tab to complete historical simulations, solve market crises, and earn major XP!",
+                "शानदार काम! आपने 5+ शेयरों के साथ एक विविध पोर्टफोलियो बनाया है! 🚀 आप तेज़ी से आगे बढ़ रहे हैं। अब आइए बाज़ार की गहरी समझ में उतरें — ऐतिहासिक सिमुलेशन पूरा करने और XP अर्जित करने के लिए केस स्टडीज़ टैब पर जाएं!"
+              )}
+            </p>
+
+            <div className="mt-6 flex flex-col sm:flex-row gap-3 w-full">
+              <button
+                onClick={() => {
+                  if (typeof window !== 'undefined') localStorage.setItem('MM_MILESTONE_5_DONE', 'true')
+                  setShowMilestone(false)
+                }}
+                className="flex-1 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-xs sm:text-sm border-2 border-[#0F172A] transition-all cursor-pointer"
+              >
+                {t('Stay on Dashboard', 'डैशबोर्ड पर रहें')}
+              </button>
+              <button
+                onClick={handleGoToCaseStudies}
+                className="flex-1 py-3 rounded-2xl bg-[#00E5FF] hover:bg-[#00B4D8] text-slate-900 font-black text-xs sm:text-sm border-2 border-[#0F172A] shadow-[2px_2px_0px_0px_#0F172A] hover:translate-y-[-1px] transition-all cursor-pointer flex items-center justify-center gap-2"
+              >
+                <span>{t('Guide Me to Case Studies 🏆', 'केस स्टडीज़ में मार्गदर्शन करें 🏆')}</span>
+                <ArrowRight className="size-4" />
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       <div className="space-y-6">
@@ -196,16 +319,18 @@ export default function DashboardPage() {
           </Link>
         </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div id="tour-stats" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label={t('Portfolio Value', 'पोर्टफोलियो मूल्य')} value={formatCurrency(stats.value)} change={stats.day_change_pct} icon={Wallet} />
         <StatCard label={t('Cash Available', 'उपलब्ध नकदी')} value={formatCurrency(stats.cash)} hint={t('Ready to invest', 'निवेश के लिए तैयार')} icon={Banknote} />
         <StatCard label={t("Today's Gain / Loss", 'आज का लाभ / हानि')} value={formatCurrency(stats.day_change)} change={stats.day_change_pct} icon={TrendingUp} accent="success" />
         <StatCard label={t('Portfolio Return', 'पोर्टफोलियो रिटर्न')} value={formatPct(stats.return_pct)} hint={t('All time', 'कुल समय')} icon={Percent} accent="success" />
       </div>
 
-      <MarketBuddy assets={stocks} holdings={stats.holdings} portfolioValue={stats.value} cash={stats.cash} />
+      <div id="tour-buddy">
+        <MarketBuddy assets={stocks} holdings={stats.holdings} portfolioValue={stats.value} cash={stats.cash} />
+      </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div id="tour-chart-holdings" className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <PortfolioChart value={stats.value} returnPct={stats.return_pct} />
         </div>
@@ -241,7 +366,7 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <div>
+      <div id="tour-watchlist">
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <h2 className="text-lg font-semibold">{t('Watchlist', 'वॉचलिस्ट')}</h2>

@@ -300,11 +300,20 @@ export function OnboardingGame({
           </span>
         </div>
         <div className="flex items-center gap-3">
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onComplete('beginner')
+            }}
+            className="text-xs font-black text-slate-500 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border-2 border-[#0F172A] px-2.5 py-1 rounded-xl transition-all cursor-pointer shadow-[2px_2px_0px_0px_#0F172A] active:translate-y-0.5"
+          >
+            Skip ✕
+          </button>
           <div className="flex items-center gap-1.5 text-xs font-extrabold text-amber-600 bg-amber-50 border-2 border-amber-200 px-3 py-1 rounded-full shadow-[2px_2px_0px_0px_rgba(245,158,11,0.2)]">
             <Zap className="size-3.5 fill-amber-500 text-amber-500" />
             <span>{score * 50} XP</span>
           </div>
-          <div className="h-3 w-20 sm:w-28 rounded-full bg-slate-100 border-2 border-[#0F172A] overflow-hidden">
+          <div className="h-3 w-16 sm:w-24 rounded-full bg-slate-100 border-2 border-[#0F172A] overflow-hidden">
             <div
               className="h-full bg-[#00B4D8] border-r-2 border-[#0F172A] transition-all duration-500"
               style={{ width: `${Math.min(100, ((step + 1) / dialogue.current.length) * 100)}%` }}

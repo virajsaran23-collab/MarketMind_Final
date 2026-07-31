@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { 
   ArrowLeft, 
@@ -79,9 +79,17 @@ interface CaseStudyDetails {
 
 export default function CaseStudyPage() {
   const { id } = useParams<{ id: string }>()
+  const router = useRouter()
   const { profile, refresh: refreshAuth, showToast } = useAuth()
   const [cs, setCs] = useState<CaseStudyDetails | null>(null)
   const [activeTab, setActiveTab] = useState<'overview' | 'quiz'>('overview')
+
+  const handleGuideToMarkets = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('MM_CASE_STUDY_COMPLETED_GUIDE', 'true')
+    }
+    router.push('/dashboard')
+  }
   
   // Quiz state
   const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0)
@@ -397,12 +405,19 @@ export default function CaseStudyPage() {
                       : "Great effort! Review the takeaways and try again to secure a perfect score."}
                   </p>
 
-                  <div className="pt-2">
+                  <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center">
                     <button
                       onClick={handleResetQuiz}
-                      className={cn(buttonVariants({ variant: 'default' }), 'px-6 py-2 cursor-pointer')}
+                      className={cn(buttonVariants({ variant: 'outline' }), 'px-5 py-2.5 rounded-xl cursor-pointer')}
                     >
                       Retake Quiz
+                    </button>
+                    <button
+                      onClick={handleGuideToMarkets}
+                      className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#00E5FF] to-[#00B4D8] text-slate-900 font-extrabold text-sm border-2 border-[#0F172A] shadow-[2px_2px_0px_0px_#0F172A] hover:translate-y-[-1px] transition-all cursor-pointer flex items-center justify-center gap-2"
+                    >
+                      <span>Back to Markets: Explore & Buy Stocks 🚀</span>
+                      <ChevronRight className="size-4" />
                     </button>
                   </div>
                 </div>

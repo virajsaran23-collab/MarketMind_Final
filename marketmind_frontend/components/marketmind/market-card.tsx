@@ -50,7 +50,7 @@ export function MarketCard({
   }, [asset.id, asset.price, asset.change])
 
   return (
-    <div className="flex flex-col rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm hover:shadow-md hover:border-[#00B4D8]/40 transition-all duration-200">
+    <div id={`tour-stock-${asset.symbol}`} className="flex flex-col rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm hover:shadow-md hover:border-[#00B4D8]/40 transition-all duration-200">
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
           <span className="flex size-10 items-center justify-center rounded-xl bg-[#00B4D8]/10 text-xs font-bold text-[#00B4D8] border border-[#00B4D8]/20">

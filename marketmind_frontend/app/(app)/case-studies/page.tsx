@@ -30,6 +30,49 @@ const DIFF_COLOR: Record<string, string> = {
   Advanced: 'bg-red-500/15 text-red-400 border-red-500/20',
 }
 
+const FALLBACK_STUDIES = [
+  {
+    id: 'ai-boom',
+    title: 'The AI Supercycle & Tech Valuation Boom',
+    description: 'Generative AI surge, capital expenditure cycles, and chipmaker rallies.',
+    long_description: 'The rapid deployment of Large Language Models in 2023 sparked an unprecedented surge in demand for accelerated computing hardware and cloud infrastructure. Key Semiconductor and AI ecosystem leaders experienced astronomical revenue growth as global enterprises rushed to build AI capabilities.',
+    difficulty: 'Beginner',
+    read_time: '7 min',
+    image: '/case-russia-ukraine.png',
+    tags: ['Artificial Intelligence', 'Tech', 'Hardware'],
+  },
+  {
+    id: 'russia-ukraine',
+    title: 'Russia–Ukraine Conflict',
+    description: 'Impact on oil prices, defense stocks, and global markets.',
+    long_description: 'In February 2022, geopolitical tensions in Eastern Europe escalated into open conflict, sending shockwaves through global commodity and financial markets.',
+    difficulty: 'Intermediate',
+    read_time: '8 min',
+    image: '/case-russia-ukraine.png',
+    tags: ['Commodities', 'Defense', 'Geopolitics'],
+  },
+  {
+    id: '2008-crisis',
+    title: 'The 2008 Subprime Mortgage Collapse',
+    description: 'Mortgage-backed securities, liquidity freezes, and systemic contagion.',
+    long_description: 'The 2008 global financial crisis was triggered by a systemic breakdown in the U.S. housing market driven by subprime lending and complex financial derivatives.',
+    difficulty: 'Beginner',
+    read_time: '10 min',
+    image: '/case-russia-ukraine.png',
+    tags: ['Banking', 'Housing', 'Systemic Risk'],
+  },
+  {
+    id: 'dotcom-bubble',
+    title: 'The 1999-2000 Dot-Com Speculation Bubble',
+    description: 'Internet mania, unproven business models, and market euphoria.',
+    long_description: 'During the late 1990s, widespread adoption of the commercial internet triggered speculative investment in tech startups with no profits.',
+    difficulty: 'Advanced',
+    read_time: '9 min',
+    image: '/case-russia-ukraine.png',
+    tags: ['Equities', 'Bubbles', 'Technology'],
+  },
+]
+
 export default function CaseStudiesPage() {
   const { t } = useLanguage()
   const { experienceLevel } = useAuth()
@@ -49,8 +92,16 @@ export default function CaseStudiesPage() {
   useEffect(() => {
     setIsLoading(true)
     api.caseStudies()
-      .then(setStudies)
-      .catch(() => {})
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setStudies(data)
+        } else {
+          setStudies(FALLBACK_STUDIES)
+        }
+      })
+      .catch(() => {
+        setStudies(FALLBACK_STUDIES)
+      })
       .finally(() => setIsLoading(false))
   }, [])
 
@@ -128,9 +179,19 @@ export default function CaseStudiesPage() {
 
   const featuredStudy = useMemo(() => {
     if (filteredStudies.length === 0) return null
-    const aiBoom = filteredStudies.find(cs => cs.id === 'ai-boom')
-    return aiBoom || filteredStudies[0]
-  }, [filteredStudies])
+    // Recommend specific case study based on user's diagnostic inputs / level
+    const recMap: Record<string, string[]> = {
+      beginner: ['2008-crisis', 'ai-boom', 'russia-ukraine'],
+      intermediate: ['russia-ukraine', 'opec-oil', '2008-crisis'],
+      advanced: ['dotcom-bubble', 'black-monday', 'russia-ukraine'],
+    }
+    const preferredIds = recMap[experienceLevel || 'beginner'] || ['2008-crisis']
+    for (const targetId of preferredIds) {
+      const found = filteredStudies.find(cs => cs.id === targetId || cs.id?.includes(targetId))
+      if (found) return found
+    }
+    return filteredStudies[0]
+  }, [filteredStudies, experienceLevel])
 
   const gridStudies = useMemo(() => {
     if (!featuredStudy) return []
@@ -413,9 +474,25 @@ export default function CaseStudiesPage() {
         <div className="space-y-10 animate-in fade-in duration-500">
           {featuredStudy && (
             <div className="space-y-4">
-              <h2 className="text-lg font-bold text-primary uppercase tracking-widest pl-1">★ {t('Featured Insight', 'विशेष पाठ')}</h2>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h2 className="text-lg font-bold text-primary uppercase tracking-widest pl-1 flex items-center gap-2">
+                  <Sparkles className="size-4 text-[#00B4D8] fill-cyan-100" />
+                  <span>★ {t("Prof. Algo's Top Recommendation For You", "प्रो. एल्गो की आपके लिए शीर्ष सिफारिश")}</span>
+                </h2>
+                {experienceLevel && (
+                  <span className="text-xs font-bold text-[#00B4D8] bg-[#00B4D8]/10 border border-[#00B4D8]/20 px-3 py-1 rounded-full uppercase">
+                    {experienceLevel} Level Match
+                  </span>
+                )}
+              </div>
+
               <Link href={`/case-studies/${featuredStudy.id}`} className="block group">
-                <Card className="overflow-hidden border border-border bg-card/35 backdrop-blur-sm shadow-xl rounded-3xl transition-all duration-300 hover:border-primary/45 hover:shadow-2xl grid grid-cols-1 lg:grid-cols-12 cursor-pointer">
+                <Card className="overflow-hidden border-3 border-[#00B4D8] bg-card/40 backdrop-blur-md shadow-[0_0_25px_rgba(0,180,216,0.25)] rounded-3xl transition-all duration-300 hover:border-[#00e5ff] hover:shadow-[0_0_35px_rgba(0,229,255,0.4)] grid grid-cols-1 lg:grid-cols-12 cursor-pointer relative">
+                  <div className="absolute top-4 left-4 z-20 bg-gradient-to-r from-[#00E5FF] to-[#00B4D8] text-slate-900 border-2 border-[#0F172A] px-3.5 py-1 rounded-full text-xs font-black shadow-[2px_2px_0px_0px_#0F172A] flex items-center gap-1.5 animate-pulse">
+                    <Sparkles className="size-3.5 fill-yellow-200 text-slate-900" />
+                    <span>START HERE: #1 Recommended Case Study</span>
+                  </div>
+
                   <div className="lg:col-span-7 relative h-60 lg:h-96 w-full overflow-hidden">
                     <CaseStudyImage
                       src={featuredStudy.image}

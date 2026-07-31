@@ -50,6 +50,7 @@ export function TopNav() {
                 <Link
                   key={link.href}
                   href={link.href}
+                  id={link.href === '/case-studies' ? 'tour-nav-case-studies' : undefined}
                   className={cn(
                     'rounded-xl px-3 py-1.5 text-sm font-medium transition-all duration-200',
                     active

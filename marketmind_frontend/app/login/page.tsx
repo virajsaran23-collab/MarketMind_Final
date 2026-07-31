@@ -28,10 +28,14 @@ export default function LoginPage() {
     try {
       if (mode === 'login') {
         await login(form.username, form.password)
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('MM_NEW_USER')
+          localStorage.setItem('MM_ONBOARDED', 'true')
+        }
       } else {
         await api.register(form)
         await refresh()
-        // Mark as new user so dashboard shows onboarding game
+        // Mark as new user so dashboard shows onboarding game ONCE for first signup only
         if (typeof window !== 'undefined') {
           localStorage.setItem('MM_NEW_USER', 'true')
           localStorage.removeItem('MM_ONBOARDED')
