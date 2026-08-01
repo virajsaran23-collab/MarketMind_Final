@@ -39,7 +39,7 @@ const FALLBACK_STUDIES = [
     difficulty: 'Beginner',
     read_time: '3 min',
     image: '/case-lemonade.png',
-    tags: ['Stocks 101', 'Dividends', 'Investing Basics'],
+    tags: ['Learn Basics', 'Stocks 101', 'Dividends', 'Investing Basics'],
   },
   {
     id: 'candy-craze',
@@ -49,7 +49,7 @@ const FALLBACK_STUDIES = [
     difficulty: 'Beginner',
     read_time: '4 min',
     image: '/case-candy.png',
-    tags: ['Supply & Demand', 'Bubbles', 'Smart Buying'],
+    tags: ['Learn Basics', 'Supply & Demand', 'Bubbles', 'Smart Buying'],
   },
   {
     id: 'egg-basket',
@@ -59,7 +59,7 @@ const FALLBACK_STUDIES = [
     difficulty: 'Beginner',
     read_time: '3 min',
     image: '/case-eggs.png',
-    tags: ['Diversification', 'Risk Management', 'Safety'],
+    tags: ['Learn Basics', 'Diversification', 'Risk Management', 'Safety'],
   },
   {
     id: 'magic-snowball',
@@ -69,7 +69,7 @@ const FALLBACK_STUDIES = [
     difficulty: 'Beginner',
     read_time: '3 min',
     image: '/case-snowball.png',
-    tags: ['Compound Interest', 'Long-Term', 'Super Growth'],
+    tags: ['Learn Basics', 'Compound Interest', 'Long-Term', 'Super Growth'],
   },
   {
     id: 'ai-boom',
@@ -145,6 +145,14 @@ export default function CaseStudiesPage() {
       .finally(() => setIsLoading(false))
   }, [])
 
+  useEffect(() => {
+    if (typeof window !== 'undefined' && localStorage.getItem('MM_NEW_USER') === 'true') {
+      setSelectedDifficulty('Beginner')
+      setSelectedTag('All')
+      openAlgoPanel()
+    }
+  }, [])
+
   // Auto-set difficulty filter from user's experience level on first load
   useEffect(() => {
     if (experienceLevel && selectedDifficulty === 'All') {
@@ -185,12 +193,15 @@ export default function CaseStudiesPage() {
   const openAlgoPanel = () => {
     setAlgoOpen(true)
     if (algoMessages.length === 0) {
+      const isFirstTime = typeof window !== 'undefined' && localStorage.getItem('MM_NEW_USER') === 'true'
       const greetings: Record<string, string> = {
-        beginner: "Hello! 👋 I'm Prof. Algo. Since you're a Market Seedling, I suggest starting with the **2008 Financial Crisis** case study — it's beginner-friendly and very eye-opening! What topic interests you?",
+        beginner: "Hello! 👋 I'm Prof. Algo. Since you're a Market Seedling, I suggest starting with the beginner case studies — they explain stocks, diversification, and how world events move markets. What topic interests you?",
         intermediate: "Hey, Market Analyst! 📊 You're ready for deeper dives. Try the **Dot-Com Bubble** or **COVID-19 Market Impact** case studies. Got a specific topic you'd like me to curate for you?",
         advanced: "Welcome back, Quant! 🧠 Your level demands precision. Explore **Black Monday 1987** or the **LTCM Collapse**. Want me to suggest a custom advanced deep-dive?",
       }
-      const greeting = greetings[experienceLevel || 'beginner'] || greetings['beginner']
+      const greeting = isFirstTime
+        ? "Welcome! 🌱 Start with the beginner case studies first. They cover what a stock is, why diversification matters, and how world events can move markets."
+        : greetings[experienceLevel || 'beginner'] || greetings['beginner']
       setAlgoMessages([{ role: 'algo', text: greeting }])
     }
   }
@@ -217,11 +228,33 @@ export default function CaseStudiesPage() {
     })
   }, [studies, searchQuery, selectedDifficulty, selectedTag])
 
+  const learnBasicsStudies = useMemo(() => {
+    return filteredStudies.filter((study) => (study.tags || []).some((tag: string) => tag.toLowerCase().includes('learn basics')))
+  }, [filteredStudies])
+
+  const regularStudies = useMemo(() => {
+    return filteredStudies.filter((study) => !learnBasicsStudies.some((basic) => basic.id === study.id))
+  }, [filteredStudies, learnBasicsStudies])
+
+  const orderedStudies = useMemo(() => {
+    const isBeginner = (experienceLevel || 'beginner').toLowerCase() === 'beginner'
+    if (isBeginner && learnBasicsStudies.length > 0) {
+      return [...learnBasicsStudies, ...regularStudies]
+    }
+    return filteredStudies
+  }, [filteredStudies, learnBasicsStudies, regularStudies, experienceLevel])
+
   const featuredStudy = useMemo(() => {
     if (filteredStudies.length === 0) return null
+
+    const beginnerBasics = learnBasicsStudies[0]
+    if ((experienceLevel || 'beginner').toLowerCase() === 'beginner' && beginnerBasics) {
+      return beginnerBasics
+    }
+
     // Recommend specific case study based on user's diagnostic inputs / level
     const recMap: Record<string, string[]> = {
-      beginner: ['2008-crisis', 'ai-boom', 'russia-ukraine'],
+      beginner: ['lemonade-stand', 'candy-craze', 'egg-basket', 'magic-snowball', '2008-crisis', 'ai-boom', 'russia-ukraine'],
       intermediate: ['russia-ukraine', 'opec-oil', '2008-crisis'],
       advanced: ['dotcom-bubble', 'black-monday', 'russia-ukraine'],
     }
@@ -231,12 +264,12 @@ export default function CaseStudiesPage() {
       if (found) return found
     }
     return filteredStudies[0]
-  }, [filteredStudies, experienceLevel])
+  }, [filteredStudies, learnBasicsStudies, experienceLevel])
 
   const gridStudies = useMemo(() => {
     if (!featuredStudy) return []
-    return filteredStudies.filter(cs => cs.id !== featuredStudy.id)
-  }, [filteredStudies, featuredStudy])
+    return orderedStudies.filter(cs => cs.id !== featuredStudy.id)
+  }, [orderedStudies, featuredStudy])
 
   const handleResetFilters = () => {
     setSearchQuery('')
@@ -448,6 +481,28 @@ export default function CaseStudiesPage() {
           </Link>
         </div>
       </div>
+
+      {learnBasicsStudies.length > 0 && (
+        <div className="mb-8 rounded-3xl border border-[#00B4D8]/20 bg-gradient-to-br from-[#00B4D8]/10 via-white to-[#00B4D8]/5 p-5 shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <div className="text-xs font-extrabold uppercase tracking-wider text-[#00B4D8]">Starter modules</div>
+              <h2 className="text-xl font-bold text-foreground">Learn investing basics first, then move into deeper case studies</h2>
+              <p className="mt-1 text-sm text-muted-foreground">These foundation modules give the user the concepts behind stocks, diversification, and market behavior before the advanced stories.</p>
+            </div>
+            <Badge className="border-[#00B4D8]/20 bg-white text-[#00B4D8]">Beginner foundations</Badge>
+          </div>
+          <div className="mt-4 grid gap-4 md:grid-cols-3">
+            {learnBasicsStudies.slice(0, 3).map((study) => (
+              <Link key={study.id} href={`/case-studies/${study.id}`} className="rounded-2xl border border-border bg-white/80 p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-[#00B4D8]/40">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-[#00B4D8]">{study.difficulty}</div>
+                <h3 className="mt-1 text-sm font-semibold text-foreground">{study.title}</h3>
+                <p className="mt-2 text-xs text-muted-foreground">{study.description}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Filter and Search Panel */}
       <div className="bg-card/40 border border-border/85 rounded-2xl p-5 mb-8 backdrop-blur-sm space-y-4">

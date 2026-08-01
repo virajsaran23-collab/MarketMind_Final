@@ -32,17 +32,17 @@ export default function LoginPage() {
           localStorage.removeItem('MM_NEW_USER')
           localStorage.setItem('MM_ONBOARDED', 'true')
         }
+        router.push('/predictor')
       } else {
         await api.register(form)
         await refresh()
-        // Mark as new user so dashboard shows onboarding game ONCE for first signup only
         if (typeof window !== 'undefined') {
           localStorage.setItem('MM_NEW_USER', 'true')
           localStorage.removeItem('MM_ONBOARDED')
           localStorage.removeItem('MM_EXPERIENCE_LEVEL')
         }
+        router.push('/case-studies')
       }
-      router.push('/dashboard')
     } catch (e: any) {
       setError(e.message || t('Something went wrong', 'कुछ गलत हो गया'))
     } finally {

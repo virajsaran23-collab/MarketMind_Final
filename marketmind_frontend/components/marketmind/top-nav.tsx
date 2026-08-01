@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { Menu, X, Bell, LogOut, BookOpen, Gamepad2 } from 'lucide-react'
+import { Menu, X, Bell, LogOut } from 'lucide-react'
 import { Logo } from './logo'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/lib/auth-context'
@@ -12,9 +12,9 @@ import { LanguageToggle } from './language-toggle'
 import { FinanceGlossaryModal } from './finance-glossary-modal'
 
 const links = [
-  { href: '/dashboard', labelEn: 'Dashboard', labelHi: 'डैशबोर्ड' },
-  { href: '/case-studies', labelEn: 'Case Studies 📚', labelHi: 'केस स्टडीज़ 📚' },
   { href: '/predictor', labelEn: 'Predictor Game 🎮', labelHi: 'अनुमान गेम 🎮' },
+  { href: '/case-studies', labelEn: 'Case Studies 📚', labelHi: 'केस स्टडीज़ 📚' },
+  { href: '/dashboard', labelEn: 'Dashboard', labelHi: 'डैशबोर्ड' },
   { href: '/portfolio', labelEn: 'Portfolio', labelHi: 'पोर्टफोलियो' },
   { href: '/markets', labelEn: 'Markets', labelHi: 'मार्केट्स' },
   { href: '/analytics', labelEn: 'Analytics', labelHi: 'एनालिटिक्स' },
@@ -70,91 +70,80 @@ export function TopNav() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Dictionary / Glossary Modal Trigger */}
-            <button
-              onClick={() => setGlossaryOpen(true)}
-              className="flex items-center gap-1.5 rounded-xl border border-[#00B4D8]/30 bg-[#00B4D8]/10 px-3 py-1.5 text-xs font-bold text-[#00B4D8] hover:bg-[#00B4D8]/20 transition-all shadow-sm"
-              title="Finance Dictionary & Terms"
-            >
-              <BookOpen className="size-4" />
-              <span className="hidden sm:inline">Dictionary 📖</span>
-            </button>
-
             <LanguageToggle />
 
-          <button
-            className="hidden size-9 items-center justify-center rounded-xl border border-slate-200/80 bg-slate-50/80 text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors sm:flex"
-            aria-label="Notifications"
-          >
-            <Bell className="size-4" />
-          </button>
-
-          <Link
-            href="/profile"
-            className="flex items-center gap-2 rounded-full border border-slate-200/80 bg-slate-50/80 py-1 pl-1 pr-3 hover:bg-slate-100 hover:border-slate-300 transition-all"
-          >
-            <span className="flex size-7 items-center justify-center rounded-full bg-gradient-to-tr from-[#00B4D8] to-[#0891b2] text-xs font-semibold text-white shadow-sm">
-              {initials}
-            </span>
-            <span className="hidden text-sm font-medium text-slate-800 sm:inline">
-              {user?.username || t('Profile', 'प्रोफाइल')}
-            </span>
-          </Link>
-
-          {user && (
             <button
-              onClick={handleLogout}
-              className="hidden size-9 items-center justify-center rounded-xl border border-slate-200/80 bg-slate-50/80 text-slate-600 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-colors sm:flex"
-              aria-label="Logout"
-              title={t('Logout', 'लॉगआउट')}
+              className="hidden size-9 items-center justify-center rounded-xl border border-slate-200/80 bg-slate-50/80 text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors sm:flex"
+              aria-label="Notifications"
             >
-              <LogOut className="size-4" />
+              <Bell className="size-4" />
             </button>
-          )}
 
-          <button
-            className="flex size-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-800 lg:hidden"
-            onClick={() => setOpen((v) => !v)}
-            aria-label="Toggle menu"
-          >
-            {open ? <X className="size-5" /> : <Menu className="size-5" />}
-          </button>
-        </div>
-      </div>
+            <Link
+              href="/profile"
+              className="flex items-center gap-2 rounded-full border border-slate-200/80 bg-slate-50/80 py-1 pl-1 pr-3 hover:bg-slate-100 hover:border-slate-300 transition-all"
+            >
+              <span className="flex size-7 items-center justify-center rounded-full bg-gradient-to-tr from-[#00B4D8] to-[#0891b2] text-xs font-semibold text-white shadow-sm">
+                {initials}
+              </span>
+              <span className="hidden text-sm font-medium text-slate-800 sm:inline">
+                {user?.username || t('Profile', 'प्रोफाइल')}
+              </span>
+            </Link>
 
-      {open && (
-        <nav className="flex flex-col gap-1 border-t border-slate-200/80 bg-white/95 backdrop-blur-xl px-4 py-3 lg:hidden">
-          {links.map((link) => {
-            const active = pathname === link.href || pathname.startsWith(link.href + '/')
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setOpen(false)}
-                className={cn(
-                  'rounded-xl px-3 py-2 text-sm font-medium transition-colors',
-                  active
-                    ? 'bg-[#00B4D8]/10 text-[#00B4D8] font-semibold'
-                    : 'text-slate-600 hover:bg-slate-100',
-                )}
+            {user && (
+              <button
+                onClick={handleLogout}
+                className="hidden size-9 items-center justify-center rounded-xl border border-slate-200/80 bg-slate-50/80 text-slate-600 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-colors sm:flex"
+                aria-label="Logout"
+                title={t('Logout', 'लॉगआउट')}
               >
-                {t(link.labelEn, link.labelHi)}
-              </Link>
-            )
-          })}
-          {user && (
+                <LogOut className="size-4" />
+              </button>
+            )}
+
             <button
-              onClick={handleLogout}
-              className="rounded-xl px-3 py-2 text-sm font-medium text-rose-600 hover:bg-rose-50 text-left"
+              className="flex size-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-800 lg:hidden"
+              onClick={() => setOpen((v) => !v)}
+              aria-label="Toggle menu"
             >
-              {t('Logout', 'लॉगआउट')}
+              {open ? <X className="size-5" /> : <Menu className="size-5" />}
             </button>
-          )}
-        </nav>
-      )}
-    </header>
+          </div>
+        </div>
+
+        {open && (
+          <nav className="flex flex-col gap-1 border-t border-slate-200/80 bg-white/95 backdrop-blur-xl px-4 py-3 lg:hidden">
+            {links.map((link) => {
+              const active = pathname === link.href || pathname.startsWith(link.href + '/')
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setOpen(false)}
+                  className={cn(
+                    'rounded-xl px-3 py-2 text-sm font-medium transition-colors',
+                    active
+                      ? 'bg-[#00B4D8]/10 text-[#00B4D8] font-semibold'
+                      : 'text-slate-600 hover:bg-slate-100',
+                  )}
+                >
+                  {t(link.labelEn, link.labelHi)}
+                </Link>
+              )
+            })}
+            {user && (
+              <button
+                onClick={handleLogout}
+                className="rounded-xl px-3 py-2 text-sm font-medium text-rose-600 hover:bg-rose-50 text-left"
+              >
+                {t('Logout', 'लॉगआउट')}
+              </button>
+            )}
+          </nav>
+        )}
+      </header>
     </>
   )
 }
-
 

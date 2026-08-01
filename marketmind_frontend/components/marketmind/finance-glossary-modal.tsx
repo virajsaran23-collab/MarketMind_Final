@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Search, HelpCircle, X, Sparkles, BookOpen, Lightbulb } from 'lucide-react'
+import { Search, X, Sparkles, BookOpen, Lightbulb, TrendingUp, ShieldCheck } from 'lucide-react'
 import { AIBuddyPortrait } from './ai-buddy-portrait'
 import { cn } from '@/lib/utils'
 
@@ -30,72 +30,63 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
     term: 'Portfolio',
     emoji: '🎒',
     simpleDefinition: 'Your collection of different stocks and investments.',
-    everydayAnalogy: 'Like a school backpack holding your notebook, pencil case, snacks, and water bottle. Your portfolio holds all your different investments!',
-    funFact: 'Having a mix of different things in your backpack makes sure you are ready for any class!',
+    everydayAnalogy: 'Like a school backpack holding your notebook, pencil case, snacks, and water bottle.',
+    funFact: 'A mixed portfolio helps you stay steady when one market story goes badly.',
     category: 'Basics',
-  },
-  {
-    id: 'dividend',
-    term: 'Dividend',
-    emoji: '🎁',
-    simpleDefinition: 'A cash thank-you bonus paid by a company to its stock owners when it makes a profit.',
-    everydayAnalogy: 'If your lemonade stand makes extra profit at the end of the summer, you share a dollar bonus with everyone who helped you build it!',
-    funFact: 'Some famous companies have paid dividends every single year for over 100 years!',
-    category: 'Growth',
   },
   {
     id: 'diversification',
     term: 'Diversification',
     emoji: '🧺',
     simpleDefinition: 'Spreading your money across different investments so one bad day doesn\'t hurt everything.',
-    everydayAnalogy: 'Putting your fruits, eggs, and honey in separate baskets so if you stumble on a rock, you don\'t drop all your food at once!',
-    funFact: 'Owning stocks in tech, food, games, and energy is the ultimate safety shield against market drops.',
+    everydayAnalogy: 'Putting your eggs into different baskets so a single fall won\'t break everything.',
+    funFact: 'Owning stocks in tech, food, games, and energy is a strong shield against market drops.',
     category: 'Basics',
-  },
-  {
-    id: 'compound-interest',
-    term: 'Compound Interest',
-    emoji: '☃️',
-    simpleDefinition: 'Earning extra money on your savings, and then earning even MORE money on top of that extra money!',
-    everydayAnalogy: 'Rolling a tiny snowball down a snowy hill. As it rolls, it collects more snow, getting bigger and faster all by itself!',
-    funFact: 'Albert Einstein called Compound Interest the 8th Wonder of the World!',
-    category: 'Growth',
   },
   {
     id: 'supply-demand',
     term: 'Supply & Demand',
     emoji: '⚖️',
-    simpleDefinition: 'How much of something exists (Supply) versus how many people want to buy it (Demand).',
-    everydayAnalogy: 'If everyone in class wants a rare superhero trading card (High Demand) but there is only 1 card left (Low Supply), its price goes UP!',
-    funFact: 'When supply goes up and demand goes down, prices become cheaper!',
+    simpleDefinition: 'How much of something exists versus how many people want it.',
+    everydayAnalogy: 'If everyone wants the last candy bar in the store, its price can jump fast.',
+    funFact: 'When supply rises and demand falls, prices usually come down.',
     category: 'Market Trends',
   },
   {
     id: 'bull-market',
     term: 'Bull Market',
     emoji: '🐂',
-    simpleDefinition: 'When stock prices are going up and investors feel confident!',
-    everydayAnalogy: 'Like a strong bull charging upwards with its horns!',
-    funFact: 'A bull market usually means the economy is growing and companies are hiring.',
+    simpleDefinition: 'When stock prices are rising and investors feel confident.',
+    everydayAnalogy: 'Like a strong bull charging upward with momentum.',
+    funFact: 'Bull markets often happen when companies are growing and people feel optimistic.',
     category: 'Market Trends',
   },
   {
     id: 'bear-market',
     term: 'Bear Market',
     emoji: '🐻',
-    simpleDefinition: 'When stock prices are falling and investors are being extra cautious.',
-    everydayAnalogy: 'Like a sleepy bear hibernating in winter while waiting for spring to arrive.',
-    funFact: 'Bear markets are actually great opportunities for smart investors to buy great stocks at discount prices!',
+    simpleDefinition: 'When stock prices are falling and investors become more cautious.',
+    everydayAnalogy: 'Like a bear hibernating while the weather gets colder.',
+    funFact: 'Bear markets can create excellent buying opportunities for patient learners.',
     category: 'Market Trends',
   },
+]
+
+const starterLessons = [
   {
-    id: 'risk',
-    term: 'Risk',
-    emoji: '🧗',
-    simpleDefinition: 'The chance that an investment might lose value or not turn out as planned.',
-    everydayAnalogy: 'Riding a bicycle faster: you might get there sooner, but you need to wear a helmet (diversification) just in case!',
-    funFact: 'Higher potential rewards usually come with higher risk, which is why balancing your portfolio is key.',
-    category: 'Trading',
+    title: 'Beginner Lesson 1: What is a stock?',
+    description: 'See how a small slice of a company can become part of your first portfolio.',
+    icon: BookOpen,
+  },
+  {
+    title: 'Beginner Lesson 2: Why events move markets',
+    description: 'Learn how news, weather, and world events can change investor confidence.',
+    icon: TrendingUp,
+  },
+  {
+    title: 'Beginner Lesson 3: Why diversification matters',
+    description: 'Discover how spreading your money can protect your learning journey.',
+    icon: ShieldCheck,
   },
 ]
 
@@ -123,7 +114,6 @@ export function FinanceGlossaryModal({
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-md animate-in fade-in duration-200">
       <div className="relative flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-[#00B4D8]/30 bg-card shadow-2xl">
-        {/* Header */}
         <div className="flex items-center justify-between border-b border-border bg-muted/40 px-6 py-4">
           <div className="flex items-center gap-3">
             <div className="flex size-10 items-center justify-center rounded-2xl bg-gradient-to-tr from-[#00B4D8] to-[#0891b2] text-white shadow-md">
@@ -131,10 +121,10 @@ export function FinanceGlossaryModal({
             </div>
             <div>
               <h2 className="text-lg font-extrabold tracking-tight text-foreground">
-                Kids Finance Dictionary 📖
+                Beginner Case Study Guide 📚
               </h2>
               <p className="text-xs text-muted-foreground">
-                Simple definitions & fun analogies explained by Prof. Algo!
+                Start with the basics, then learn how world events move the market.
               </p>
             </div>
           </div>
@@ -146,23 +136,36 @@ export function FinanceGlossaryModal({
           </button>
         </div>
 
-        {/* Content Area */}
         <div className="grid flex-1 grid-cols-1 overflow-hidden md:grid-cols-12">
-          {/* Left Column: Search & Term List */}
           <div className="flex flex-col border-r border-border bg-card/50 p-4 md:col-span-5">
-            {/* Search Input */}
+            <div className="mb-3 rounded-2xl border border-[#00B4D8]/20 bg-[#00B4D8]/10 p-3">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-[#00B4D8]">Starter path</div>
+              <div className="mt-2 space-y-2">
+                {starterLessons.map((lesson) => {
+                  const Icon = lesson.icon
+                  return (
+                    <div key={lesson.title} className="rounded-xl border border-white/10 bg-white/70 p-2">
+                      <div className="flex items-center gap-2 text-xs font-semibold text-slate-800">
+                        <Icon className="size-3.5" /> {lesson.title}
+                      </div>
+                      <p className="mt-1 text-[11px] text-slate-600">{lesson.description}</p>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
             <div className="relative mb-3">
               <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               <input
                 type="text"
-                placeholder="Search a term (e.g. Stock, Dividend)..."
+                placeholder="Search a beginner term..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full rounded-xl border border-border bg-background py-2 pl-9 pr-3 text-xs outline-none focus:border-primary text-foreground"
               />
             </div>
 
-            {/* Category Filter Pills */}
             <div className="mb-3 flex flex-wrap gap-1.5">
               {['All', 'Basics', 'Growth', 'Market Trends'].map((cat) => (
                 <button
@@ -180,7 +183,6 @@ export function FinanceGlossaryModal({
               ))}
             </div>
 
-            {/* Terms List */}
             <div className="flex-1 space-y-1.5 overflow-y-auto pr-1">
               {filtered.map((item) => (
                 <button
@@ -196,21 +198,16 @@ export function FinanceGlossaryModal({
                   <span className="text-2xl">{item.emoji}</span>
                   <div className="min-w-0 flex-1">
                     <div className="text-xs font-bold text-foreground">{item.term}</div>
-                    <div className="truncate text-[11px] text-muted-foreground">
-                      {item.simpleDefinition}
-                    </div>
+                    <div className="truncate text-[11px] text-muted-foreground">{item.simpleDefinition}</div>
                   </div>
                 </button>
               ))}
               {filtered.length === 0 && (
-                <div className="py-8 text-center text-xs text-muted-foreground">
-                  No financial terms found matching your search.
-                </div>
+                <div className="py-8 text-center text-xs text-muted-foreground">No beginner concepts found.</div>
               )}
             </div>
           </div>
 
-          {/* Right Column: Detailed View */}
           <div className="flex flex-col overflow-y-auto p-6 md:col-span-7 bg-muted/10">
             <div className="flex items-center gap-3 mb-4">
               <span className="text-4xl">{activeTerm.emoji}</span>
@@ -218,42 +215,29 @@ export function FinanceGlossaryModal({
                 <span className="rounded-full bg-[#00B4D8]/10 px-2.5 py-0.5 text-[10px] font-bold text-[#00B4D8] border border-[#00B4D8]/20">
                   {activeTerm.category}
                 </span>
-                <h3 className="text-xl font-extrabold text-foreground mt-1">
-                  {activeTerm.term}
-                </h3>
+                <h3 className="text-xl font-extrabold text-foreground mt-1">{activeTerm.term}</h3>
               </div>
             </div>
 
-            {/* Simple Definition Card */}
             <div className="mb-4 rounded-2xl border border-primary/20 bg-primary/5 p-4">
               <div className="flex items-center gap-2 text-xs font-bold text-primary mb-1">
                 <Sparkles className="size-4" /> Plain English Definition
               </div>
-              <p className="text-sm font-medium text-foreground leading-relaxed">
-                {activeTerm.simpleDefinition}
-              </p>
+              <p className="text-sm font-medium text-foreground leading-relaxed">{activeTerm.simpleDefinition}</p>
             </div>
 
-            {/* Everyday Analogy Card */}
             <div className="mb-4 rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4 dark:bg-amber-500/10">
               <div className="flex items-center gap-2 text-xs font-bold text-amber-600 dark:text-amber-400 mb-1">
                 <Lightbulb className="size-4" /> Real World Analogy
               </div>
-              <p className="text-xs text-muted-foreground leading-relaxed font-normal">
-                {activeTerm.everydayAnalogy}
-              </p>
+              <p className="text-xs text-muted-foreground leading-relaxed font-normal">{activeTerm.everydayAnalogy}</p>
             </div>
 
-            {/* Prof Algo Fun Fact */}
             <div className="mt-auto flex items-start gap-3 rounded-2xl border border-slate-700/40 bg-slate-900 p-4 text-slate-200">
               <AIBuddyPortrait size={48} speaking={false} />
               <div>
-                <div className="text-xs font-bold text-[#00B4D8] uppercase tracking-wider mb-0.5">
-                  Prof. Algo&apos;s Fun Fact 🤖
-                </div>
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  "{activeTerm.funFact}"
-                </p>
+                <div className="text-xs font-bold text-[#00B4D8] uppercase tracking-wider mb-0.5">Prof. Algo&apos;s Tip 🤖</div>
+                <p className="text-xs text-slate-300 leading-relaxed">{activeTerm.funFact}</p>
               </div>
             </div>
           </div>
