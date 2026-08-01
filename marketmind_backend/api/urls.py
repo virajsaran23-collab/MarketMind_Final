@@ -24,6 +24,10 @@ urlpatterns = [
     path('math-modules/<str:slug>/', views.math_module_detail),
     path('math-modules/<str:slug>/submit-quiz/', views.submit_math_quiz),
 
+    path('story/', views.story_mode_index),
+    path('story/<str:chapter_id>/', views.story_chapter_detail),
+    path('story/<str:chapter_id>/execute/', views.story_chapter_execute),
+
     path('leaderboard/', views.leaderboard),
 
     path('analytics/', views.analytics),

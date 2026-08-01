@@ -311,7 +311,7 @@ def _label(item):
     return symbol
 
 
-def build_llm_prompt(message, quotes, holdings, cash, history=None):
+def build_llm_prompt(message, quotes, holdings, cash, history=None, user=None):
     history = history or []
     quote_lines = []
     for item in quotes[:5]:
@@ -335,11 +335,27 @@ def build_llm_prompt(message, quotes, holdings, cash, history=None):
             speaker = 'Assistant' if role == 'assistant' else 'User'
             conversation_lines.append(f'- {speaker}: {content}')
 
+    memory_lines = []
+    if user and hasattr(user, 'algo_memory'):
+        mem = user.algo_memory
+        memory_lines.append(f"Trader Persona: {mem.trader_persona}")
+        if mem.memory_notes:
+            memory_lines.append("Prof Algo's Memory Notes about User:")
+            for note in mem.memory_notes[-4:]:
+                memory_lines.append(f"- {note}")
+        if mem.strengths:
+            memory_lines.append(f"Recorded Strengths: {', '.join(mem.strengths[:3])}")
+        if mem.weaknesses:
+            memory_lines.append(f"Areas to Improve: {', '.join(mem.weaknesses[:3])}")
+
     context = [
-        'You are MarketMind, a concise trading assistant for a stock simulation app.',
+        'You are Prof Algo, the expert AI stock trading mentor and narrator of MarketMind.',
+        'You remember everything about the user, including their trader persona, past simulation decisions, and trading mistakes.',
+        'Always address the user by name if available, and reference their past trading performance or persona naturally.',
         'Always refer to stocks by their full company name followed by ticker in parentheses, e.g. Apple Inc. (AAPL).',
         'Only use the prices provided in the market context below — never invent or guess prices.',
-        'Use the user message plus the market context below to answer in 2-4 short sentences.',
+        'Use the user message plus the market context below to answer concisely.',
+        *( ['=== User Memory Dossier ===', *memory_lines] if memory_lines else [] ),
         f"User message: {message or ''}",
         'Recent conversation:',
         *(conversation_lines if conversation_lines else ['- No prior conversation available']),
@@ -353,14 +369,14 @@ def build_llm_prompt(message, quotes, holdings, cash, history=None):
     return '\n'.join(context)
 
 
-def call_llm(message, quotes, holdings, cash, history=None):
-    prompt = build_llm_prompt(message, quotes, holdings, cash, history=history)
+def call_llm(message, quotes, holdings, cash, history=None, user=None):
+    prompt = build_llm_prompt(message, quotes, holdings, cash, history=history, user=user)
     system_instruction = (
-        'You are MarketMind, an expert stock trading mentor and analyst. Always refer to stocks by their full company name '
-        'with ticker in parentheses (e.g. Apple Inc. (AAPL)). Only use the prices given in the context — never invent prices. '
-        'If asked to compare stocks, perform a clear side-by-side technical and fundamental comparison with a concluding pick. '
-        'If asked for future predictions or price targets, provide multi-scenario technical price projections (Bullish, Base, Bearish) '
-        'with catalysts and risk guidance. Frame suggestions as educational guidance only.'
+        'You are Prof Algo, an expert stock trading mentor, story game narrator, and market analyst. '
+        'You have persistent memory of the user\'s past calamity simulations, risk tendencies, and trading decisions. '
+        'Always refer to stocks by their full company name with ticker in parentheses (e.g. Apple Inc. (AAPL)). '
+        'Only use the prices given in the context — never invent prices. '
+        'Provide helpful, encouraging, and memory-aware educational guidance.'
     )
 
     # Try Gemini first if key is present
@@ -874,7 +890,7 @@ def generate_prediction_reply(matches, message, quotes):
     return "\n".join(lines)
 
 
-def generate_reply(message, quotes, holdings, cash, history=None):
+def generate_reply(message, quotes, holdings, cash, history=None, user=None):
     normalized = (message or '').strip().lower()
     
     # Fuzzy match assets from either DB or quotes parameter
@@ -889,7 +905,7 @@ def generate_reply(message, quotes, holdings, cash, history=None):
     # 1. Comparison tasks
     if is_comparison and (matched_assets or quotes):
         if USE_LLM_MENTOR:
-            llm_reply = call_llm(message, quotes, holdings, cash, history=history)
+            llm_reply = call_llm(message, quotes, holdings, cash, history=history, user=user)
             if llm_reply:
                 return llm_reply
         comp_reply = generate_comparison_reply(matched_assets, message, quotes)
@@ -899,7 +915,7 @@ def generate_reply(message, quotes, holdings, cash, history=None):
     # 2. Future prediction tasks
     if is_prediction and (matched_assets or quotes):
         if USE_LLM_MENTOR:
-            llm_reply = call_llm(message, quotes, holdings, cash, history=history)
+            llm_reply = call_llm(message, quotes, holdings, cash, history=history, user=user)
             if llm_reply:
                 return llm_reply
         pred_reply = generate_prediction_reply(matched_assets, message, quotes)
@@ -946,7 +962,7 @@ def generate_reply(message, quotes, holdings, cash, history=None):
 
     # 4. LLM for General Conversational Queries
     if USE_LLM_MENTOR:
-        llm_reply = call_llm(message, quotes, holdings, cash, history=history)
+        llm_reply = call_llm(message, quotes, holdings, cash, history=history, user=user)
         if llm_reply:
             return llm_reply
 

@@ -255,3 +255,18 @@ class UserCaseStudyCompletion(models.Model):
     def __str__(self):
         return f"{self.user.username} completed {self.case_study.title} ({self.score}/{self.total_questions})"
 
+
+class ProfAlgoMemory(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='algo_memory')
+    trader_persona = models.CharField(max_length=100, default='Market Apprentice')
+    memory_notes = models.JSONField(default=list, blank=True)
+    strengths = models.JSONField(default=list, blank=True)
+    weaknesses = models.JSONField(default=list, blank=True)
+    calamities_completed = models.JSONField(default=list, blank=True)
+    total_story_xp = models.IntegerField(default=0)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Prof Algo Memory: {self.user.username} ({self.trader_persona})"
+
+

@@ -12,7 +12,9 @@ import requests
 from .models import (
     Asset, UserProfile, Holding, Trade, CaseStudy, LeaderboardEntry,
     GameChallenge, UserChallenge, PortfolioSnapshot, MathModule, UserMathModuleProgress,
+    ProfAlgoMemory,
 )
+from .story_data import get_all_calamities, get_calamity_by_id
 from .math_modules import (
     asset_foundation_defaults, build_ratio_lab_interactive,
     build_ratio_lab_quiz, quiz_for_client, grade_ratio_lab_quiz, award_badge_track_bonus,
@@ -1309,7 +1311,7 @@ def mentor(request):
         'message': message,
         'history': history[-6:] if isinstance(history, list) else [],
         'symbols': symbols,
-        'reply': generate_reply(message, quotes, holdings, profile.cash, history=history[-6:] if isinstance(history, list) else []),
+        'reply': generate_reply(message, quotes, holdings, profile.cash, history=history[-6:] if isinstance(history, list) else [], user=request.user),
         'summary': summarize_market(quotes, holdings, profile.cash),
         'portfolio': {
             'cash': profile.cash,
@@ -1320,6 +1322,172 @@ def mentor(request):
         'news': news,
     }
     return Response(response)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def story_mode_index(request):
+    profile = UserProfile.objects.get_or_create(user=request.user)[0]
+    algo_mem, _ = ProfAlgoMemory.objects.get_or_create(user=request.user)
+
+    calamities = get_all_calamities()
+    formatted_calamities = []
+
+    for idx, c in enumerate(calamities):
+        is_completed = c["id"] in algo_mem.calamities_completed
+        formatted_calamities.append({
+            **c,
+            "completed": is_completed,
+            "locked": False, # All 7 great calamities unlocked for exploration
+        })
+
+    return Response({
+        "user_profile": UserProfileSerializer(profile).data,
+        "algo_memory": {
+            "trader_persona": algo_mem.trader_persona,
+            "memory_notes": algo_mem.memory_notes,
+            "strengths": algo_mem.strengths,
+            "weaknesses": algo_mem.weaknesses,
+            "calamities_completed": algo_mem.calamities_completed,
+            "total_story_xp": algo_mem.total_story_xp,
+        },
+        "calamities": formatted_calamities,
+    })
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def story_chapter_detail(request, chapter_id):
+    profile = UserProfile.objects.get_or_create(user=request.user)[0]
+    algo_mem, _ = ProfAlgoMemory.objects.get_or_create(user=request.user)
+    calamity = get_calamity_by_id(chapter_id)
+
+    if not calamity:
+        return Response({"error": "Calamity chapter not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    is_completed = calamity["id"] in algo_mem.calamities_completed
+
+    return Response({
+        "chapter": calamity,
+        "completed": is_completed,
+        "user_cash": profile.cash,
+        "portfolio_value": profile.portfolio_value,
+        "algo_memory": {
+            "trader_persona": algo_mem.trader_persona,
+            "memory_notes": algo_mem.memory_notes,
+        }
+    })
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def story_chapter_execute(request, chapter_id):
+    profile = UserProfile.objects.get_or_create(user=request.user)[0]
+    algo_mem, _ = ProfAlgoMemory.objects.get_or_create(user=request.user)
+    calamity = get_calamity_by_id(chapter_id)
+
+    if not calamity:
+        return Response({"error": "Calamity chapter not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    step_index = request.data.get('step_index', 1) # 1-based index
+    option_id = request.data.get('option_id', '')
+    position_pct = float(request.data.get('position_pct', 0.5)) # fraction of cash 0.1 to 1.0
+
+    ticks = calamity.get("simulation", {}).get("ticks", [])
+    matching_tick = None
+    matching_option = None
+
+    for tick in ticks:
+        if tick.get("step") == step_index:
+            matching_tick = tick
+            for opt in tick.get("options", []):
+                if opt.get("id") == option_id:
+                    matching_option = opt
+                    break
+            break
+
+    if not matching_tick or not matching_option:
+        return Response({"error": "Invalid step index or option choice"}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Calculate real cash PnL impact
+    pnl_impact = matching_option.get("pnl_impact", 0.0) * position_pct
+    pnl_amount = profile.cash * pnl_impact
+    profile.cash += pnl_amount
+
+    # Cash safety floor
+    if profile.cash < 1000.0:
+        profile.cash = 1000.0
+
+    # Recalculate portfolio value
+    profile.portfolio_value = calculate_portfolio_value(request.user)
+    profile.save()
+
+    # Record trade in DB history
+    first_asset = Asset.objects.filter(category='Stocks').first()
+    if first_asset:
+        Trade.objects.create(
+            user=request.user,
+            asset=first_asset,
+            mode='buy' if pnl_amount >= 0 else 'sell',
+            shares=1.0,
+            price=max(1.0, abs(pnl_amount)),
+            total=max(1.0, abs(pnl_amount)),
+        )
+
+    # Record Memory in Prof Algo
+    note_text = f"Chapter '{calamity['title']}' ({matching_tick['date']}): Chose '{matching_option['label']}' with PnL ${pnl_amount:+.2f}."
+    algo_mem.memory_notes.append(note_text)
+    if matching_option.get("memory_tag"):
+        algo_mem.trader_persona = matching_option["memory_tag"]
+        if pnl_amount >= 0:
+            if matching_option["memory_tag"] not in algo_mem.strengths:
+                algo_mem.strengths.append(matching_option["memory_tag"])
+        else:
+            if matching_option["memory_tag"] not in algo_mem.weaknesses:
+                algo_mem.weaknesses.append(matching_option["memory_tag"])
+
+    is_final_step = (step_index >= len(ticks))
+    xp_earned = 0
+
+    if is_final_step:
+        if calamity["id"] not in algo_mem.calamities_completed:
+            algo_mem.calamities_completed.append(calamity["id"])
+            xp_earned = calamity.get("reward_xp", 500)
+            algo_mem.total_story_xp += xp_earned
+            profile.learning_score += xp_earned
+            profile.bonus_tokens += 100
+            profile.simulations_completed += 1
+            update_user_badge(profile)
+            profile.save()
+
+    algo_mem.save()
+
+    # Capture Leaderboard rank shift
+    old_rank = profile.global_rank
+    update_leaderboard_for_user(request.user)
+    profile.refresh_from_db()
+    new_rank = profile.global_rank
+    rank_change = old_rank - new_rank if old_rank > 0 else 0
+
+    return Response({
+        "success": True,
+        "step_index": step_index,
+        "option_id": option_id,
+        "pnl_amount": pnl_amount,
+        "pnl_pct": pnl_impact * 100,
+        "updated_cash": profile.cash,
+        "updated_portfolio_value": profile.portfolio_value,
+        "prof_algo_reaction": matching_option.get("prof_algo_reaction", ""),
+        "trader_persona": algo_mem.trader_persona,
+        "is_final_step": is_final_step,
+        "xp_earned": xp_earned,
+        "total_story_xp": algo_mem.total_story_xp,
+        "old_rank": old_rank,
+        "new_rank": new_rank,
+        "rank_change": rank_change,
+        "badge": profile.badge,
+        "user_profile": UserProfileSerializer(profile).data,
+    })
 
 
 @api_view(['GET'])

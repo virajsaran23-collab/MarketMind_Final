@@ -91,4 +91,14 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ answers }),
     }),
+
+  storyMode: () => request('/story/'),
+
+  storyChapter: (id: string) => request(`/story/${id}/`),
+
+  storyExecute: (id: string, payload: { step_index: number; option_id: string; position_pct?: number }) =>
+    request(`/story/${id}/execute/`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
 }

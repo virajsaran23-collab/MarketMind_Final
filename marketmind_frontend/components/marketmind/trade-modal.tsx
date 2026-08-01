@@ -65,6 +65,13 @@ export function TradeModal({
       setCash(refreshed.cash)
       setPortfolioValue(refreshed.value ?? 100000)
       await refreshAuth()
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(
+          new CustomEvent('mm:trade_completed', {
+            detail: { assetName: asset.name, symbol: asset.symbol, mode, investment }
+          })
+        )
+      }
       setConfirmed(true)
       onSuccess?.()
     } catch (e: any) {
@@ -96,6 +103,18 @@ export function TradeModal({
             <p className="mt-1 text-sm text-muted-foreground">
               {isBuy ? t('Bought', 'खरीदा गया') : t('Sold', 'बेचा गया')} {qty} {qty > 1 ? t('shares', 'शेयर') : t('share', 'शेयर')} {t('of', 'का')} {asset.name} {t('for', 'मूल्य')} {formatCurrency(investment)}.
             </p>
+
+            {/* Prof Algo Live Reaction Box */}
+            <div className="mt-4 w-full rounded-2xl bg-slate-950 p-4 text-left text-white border border-cyan-500/30 space-y-1.5 shadow-lg">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-cyan-300">
+                <span>🤖 Prof Algo Live Guide:</span>
+              </div>
+              <p className="text-xs text-slate-200 leading-relaxed italic">
+                "{isBuy 
+                  ? `Great execution! You allocated ${formatCurrency(investment)} to ${asset.name} (${asset.symbol}). Your story persona and Leaderboard standing have been updated!`
+                  : `Smart risk management! Adjusting your position in ${asset.name} (${asset.symbol}) keeps your virtual portfolio balanced.`}"
+              </p>
+            </div>
 
             {completedChallenges.length > 0 && (
               <div className="mt-4 w-full space-y-2">
