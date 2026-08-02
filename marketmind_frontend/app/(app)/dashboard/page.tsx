@@ -10,6 +10,7 @@ import { MarketGrid } from '@/components/marketmind/market-grid'
 import { MarketBuddy } from '@/components/marketmind/market-buddy'
 import { OnboardingGame } from '@/components/marketmind/onboarding-game'
 import { OnboardingTour } from '@/components/marketmind/onboarding-tour'
+import { ProfAlgoOnboardingModal } from '@/components/marketmind/prof-algo-onboarding-modal'
 import { AIBuddyPortrait } from '@/components/marketmind/ai-buddy-portrait'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -26,6 +27,7 @@ export default function DashboardPage() {
   const [portfolioData, setPortfolioData] = useState<any>(null)
   const [stocks, setStocks] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [showProfAlgoModal, setShowProfAlgoModal] = useState(false)
   const [showOnboarding, setShowOnboarding] = useState(false)
   const [showTour, setShowTour] = useState(false)
   const [showMilestone, setShowMilestone] = useState(false)
@@ -33,17 +35,31 @@ export default function DashboardPage() {
   const [tempLevel, setTempLevel] = useState<ExperienceLevel | null>(null)
   const router = useRouter()
 
-  // Detect first-time users: only show onboarding if MM_NEW_USER is set
+  // Detect first-time users: show Prof Algo modal first, then onboarding game
   useEffect(() => {
     if (typeof window === 'undefined') return
     const isNewUser = localStorage.getItem('MM_NEW_USER') === 'true'
-    if (isNewUser) {
+    const flowOnboarded = localStorage.getItem('MM_FLOW_ONBOARDED') === 'true'
+    if (isNewUser && !flowOnboarded) {
+      // Show Prof Algo intro modal first (3-step: Welcome → Basics → Dashboard)
+      setShowProfAlgoModal(true)
+    } else if (isNewUser && flowOnboarded) {
+      // Prof Algo modal was completed, proceed to onboarding game diagnostic
       setShowOnboarding(true)
-      // Consume MM_NEW_USER immediately so refreshing or re-entering never shows it again
       localStorage.removeItem('MM_NEW_USER')
       localStorage.setItem('MM_ONBOARDED', 'true')
     }
   }, [user])
+
+  // Handler when Prof Algo modal closes → start onboarding game
+  const handleProfAlgoModalClose = () => {
+    setShowProfAlgoModal(false)
+    setShowOnboarding(true)
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('MM_NEW_USER')
+      localStorage.setItem('MM_ONBOARDED', 'true')
+    }
+  }
 
   // Detect post-case study return guide
   useEffect(() => {
@@ -237,7 +253,13 @@ export default function DashboardPage() {
 
   return (
     <>
-      {/* Onboarding Game Overlay — shown for first-time users */}
+      {/* Prof Algo Onboarding Modal — shown as the very first step for new users */}
+      <ProfAlgoOnboardingModal
+        isOpen={showProfAlgoModal}
+        onClose={handleProfAlgoModalClose}
+      />
+
+      {/* Onboarding Game Overlay — shown after Prof Algo modal closes */}
       {showOnboarding && (
         <OnboardingGame
           userName={user?.first_name || user?.username || ''}

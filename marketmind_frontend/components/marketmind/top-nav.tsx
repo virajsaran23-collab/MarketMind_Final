@@ -13,6 +13,7 @@ import { FinanceGlossaryModal } from './finance-glossary-modal'
 
 const links = [
   { href: '/predictor', labelEn: 'Predictor Game 🎮', labelHi: 'अनुमान गेम 🎮' },
+  { href: '/learning-basics', labelEn: 'Learning the basics', labelHi: 'बेसिक्स सीखें' },
   { href: '/case-studies', labelEn: 'Case Studies 📚', labelHi: 'केस स्टडीज़ 📚' },
   { href: '/dashboard', labelEn: 'Dashboard', labelHi: 'डैशबोर्ड' },
   { href: '/portfolio', labelEn: 'Portfolio', labelHi: 'पोर्टफोलियो' },

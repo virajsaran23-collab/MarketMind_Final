@@ -32,7 +32,7 @@ export default function LoginPage() {
           localStorage.removeItem('MM_NEW_USER')
           localStorage.setItem('MM_ONBOARDED', 'true')
         }
-        router.push('/predictor')
+        router.push('/learning-basics')
       } else {
         await api.register(form)
         await refresh()
@@ -41,7 +41,7 @@ export default function LoginPage() {
           localStorage.removeItem('MM_ONBOARDED')
           localStorage.removeItem('MM_EXPERIENCE_LEVEL')
         }
-        router.push('/case-studies')
+        router.push('/learning-basics')
       }
     } catch (e: any) {
       setError(e.message || t('Something went wrong', 'कुछ गलत हो गया'))

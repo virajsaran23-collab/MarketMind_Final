@@ -78,7 +78,7 @@ const FALLBACK_STUDIES = [
     long_description: 'The rapid deployment of Large Language Models in 2023 sparked an unprecedented surge in demand for accelerated computing hardware and cloud infrastructure.',
     difficulty: 'Beginner',
     read_time: '7 min',
-    image: '/case-russia-ukraine.png',
+    image: '/case-ai-boom.png',
     tags: ['Artificial Intelligence', 'Tech', 'Hardware'],
   },
   {
@@ -98,7 +98,7 @@ const FALLBACK_STUDIES = [
     long_description: 'The 2008 global financial crisis was triggered by a systemic breakdown in the U.S. housing market driven by subprime lending and complex financial derivatives.',
     difficulty: 'Beginner',
     read_time: '10 min',
-    image: '/case-russia-ukraine.png',
+    image: '/case-2008-crash.png',
     tags: ['Banking', 'Housing', 'Systemic Risk'],
   },
   {
@@ -108,7 +108,7 @@ const FALLBACK_STUDIES = [
     long_description: 'During the late 1990s, widespread adoption of the commercial internet triggered speculative investment in tech startups with no profits.',
     difficulty: 'Advanced',
     read_time: '9 min',
-    image: '/case-russia-ukraine.png',
+    image: '/case-dotcom-bubble.png',
     tags: ['Equities', 'Bubbles', 'Technology'],
   },
 ]
@@ -608,8 +608,8 @@ export default function CaseStudiesPage() {
               </div>
 
               <Link href={`/case-studies/${featuredStudy.id}`} className="block group">
-                <Card className="overflow-hidden border-3 border-[#00B4D8] bg-card/40 backdrop-blur-md shadow-[0_0_25px_rgba(0,180,216,0.25)] rounded-3xl transition-all duration-300 hover:border-[#00e5ff] hover:shadow-[0_0_35px_rgba(0,229,255,0.4)] grid grid-cols-1 lg:grid-cols-12 cursor-pointer relative">
-                  <div className="absolute top-4 left-4 z-20 bg-gradient-to-r from-[#00E5FF] to-[#00B4D8] text-slate-900 border-2 border-[#0F172A] px-3.5 py-1 rounded-full text-xs font-black shadow-[2px_2px_0px_0px_#0F172A] flex items-center gap-1.5 animate-pulse">
+                <Card className="overflow-hidden rounded-[1.75rem] border border-slate-200/70 bg-white shadow-sm transition-all duration-300 hover:border-primary/45 hover:shadow-xl hover:-translate-y-1 grid grid-cols-1 lg:grid-cols-12 cursor-pointer relative">
+                  <div className="absolute top-4 left-4 z-20 bg-gradient-to-r from-[#00E5FF] to-[#00B4D8] text-slate-900 border border-slate-900/10 px-3.5 py-1 rounded-full text-xs font-black shadow-[2px_2px_0px_0px_rgba(15,23,42,0.12)] flex items-center gap-1.5 animate-pulse">
                     <Sparkles className="size-3.5 fill-yellow-200 text-slate-900" />
                     <span>START HERE: #1 Recommended Case Study</span>
                   </div>
@@ -675,13 +675,13 @@ export default function CaseStudiesPage() {
               <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                 {gridStudies.map((cs) => (
                   <Link key={cs.id} href={`/case-studies/${cs.id}`} className="group block">
-                    <Card className="h-full overflow-hidden border border-border/70 bg-card/30 rounded-2xl transition-all duration-300 hover:border-primary/45 hover:shadow-xl hover:translate-y-[-4px] cursor-pointer flex flex-col justify-between">
+                    <Card className="h-full overflow-hidden rounded-[1.75rem] border border-slate-200/70 bg-white shadow-sm transition-all duration-300 hover:border-primary/45 hover:shadow-xl hover:-translate-y-1 cursor-pointer flex flex-col justify-between">
                       <div>
                         <CaseStudyImage
                           src={cs.image}
                           alt={cs.title}
                           seed={cs.id}
-                          className="aspect-[16/9] w-full border-none rounded-none rounded-t-2xl"
+                          className="aspect-[16/9] w-full border-none rounded-t-[1.75rem]"
                         />
                         
                         <div className="p-5 space-y-3">
