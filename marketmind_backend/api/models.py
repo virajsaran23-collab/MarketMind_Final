@@ -68,6 +68,7 @@ class UserProfile(models.Model):
     accuracy = models.IntegerField(default=0)
     bonus_tokens = models.IntegerField(default=0)
     global_rank = models.IntegerField(default=0)
+    seen_onboarding = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user.username

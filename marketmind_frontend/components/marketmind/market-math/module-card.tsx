@@ -66,7 +66,7 @@ export function ModuleCard({ module }: ModuleCardProps) {
               <CheckCircle2 className="size-3" /> Completed
             </Badge>
           ) : isLocked ? (
-            <Badge variant="secondary" className="gap-1 text-[10px] font-bold bg-muted/60 text-muted-foreground">
+            <Badge variant="muted" className="gap-1 text-[10px] font-bold bg-muted/60 text-muted-foreground">
               <Lock className="size-3" /> Locked
             </Badge>
           ) : (

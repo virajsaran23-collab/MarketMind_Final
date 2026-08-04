@@ -86,7 +86,11 @@ export default function CaseStudyPage() {
 
   const handleGuideToMarkets = () => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('MM_CASE_STUDY_COMPLETED_GUIDE', 'true')
+      if (id === 'lemonade-stand' || id?.includes('lemonade') || cs?.tags?.includes('Learn Basics')) {
+        localStorage.setItem('MM_BASICS_COMPLETED', 'true')
+      } else {
+        localStorage.setItem('MM_CASE_STUDY_COMPLETED_GUIDE', 'true')
+      }
     }
     router.push('/dashboard')
   }
@@ -177,6 +181,11 @@ export default function CaseStudyPage() {
       setIsSubmitted(false)
     } else {
       setQuizFinished(true)
+      if (typeof window !== 'undefined') {
+        if (id === 'lemonade-stand' || id?.includes('lemonade') || cs?.tags?.includes('Learn Basics')) {
+          localStorage.setItem('MM_BASICS_COMPLETED', 'true')
+        }
+      }
       api.completeCaseStudy(id, score, cs.quiz.length).then((res: any) => {
         if (res.challenges) {
           checkChallengeCompletions(res.challenges, showToast)

@@ -28,11 +28,7 @@ export default function LoginPage() {
     try {
       if (mode === 'login') {
         await login(form.username, form.password)
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem('MM_NEW_USER')
-          localStorage.setItem('MM_ONBOARDED', 'true')
-        }
-        router.push('/learning-basics')
+        router.push('/predictor')
       } else {
         await api.register(form)
         await refresh()

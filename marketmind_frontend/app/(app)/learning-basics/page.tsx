@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   BookOpen,
   ChevronDown,
@@ -795,7 +796,7 @@ function getModuleWhyItMatters(moduleId: string) {
 }
 
 function getLessonContext(moduleId: string, lessonIndex: number, lessonTitle: string) {
-  const baseContext = {
+  const baseContext: Record<string, string[]> = {
     'what-is-stock-market': [
       'Think of the stock market as a public marketplace where ownership changes hands. It is one of the clearest ways for companies to raise money while giving everyday people a chance to participate.',
       'An IPO is a major milestone because it moves a company from private ownership into public ownership, which can bring in new capital and public attention.',
@@ -1018,7 +1019,15 @@ function ModuleIllustration({ moduleId }: { moduleId: string }) {
 
 /* ─────────────────────────── Module Component ─────────────────────────── */
 
-function ModuleCard({ module, index }: { module: Module; index: number }) {
+function ModuleCard({
+  module,
+  index,
+  onModuleComplete,
+}: {
+  module: Module
+  index: number
+  onModuleComplete?: () => void
+}) {
   const [expanded, setExpanded] = useState(false)
   const [currentLesson, setCurrentLesson] = useState(0)
   const [quizStarted, setQuizStarted] = useState(false)
@@ -1047,8 +1056,10 @@ function ModuleCard({ module, index }: { module: Module; index: number }) {
     if (correctCount >= Math.ceil(quizQuestions.length / 2)) {
       if (typeof window !== 'undefined') {
         localStorage.setItem(`MM_LEARN_${module.id}`, 'true')
+        localStorage.setItem('MM_BASICS_COMPLETED', 'true')
       }
       setCompleted(true)
+      onModuleComplete?.()
     }
   }
 
@@ -1363,10 +1374,107 @@ function ModuleCard({ module, index }: { module: Module; index: number }) {
   )
 }
 
+/* ─────────────────────────── Prof Algo Basics Modal ─────────────────────────── */
+
+function ProfAlgoBasicsGuideModal({
+  isOpen,
+  mode,
+  onClose,
+  onContinue,
+}: {
+  isOpen: boolean
+  mode: 'welcome' | 'completed'
+  onClose: () => void
+  onContinue?: () => void
+}) {
+  if (!isOpen) return null
+
+  const isWelcome = mode === 'welcome'
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 backdrop-blur-md animate-in fade-in duration-300">
+      <div className="relative w-full max-w-lg overflow-hidden rounded-3xl border-4 border-[#0F172A] bg-card p-6 md:p-8 shadow-[8px_8px_0px_0px_rgba(15,23,42,1)] space-y-6 animate-pop">
+        {/* Header */}
+        <div className="flex items-center gap-3">
+          <div className="relative shrink-0">
+            <AIBuddyPortrait size={64} speaking={true} floating={true} />
+          </div>
+          <div>
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-[#00B4D8] px-3 py-0.5 text-[10px] font-extrabold uppercase text-white border border-[#0F172A] shadow-sm">
+              <Sparkles className="size-3 fill-yellow-200" />
+              Prof. Algo
+            </div>
+            <h2 className="text-xl md:text-2xl font-black tracking-tight text-foreground mt-1">
+              {isWelcome ? 'Welcome to MarketMind! 🚀' : 'Basics Mastered! 🎉'}
+            </h2>
+          </div>
+        </div>
+
+        {/* Speech Card */}
+        <div className="rounded-2xl border-2 border-[#0F172A] bg-[#ECFEFF] p-5 text-slate-800 font-bold leading-relaxed space-y-3 shadow-inner">
+          <p className="text-sm md:text-base">
+            {isWelcome ? (
+              <>
+                Bzzzt! Connection active! Welcome to <strong>MarketMind</strong>! 🧠 I&apos;m Prof. Algo, your personal market mentor.
+                <br /><br />
+                Before diving into real-world case studies and trading, let&apos;s complete the <strong>Market Basics</strong> lessons right here! Master these fundamentals so you can analyze stocks and market trends like a veteran.
+              </>
+            ) : (
+              <>
+                Phenomenal work! 🌟 You have successfully completed the <strong>Market Basics</strong>! Your financial knowledge circuits are now fully powered up.
+                <br /><br />
+                Now, let&apos;s continue with your <strong>First Case Study</strong> to apply your learning to real-world market scenarios!
+              </>
+            )}
+          </p>
+        </div>
+
+        {/* CTA Button */}
+        <div className="pt-2">
+          <button
+            onClick={() => {
+              onClose()
+              if (!isWelcome && onContinue) {
+                onContinue()
+              }
+            }}
+            className="w-full rounded-2xl bg-[#00E5FF] hover:bg-[#00B4D8] text-[#0F172A] text-base md:text-lg font-black px-6 py-4 border-4 border-[#0F172A] shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:translate-y-[-2px] active:translate-y-[2px] transition-all flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <Sparkles className="size-5 fill-yellow-200" />
+            {isWelcome ? "Let's Learn the Basics! 📖" : "Continue to First Case Study 🚀"}
+            <ChevronRight className="size-5" />
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 /* ─────────────────────────── Main Page ─────────────────────────── */
 
 export default function LearningBasicsPage() {
   const { t } = useLanguage()
+  const router = useRouter()
+  const [modalMode, setModalMode] = useState<'welcome' | 'completed' | null>(null)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const welcomeSeen = localStorage.getItem('MM_LEARN_WELCOME_SEEN') === 'true'
+    if (!welcomeSeen) {
+      setModalMode('welcome')
+      localStorage.setItem('MM_LEARN_WELCOME_SEEN', 'true')
+    }
+  }, [])
+
+  const handleModuleComplete = () => {
+    if (typeof window === 'undefined') return
+    const completedFlashSeen = localStorage.getItem('MM_LEARN_COMPLETED_FLASH_SEEN') === 'true'
+    if (!completedFlashSeen) {
+      localStorage.setItem('MM_LEARN_COMPLETED_FLASH_SEEN', 'true')
+      localStorage.setItem('MM_BASICS_COMPLETED', 'true')
+      setModalMode('completed')
+    }
+  }
 
   const completedCount = MODULES.reduce((acc, m) => {
     if (typeof window !== 'undefined' && localStorage.getItem(`MM_LEARN_${m.id}`) === 'true') {
@@ -1378,99 +1486,113 @@ export default function LearningBasicsPage() {
   const progressPct = Math.round((completedCount / MODULES.length) * 100)
 
   return (
-    <div className="mx-auto w-full max-w-4xl space-y-8 px-4 py-8 sm:px-6">
-      {/* Header */}
-      <div className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-          <div className="flex items-start gap-4">
-            <div className="relative shrink-0">
-              <AIBuddyPortrait size={70} speaking={false} floating={true} />
-              <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-[#00B4D8] text-white border border-[#0F172A] px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase shadow-sm whitespace-nowrap">
-                Prof. Algo
+    <>
+      <ProfAlgoBasicsGuideModal
+        isOpen={modalMode !== null}
+        mode={modalMode || 'welcome'}
+        onClose={() => setModalMode(null)}
+        onContinue={() => router.push('/case-studies')}
+      />
+
+      <div className="mx-auto w-full max-w-4xl space-y-8 px-4 py-8 sm:px-6">
+        {/* Header */}
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+            <div className="flex items-start gap-4">
+              <div className="relative shrink-0">
+                <AIBuddyPortrait size={70} speaking={false} floating={true} />
+                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-[#00B4D8] text-white border border-[#0F172A] px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase shadow-sm whitespace-nowrap">
+                  Prof. Algo
+                </div>
               </div>
-            </div>
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <BookOpen className="size-5 text-[#00B4D8]" />
-                <h1 className="text-2xl font-bold tracking-tight">
-                  {t('Learning the basics', 'बेसिक्स सीखें')}
-                </h1>
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <BookOpen className="size-5 text-[#00B4D8]" />
+                  <h1 className="text-2xl font-bold tracking-tight">
+                    {t('Learning the basics', 'बेसिक्स सीखें')}
+                  </h1>
+                </div>
+                <p className="text-sm text-muted-foreground max-w-lg">
+                  {t(
+                    'Master the fundamentals of investing and the stock market through interactive lessons and quizzes. Complete all modules to become a confident investor!',
+                    'इंटरैक्टिव पाठों और क्विज़ के माध्यम से निवेश और शेयर बाजार की बुनियादी बातें सीखें। एक आत्मविश्वासी निवेशक बनने के लिए सभी मॉड्यूल पूरे करें!'
+                  )}
+                </p>
               </div>
-              <p className="text-sm text-muted-foreground max-w-lg">
-                {t(
-                  'Master the fundamentals of investing and the stock market through interactive lessons and quizzes. Complete all modules to become a confident investor!',
-                  'इंटरैक्टिव पाठों और क्विज़ के माध्यम से निवेश और शेयर बाजार की बुनियादी बातें सीखें। एक आत्मविश्वासी निवेशक बनने के लिए सभी मॉड्यूल पूरे करें!'
-                )}
-              </p>
             </div>
           </div>
-        </div>
 
-        {/* Progress Bar */}
-        <div className="rounded-2xl border border-border/60 bg-card p-4 sm:p-5">
-          <div className="flex items-center justify-between mb-2.5">
-            <div className="flex items-center gap-2">
-              <Trophy className="size-4 text-amber-400" />
-              <span className="text-sm font-bold text-foreground">
-                {t('Your Progress', 'आपकी प्रगति')}
+          {/* Progress Bar */}
+          <div className="rounded-2xl border border-border/60 bg-card p-4 sm:p-5">
+            <div className="flex items-center justify-between mb-2.5">
+              <div className="flex items-center gap-2">
+                <Trophy className="size-4 text-amber-400" />
+                <span className="text-sm font-bold text-foreground">
+                  {t('Your Progress', 'आपकी प्रगति')}
+                </span>
+              </div>
+              <span className="text-xs font-bold text-muted-foreground">
+                {completedCount}/{MODULES.length} {t('modules', 'मॉड्यूल')}
               </span>
             </div>
-            <span className="text-xs font-bold text-muted-foreground">
-              {completedCount}/{MODULES.length} {t('modules', 'मॉड्यूल')}
-            </span>
+            <div className="h-3 w-full rounded-full bg-secondary overflow-hidden">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-[#00B4D8] to-emerald-500 transition-all duration-700 ease-out"
+                style={{ width: `${progressPct}%` }}
+              />
+            </div>
+            <div className="flex items-center justify-between mt-2">
+              <span className="text-[10px] text-muted-foreground">
+                {progressPct === 100 ? '🎉 All modules completed!' : `${progressPct}% complete`}
+              </span>
+              {progressPct === 100 && (
+                <Badge className="bg-emerald-500/15 text-emerald-400 border-emerald-500/20 text-[10px]">
+                  <Sparkles className="size-3 mr-1" /> Investment Basics Mastered
+                </Badge>
+              )}
+            </div>
           </div>
-          <div className="h-3 w-full rounded-full bg-secondary overflow-hidden">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-[#00B4D8] to-emerald-500 transition-all duration-700 ease-out"
-              style={{ width: `${progressPct}%` }}
+        </div>
+
+        {/* Module List */}
+        <div className="space-y-4">
+          {MODULES.map((module, i) => (
+            <ModuleCard
+              key={module.id}
+              module={module}
+              index={i}
+              onModuleComplete={handleModuleComplete}
             />
-          </div>
-          <div className="flex items-center justify-between mt-2">
-            <span className="text-[10px] text-muted-foreground">
-              {progressPct === 100 ? '🎉 All modules completed!' : `${progressPct}% complete`}
-            </span>
-            {progressPct === 100 && (
-              <Badge className="bg-emerald-500/15 text-emerald-400 border-emerald-500/20 text-[10px]">
-                <Sparkles className="size-3 mr-1" /> Investment Basics Mastered
-              </Badge>
+          ))}
+        </div>
+
+        {/* Bottom CTA */}
+        <div className="rounded-2xl border border-border/60 bg-gradient-to-r from-[#00B4D8]/5 to-purple-500/5 p-6 text-center space-y-3">
+          <h3 className="text-lg font-bold text-foreground">
+            {t('Ready to Apply Your Knowledge?', 'अपना ज्ञान लागू करने के लिए तैयार?')}
+          </h3>
+          <p className="text-sm text-muted-foreground max-w-md mx-auto">
+            {t(
+              'Head to the Dashboard to buy your first stocks, or try the Case Studies for real-world market scenarios!',
+              'अपने पहले शेयर खरीदने के लिए डैशबोर्ड पर जाएं, या वास्तविक बाज़ार परिदृश्यों के लिए केस स्टडीज़ आज़माएं!'
             )}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+            <a
+              href="/dashboard"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#00B4D8] to-[#0891b2] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-cyan-500/20 hover:-translate-y-0.5 transition-all"
+            >
+              <TrendingUp className="size-4" /> {t('Go to Dashboard', 'डैशबोर्ड पर जाएं')}
+            </a>
+            <a
+              href="/case-studies"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-border px-6 py-3 text-sm font-bold text-foreground hover:bg-secondary transition-all"
+            >
+              <BookOpen className="size-4" /> {t('Case Studies', 'केस स्टडीज़')}
+            </a>
           </div>
         </div>
       </div>
-
-      {/* Module List */}
-      <div className="space-y-4">
-        {MODULES.map((module, i) => (
-          <ModuleCard key={module.id} module={module} index={i} />
-        ))}
-      </div>
-
-      {/* Bottom CTA */}
-      <div className="rounded-2xl border border-border/60 bg-gradient-to-r from-[#00B4D8]/5 to-purple-500/5 p-6 text-center space-y-3">
-        <h3 className="text-lg font-bold text-foreground">
-          {t('Ready to Apply Your Knowledge?', 'अपना ज्ञान लागू करने के लिए तैयार?')}
-        </h3>
-        <p className="text-sm text-muted-foreground max-w-md mx-auto">
-          {t(
-            'Head to the Dashboard to buy your first stocks, or try the Case Studies for real-world market scenarios!',
-            'अपने पहले शेयर खरीदने के लिए डैशबोर्ड पर जाएं, या वास्तविक बाज़ार परिदृश्यों के लिए केस स्टडीज़ आज़माएं!'
-          )}
-        </p>
-        <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
-          <a
-            href="/dashboard"
-            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#00B4D8] to-[#0891b2] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-cyan-500/20 hover:-translate-y-0.5 transition-all"
-          >
-            <TrendingUp className="size-4" /> {t('Go to Dashboard', 'डैशबोर्ड पर जाएं')}
-          </a>
-          <a
-            href="/case-studies"
-            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-border px-6 py-3 text-sm font-bold text-foreground hover:bg-secondary transition-all"
-          >
-            <BookOpen className="size-4" /> {t('Case Studies', 'केस स्टडीज़')}
-          </a>
-        </div>
-      </div>
-    </div>
+    </>
   )
 }

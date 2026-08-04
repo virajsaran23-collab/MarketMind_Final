@@ -249,7 +249,7 @@ export function RatioLabInteractive({ data }: RatioLabInteractiveProps) {
                   <YAxis stroke="#888888" fontSize={12} tickLine={false} unit="x" />
                   <Tooltip
                     contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '12px', color: 'hsl(var(--foreground))' }}
-                    formatter={(value: any, name: string) => [`${value}x`, name === 'simulatedPE' ? 'Simulated P/E' : 'Current P/E']}
+                    formatter={(value: any, name: any) => [`${value}x`, String(name) === 'simulatedPE' ? 'Simulated P/E' : 'Current P/E']}
                   />
                   <Bar dataKey="currentPE" name="Current P/E" fill="#3b82f6" radius={[6, 6, 0, 0]} />
                   <Bar dataKey="simulatedPE" name="Simulated P/E" fill="#10b981" radius={[6, 6, 0, 0]} />
@@ -282,7 +282,7 @@ export function RatioLabInteractive({ data }: RatioLabInteractiveProps) {
             <div className="flex items-center gap-2">
               <h3 className="text-xl font-bold tracking-tight">2. Your Holdings % Gain & Loss</h3>
               {data.holdings_gains.length === 0 && (
-                <Badge variant="secondary" className="text-[10px] bg-yellow-500/15 text-yellow-400 border-yellow-500/20">
+                <Badge variant="muted" className="text-[10px] bg-yellow-500/15 text-yellow-400 border-yellow-500/20">
                   Using Example Data — buy stocks to see your real data
                 </Badge>
               )}

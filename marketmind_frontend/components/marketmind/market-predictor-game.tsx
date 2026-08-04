@@ -939,7 +939,7 @@ export function MarketPredictorGame() {
                     Live Portfolio Connected 🟢
                   </Badge>
                 ) : (
-                  <Badge variant="secondary" className="text-[10px] font-bold px-2 py-0.5">
+                  <Badge variant="muted" className="text-[10px] font-bold px-2 py-0.5">
                     Sample Portfolio (Buy stocks in Market to add live)
                   </Badge>
                 )}

@@ -70,9 +70,33 @@ function buildDialogue(name: string): DialogueLine[] {
       speaker: 'algo',
       text: "I'm not a human advisor — I'm a purpose-built market intelligence engine. Think of me as your personal finance mentor that never sleeps, never panics, and always keeps learning!",
     },
+
+    // --- Site tour intro ---
     {
       speaker: 'algo',
-      text: "Before we dive into the markets together, I need to run a quick diagnostic on YOUR financial knowledge circuits. Don't worry — there are no wrong answers, only data points! 📊",
+      text: "Before we get started, let me give you a quick tour of what you'll find here on MarketMind! 🏠",
+    },
+    {
+      speaker: 'algo',
+      text: "📚 CASE STUDIES — This is where you'll learn the basics of the stock market! Start with Market Fundamentals to understand how stocks, dividends, supply & demand work. Then move on to real historical market events!",
+    },
+    {
+      speaker: 'algo',
+      text: "📊 DASHBOARD — Your personal trading headquarters! Once you learn the basics, I'll guide you on how to buy your first stocks with virtual money — completely risk-free!",
+    },
+    {
+      speaker: 'algo',
+      text: "🎮 PREDICTOR GAME — Test your market prediction skills! But first, you'll need to buy at least 3 stocks from the Dashboard. This game teaches you how real market conditions affect stock prices!",
+    },
+    {
+      speaker: 'algo',
+      text: "🏆 LEADERBOARD — Compete with real traders! Every case study you complete and every smart trade you make earns you XP. The rankings are 100% real — no fake data here!",
+    },
+
+    // --- Diagnostic intro ---
+    {
+      speaker: 'algo',
+      text: "Now, I need to run a quick diagnostic on YOUR financial knowledge circuits. Don't worry — there are no wrong answers, only data points! 📊",
     },
 
     // --- Question 1 ---
@@ -126,10 +150,10 @@ function buildDialogue(name: string): DialogueLine[] {
       text: '__RESULT__',
     },
 
-    // --- Case study redirect ---
+    // --- Market basics redirect ---
     {
       speaker: 'algo',
-      text: "I've prepared a personalized learning path for you! Your first mission: complete a Case Study to earn XP and climb the ranks. Let's go! 🚀",
+      text: "Now let's start with the basics! 📖 I've prepared a Market Fundamentals lesson for you — it covers what stocks are, how buying and selling works, and the do's and don'ts of investing. Once you complete it, I'll guide you on how to buy your first stocks! 🚀",
     },
   ]
 }
@@ -238,7 +262,7 @@ export function OnboardingGame({
   const handleComplete = () => {
     const exp: ExperienceLevel = score >= 4 ? 'advanced' : score >= 2 ? 'intermediate' : 'beginner'
     onComplete(exp)
-    router.push('/case-studies')
+    router.push('/learning-basics')
   }
 
   const handleTap = () => {
@@ -433,7 +457,7 @@ export function OnboardingGame({
                   className="w-full sm:w-auto rounded-2xl bg-[#00E5FF] hover:bg-[#00B4D8] text-[#0F172A] text-base md:text-lg font-black px-8 py-3.5 border-4 border-[#0F172A] shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:translate-y-[-2px] active:translate-y-[2px] transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <Sparkles className="size-5 fill-yellow-200" />
-                  Begin My First Case Study
+                  Learn Market Basics 📖
                   <ChevronRight className="size-5" />
                 </button>
               </div>

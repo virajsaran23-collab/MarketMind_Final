@@ -189,7 +189,7 @@ export function GrowthLabInteractive({ data }: GrowthLabInteractiveProps) {
                   <YAxis stroke="#888888" fontSize={11} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}K`} />
                   <Tooltip
                     contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '12px', color: 'hsl(var(--foreground))' }}
-                    formatter={(val: any, name: string) => [`$${Number(val).toLocaleString()}`, name]}
+                    formatter={(val: any, name: any) => [`$${Number(val).toLocaleString()}`, String(name ?? '')]}
                   />
                   <Line type="monotone" dataKey="With Compounding" stroke="#10b981" strokeWidth={3} dot={false} />
                   <Line type="monotone" dataKey="Simple Deposits Only" stroke="#3b82f6" strokeWidth={2} strokeDasharray="5 5" dot={false} />
