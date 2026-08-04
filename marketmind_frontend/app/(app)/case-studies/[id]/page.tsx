@@ -185,6 +185,10 @@ export default function CaseStudyPage() {
         if (id === 'lemonade-stand' || id?.includes('lemonade') || cs?.tags?.includes('Learn Basics')) {
           localStorage.setItem('MM_BASICS_COMPLETED', 'true')
         }
+        // Mark that at least one case study has been completed (unlocks dashboard)
+        localStorage.setItem('MM_CASE_STUDY_COMPLETED', 'true')
+        // Signal the dashboard to show the guided tour on next visit
+        localStorage.setItem('MM_SHOW_DASHBOARD_TOUR', 'true')
       }
       api.completeCaseStudy(id, score, cs.quiz.length).then((res: any) => {
         if (res.challenges) {

@@ -17,10 +17,10 @@ type TourStep = {
 const TOUR_STEPS: TourStep[] = [
   {
     targetId: null,
-    titleEn: 'Data Points Logged! Neural Profile Active 🤖',
-    titleHi: 'सभी डेटा पॉइंट लॉग किए गए! न्यूरल प्रोफाइल सक्रिय 🤖',
-    descEn: "Diagnostic Complete! All your financial data points have been compiled into your neural profile. You start with 100 XP and your initial Leaderboard Rank is #42! Now let's begin your trading journey by making your very first investment! 🚀",
-    descHi: 'निदान पूरा हुआ! आपके सभी वित्तीय डेटा बिंदु आपकी न्यूरल प्रोफाइल में संकलित कर दिए गए हैं। आप 100 XP के साथ शुरुआत करते हैं और आपकी प्रारंभिक लीडरबोर्ड रैंक #42 है! आइए अपना पहला निवेश करके अपनी ट्रेडिंग यात्रा शुरू करें! 🚀',
+    titleEn: 'Case Study Mastered! Welcome to Trading Headquarters 🚀',
+    titleHi: 'केस स्टडी पूरी! ट्रेडिंग मुख्यालय में आपका स्वागत है 🚀',
+    descEn: "Bzzzt! Outstanding job completing your case study! You've unlocked the Trading Dashboard! Let me give you a quick tour on how to buy stocks and manage your portfolio!",
+    descHi: 'शानदार काम! आपने केस स्टडी पूरी कर ली है और ट्रेडिंग डैशबोर्ड अनलॉक कर लिया है! आइए मैं आपको शेयर खरीदने और अपने पोर्टफोलियो को मैनेज करने का एक क्विक टूर देता हूँ!',
   },
   {
     targetId: 'tour-stats',
@@ -31,8 +31,8 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     targetId: 'tour-stock-target',
-    titleEn: 'First Stock Choice 📈',
-    titleHi: 'पहला शेयर चुनाव 📈',
+    titleEn: 'First Stock Choice & Buying 📈',
+    titleHi: 'पहला शेयर चुनाव और खरीदारी 📈',
     descEn: "I've analyzed the market and selected the perfect starter stock for you: Apple Inc. (AAPL)!\n\nWhy is it perfect? Apple has a $60B+ cash reserve, steady earnings growth, global brand equity, and lower volatility than speculative stocks. Click the 'Buy' button right here on AAPL to make your very first trade!",
     descHi: "मैंने बाज़ार का विश्लेषण किया है और आपके लिए पहला सबसे अच्छा शेयर चुना है: Apple Inc. (AAPL)!\n\nयह क्यों बेहतर है? Apple के पास $60B+ नकद भंडार, निरंतर आय वृद्धि और कम अस्थिरता है। अपना पहला व्यापार करने के लिए AAPL पर 'Buy' बटन पर क्लिक करें!",
   },
@@ -48,14 +48,14 @@ const TOUR_STEPS: TourStep[] = [
     titleEn: 'Ask Market Buddy for Advice 💬',
     titleHi: 'मार्केट बडी से सलाह लें 💬',
     descEn: "This is the Market Buddy panel. You can ask me questions about any stock! Type 'Should I buy Apple today?' or 'What is the news?' and I will analyze live prices, headlines, and metrics to give you educational guidance!",
-    descHi: "à¤¯à¤¹ à¤®à¤¾à¤°à¥à¤•à¥‡à¤Ÿ à¤¬à¤¡à¥€ à¤ªà¥ˆà¤¨à¤² à¤¹à¥ˆà¥¤ à¤†à¤ª à¤®à¥à¤à¤¸à¥‡ à¤•à¤¿à¤¸à¥€ à¤­à¥€ à¤¶à¥‡à¤¯à¤° à¤•à¥‡ à¤¬à¤¾à¤°à¥‡ à¤®à¥‡à¤‚ à¤ªà¥à¤°à¤¶à¥à¤¨ à¤ªà¥‚à¤› à¤¸à¤•à¤¤à¥‡ à¤¹à¥ˆà¤‚! à¤Ÿà¤¾à¤‡à¤ª à¤•à¤°à¥‡à¤‚ 'à¤•à¥à¤¯à¤¾ à¤®à¥à¤à¥‡ à¤†à¤œ Apple à¤–à¤°à¥€à¤¦à¤¨à¤¾ à¤šà¤¾à¤¹à¤¿à¤?' à¤¯à¤¾ 'à¤–à¤¬à¤°à¥‡à¤‚ à¤•à¥à¤¯à¤¾ à¤¹à¥ˆà¤‚?' à¤”à¤° à¤®à¥ˆà¤‚ à¤†à¤ªà¤•à¥‹ à¤¶à¥ˆà¤•à¥à¤·à¤£à¤¿à¤• à¤®à¤¾à¤°à¥à¤—à¤¦à¤°à¥à¤¶à¤¨ à¤¦à¥‡à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤²à¤¾à¤‡à¤µ à¤•à¥€à¤®à¤¤à¥‹à¤‚, à¤¸à¥à¤°à¥à¤–à¤¿à¤¯à¥‹à¤‚ à¤”à¤° à¤®à¥‡à¤Ÿà¥à¤°à¤¿à¤•à¥à¤¸ à¤•à¤¾ à¤µà¤¿à¤¶à¥à¤²à¥‡à¤·à¤£ à¤•à¤°à¥‚à¤à¤—à¤¾!",
+    descHi: "यह मार्केट बडी पैनल है। आप मुझसे किसी भी शेयर के बारे में प्रश्न पूछ सकते हैं! टाइप करें 'क्या मुझे आज Apple खरीदना चाहिए?' या 'खबरें क्या हैं?' और मैं आपको शैक्षणिक मार्गदर्शन देने के लिए लाइव कीमतों, सुर्खियों और मेट्रिक्स का विश्लेषण करूंगा!",
   },
   {
     targetId: null,
-    titleEn: "Let's Build Your Portfolio! ðŸš€",
-    titleHi: 'à¤†à¤‡à¤ à¤…à¤ªà¤¨à¤¾ à¤ªà¥‹à¤°à¥à¤Ÿà¤«à¥‹à¤²à¤¿à¤¯à¥‹ à¤¬à¤¨à¤¾à¤à¤‚! ðŸš€',
-    descEn: "Now it's your turn! Buy your first 5-6 stocks to build a strong, diversified portfolio. Once you own 5+ stock positions, I will reappear to praise your progress and guide you into advanced Case Studies! Happy trading! ðŸ§ ðŸ’¼",
-    descHi: 'à¤…à¤¬ à¤†à¤ªà¤•à¥€ à¤¬à¤¾à¤°à¥€ à¤¹à¥ˆ! à¤à¤• à¤®à¤œà¤¬à¥‚à¤¤, à¤µà¤¿à¤µà¤¿à¤§ à¤ªà¥‹à¤°à¥à¤Ÿà¤«à¥‹à¤²à¤¿à¤¯à¥‹ à¤¬à¤¨à¤¾à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤…à¤ªà¤¨à¥‡ à¤ªà¤¹à¤²à¥‡ 5-6 à¤¶à¥‡à¤¯à¤° à¤–à¤°à¥€à¤¦à¥‡à¤‚à¥¤ à¤à¤• à¤¬à¤¾à¤° à¤œà¤¬ à¤†à¤ªà¤•à¤‡ à¤ªà¤¾à¤¸ 5+ à¤¶à¥‡à¤¯à¤° à¤ªà¥‹à¤œà¥€à¤¶à¤¨ à¤¹à¥‹ à¤œà¤¾à¤à¤‚à¤—à¥‡, à¤¤à¥‹ à¤®à¥ˆà¤‚ à¤†à¤ªà¤•à¥€ à¤ªà¥à¤°à¤—à¤¤à¤¿ à¤•à¥€ à¤¸à¤°à¤¾à¤¹à¤¨à¤¾ à¤•à¤°à¤¨à¥‡ à¤”à¤° à¤†à¤ªà¤•à¥‹ à¤‰à¤¨à¥à¤¨à¤¤ à¤•à¥‡à¤¸ à¤¸à¥à¤Ÿà¤¡à¥€à¤œà¤¼ à¤®à¥‡à¤‚ à¤®à¤¾à¤°à¥à¤—à¤¦à¤°à¥à¤¶à¤¨ à¤•à¤°à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤«à¤¿à¤° à¤¸à¥‡ à¤ªà¥à¤°à¤•à¤Ÿ à¤¹à¥‚à¤à¤—à¤¾! ðŸ§ ðŸ’¼',
+    titleEn: "Let's Build Your Portfolio! 🚀",
+    titleHi: 'आइए अपना पोर्टफोलियो बनाएं! 🚀',
+    descEn: "Now it's your turn! Buy your first 5-6 stocks to build a strong, diversified portfolio. Once you own 3+ stock positions, you unlock the Predictor Game! Happy trading! 🧠💼",
+    descHi: 'अब आपकी बारी है! एक मजबूत, विविध पोर्टफोलियो बनाने के लिए अपने पहले 5-6 शेयर खरीदें। एक बार जब आपके पास 3+ शेयर पोजीशन हो जाएंगे, तो आप प्रिडिक्टर गेम अनलॉक कर लेंगे!',
   },
 ]
 
