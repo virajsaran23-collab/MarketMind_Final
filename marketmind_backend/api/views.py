@@ -28,6 +28,7 @@ from .serializers import (
     TradeSerializer, CaseStudySerializer, LeaderboardEntrySerializer,
     UserChallengeSerializer, RegisterSerializer, UserSerializer,
     PortfolioSnapshotSerializer, MathModuleSerializer,
+    PredictorRequestSerializer,
 )
 from .services.market_data import get_quote
 
@@ -798,6 +799,34 @@ def update_leaderboard_for_user(user):
     entry.handle = entry.handle or f'@{user.username}'
     entry.save(update_fields=['portfolio', 'learning_score', 'badge', 'accuracy', 'token_count', 'handle'])
     rebuild_leaderboard_ranks()
+
+
+# Predictor LLM endpoint
+from .predictor_llm import generate_prediction
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def predictor_llm(request):
+    serializer = PredictorRequestSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    data = serializer.validated_data
+    symbols = data.get('symbols', [])
+    question = data.get('question')
+    situation = data.get('situation')
+
+    user_context = None
+    try:
+        profile = UserProfile.objects.get_or_create(user=request.user)[0]
+        user_context = f"username={request.user.username}, cash={profile.cash}, portfolio_value={profile.portfolio_value}"
+    except Exception:
+        user_context = None
+
+    result = generate_prediction(symbols, question, situation=situation, user_context=user_context)
+
+    return Response({'prediction': result.get('prediction'), 'raw': result.get('raw')}, status=status.HTTP_200_OK)
     profile.global_rank = entry.rank
     profile.save(update_fields=['global_rank'])
     return entry

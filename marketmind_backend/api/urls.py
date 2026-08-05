@@ -35,4 +35,5 @@ urlpatterns = [
     path('mentor/', views.mentor),
     path('challenges/', views.challenges),
     path('ai-analyzer/', views.ai_analyzer),
+    path('predictor/llm/', views.predictor_llm),
 ]

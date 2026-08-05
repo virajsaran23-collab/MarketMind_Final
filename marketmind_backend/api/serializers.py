@@ -153,3 +153,14 @@ class RegisterSerializer(serializers.ModelSerializer):
             last_name=validated_data.get('last_name', ''),
         )
         return user
+
+
+class PredictorRequestSerializer(serializers.Serializer):
+    symbols = serializers.ListField(child=serializers.CharField(), required=False)
+    question = serializers.CharField()
+    situation = serializers.CharField(required=False, allow_blank=True)
+
+
+class PredictorResponseSerializer(serializers.Serializer):
+    prediction = serializers.CharField()
+    raw = serializers.JSONField(required=False, allow_null=True)
