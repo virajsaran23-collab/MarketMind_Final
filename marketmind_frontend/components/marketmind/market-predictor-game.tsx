@@ -192,6 +192,78 @@ type SituationScenario = {
   }
 }
 
+function normalizeGeneratedScenario(rawScenario: any, stock: PurchasedStock, fallbackScenario: SituationScenario): SituationScenario {
+  if (!rawScenario || typeof rawScenario !== 'object') {
+    return fallbackScenario
+  }
+
+  const allowedDirections = new Set(['up_strong', 'up_moderate', 'flat', 'down'])
+  const chartData = Array.isArray(rawScenario.chartData) && rawScenario.chartData.length >= 5
+    ? rawScenario.chartData.slice(0, 5).map((point: any, index: number) => ({
+        day: typeof point?.day === 'string' ? point.day : `Day ${index * 7}`,
+        predicted: Number(point?.predicted ?? stock.currentPrice),
+        actual: Number(point?.actual ?? stock.currentPrice),
+      }))
+    : fallbackScenario.chartData
+
+  const q1Options = Array.isArray(rawScenario.q1?.options) && rawScenario.q1.options.length >= 3
+    ? rawScenario.q1.options.slice(0, 3).map((option: any, index: number) => ({
+        id: typeof option?.id === 'string' ? option.id : ['a', 'b', 'c'][index],
+        text: String(option?.text ?? fallbackScenario.q1.options[index].text),
+        isCorrect: typeof option?.isCorrect === 'boolean' ? option.isCorrect : index === 0,
+        explanation: String(option?.explanation ?? fallbackScenario.q1.options[index].explanation),
+      }))
+    : fallbackScenario.q1.options
+
+  const q2Options = Array.isArray(rawScenario.q2?.options) && rawScenario.q2.options.length >= 4
+    ? rawScenario.q2.options.slice(0, 4).map((option: any, index: number) => ({
+        direction: String(option?.direction ?? ['up_strong', 'up_moderate', 'flat', 'down'][index]) as SituationScenario['q2']['options'][number]['direction'],
+        label: String(option?.label ?? fallbackScenario.q2.options[index].label),
+        range: String(option?.range ?? fallbackScenario.q2.options[index].range),
+      }))
+    : fallbackScenario.q2.options
+
+  const q3Options = Array.isArray(rawScenario.q3?.options) && rawScenario.q3.options.length >= 3
+    ? rawScenario.q3.options.slice(0, 3).map((option: any, index: number) => ({
+        id: typeof option?.id === 'string' ? option.id : ['a', 'b', 'c'][index],
+        text: String(option?.text ?? fallbackScenario.q3.options[index].text),
+        isCorrect: typeof option?.isCorrect === 'boolean' ? option.isCorrect : index === 0,
+        advice: String(option?.advice ?? fallbackScenario.q3.options[index].advice),
+      }))
+    : fallbackScenario.q3.options
+
+  return {
+    ...fallbackScenario,
+    ...rawScenario,
+    id: String(rawScenario.id ?? fallbackScenario.id),
+    title: String(rawScenario.title ?? fallbackScenario.title),
+    emoji: String(rawScenario.emoji ?? fallbackScenario.emoji),
+    category: String(rawScenario.category ?? fallbackScenario.category),
+    headline: String(rawScenario.headline ?? fallbackScenario.headline),
+    story: String(rawScenario.story ?? fallbackScenario.story),
+    targetStockSymbol: stock.symbol,
+    basicKnowledgeTip: String(rawScenario.basicKnowledgeTip ?? fallbackScenario.basicKnowledgeTip),
+    actualOutcomeDirection: allowedDirections.has(rawScenario.actualOutcomeDirection)
+      ? rawScenario.actualOutcomeDirection
+      : fallbackScenario.actualOutcomeDirection,
+    actualChangePct: Number(rawScenario.actualChangePct ?? fallbackScenario.actualChangePct),
+    explanation: String(rawScenario.explanation ?? fallbackScenario.explanation),
+    chartData,
+    q1: {
+      question: String(rawScenario.q1?.question ?? fallbackScenario.q1.question),
+      options: q1Options,
+    },
+    q2: {
+      question: String(rawScenario.q2?.question ?? fallbackScenario.q2.question),
+      options: q2Options,
+    },
+    q3: {
+      question: String(rawScenario.q3?.question ?? fallbackScenario.q3.question),
+      options: q3Options,
+    },
+  }
+}
+
 const GENERATE_SCENARIOS_FOR_STOCK = (stock: PurchasedStock): SituationScenario[] => {
   const sym = stock.symbol
   const name = stock.name
@@ -689,6 +761,7 @@ export function MarketPredictorGame() {
   // Scenarios pool & current scenario
   const [currentScenario, setCurrentScenario] = useState<SituationScenario | null>(null)
   const [scenarioIndex, setScenarioIndex] = useState(0)
+  const [isGeneratingScenario, setIsGeneratingScenario] = useState(false)
 
   // Answers state
   const [ansQ1, setAnsQ1] = useState<string>('')
@@ -764,7 +837,7 @@ export function MarketPredictorGame() {
   }, [])
 
   // Start scenario for selected stock
-  const startScenarioGame = (stockSym?: string) => {
+  const startScenarioGame = async (stockSym?: string) => {
     const sym = stockSym || selectedStockSymbol
     const stockObj = purchasedStocks.find((s) => s.symbol === sym) || purchasedStocks[0]
     const scenarios = GENERATE_SCENARIOS_FOR_STOCK(stockObj)
@@ -772,16 +845,39 @@ export function MarketPredictorGame() {
     // pick next scenario randomly or sequentially
     const nextIdx = (scenarioIndex + 1) % scenarios.length
     setScenarioIndex(nextIdx)
-    const selectedScenario = scenarios[nextIdx]
-
-    setCurrentScenario(selectedScenario)
+    const fallbackScenario = scenarios[nextIdx]
+    setIsGeneratingScenario(true)
+    setCurrentScenario(null)
     setAnsQ1('')
     setAnsQ2('')
     setAnsQ3('')
     setGameState('question')
-    setDialogueText(
-      `A new market situation has broken for ${stockObj.name} (${stockObj.symbol})! Review the situation, apply your basic stock knowledge, and make your price prediction!`
-    )
+    setDialogueText(`Creating a fresh market situation for ${stockObj.name} (${stockObj.symbol})...`)
+
+    try {
+      const response = await api.predictorSituation({
+        symbol: stockObj.symbol,
+        name: stockObj.name,
+        category: stockObj.category,
+        current_price: stockObj.currentPrice,
+        return_pct: stockObj.returnPct,
+        growth_driver: stockObj.growthDriver,
+      })
+
+      const generatedScenario = normalizeGeneratedScenario(response.scenario, stockObj, fallbackScenario)
+      setCurrentScenario(generatedScenario)
+      setDialogueText(
+        `A new market situation has broken for ${stockObj.name} (${stockObj.symbol})! Review the situation, apply your basic stock knowledge, and make your price prediction!`
+      )
+    } catch {
+      setCurrentScenario(fallbackScenario)
+      setDialogueText(
+        `A new market situation has broken for ${stockObj.name} (${stockObj.symbol})! Review the situation, apply your basic stock knowledge, and make your price prediction!`
+      )
+      showToast('Using backup scenario', 'Groq scenario generation is unavailable right now.')
+    } finally {
+      setIsGeneratingScenario(false)
+    }
   }
 
   // Calculate results when user submits answers
@@ -1050,6 +1146,20 @@ export function MarketPredictorGame() {
       )}
 
       {/* STATE 2: ANSWER SITUATION & QUESTION SCENARIO */}
+      {gameState === 'question' && isGeneratingScenario && !currentScenario && (
+        <Card className="p-6 sm:p-8 space-y-6 rounded-3xl border-border/80 shadow-lg">
+          <div className="flex items-center justify-between border-b border-border/60 pb-4">
+            <div>
+              <span className="text-xs font-extrabold text-[#00B4D8] uppercase tracking-wider">Step 2 of 3</span>
+              <h2 className="text-xl font-extrabold text-foreground mt-1">Building a fresh market scenario...</h2>
+            </div>
+          </div>
+          <div className="rounded-3xl border border-[#00B4D8]/20 bg-[#00B4D8]/8 p-6 text-sm text-muted-foreground animate-pulse">
+            Prof. Algo is generating a new situation and matching questions with Groq.
+          </div>
+        </Card>
+      )}
+
       {gameState === 'question' && currentScenario && (
         <Card className="p-6 sm:p-8 space-y-6 rounded-3xl border-border/80 shadow-lg">
           {/* Header Bar */}

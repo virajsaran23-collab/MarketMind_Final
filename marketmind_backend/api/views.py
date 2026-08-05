@@ -28,6 +28,7 @@ from .serializers import (
     TradeSerializer, CaseStudySerializer, LeaderboardEntrySerializer,
     UserChallengeSerializer, RegisterSerializer, UserSerializer,
     PortfolioSnapshotSerializer, MathModuleSerializer,
+    PredictorSituationRequestSerializer,
     PredictorRequestSerializer,
 )
 from .services.market_data import get_quote
@@ -73,6 +74,11 @@ def update_user_badge(profile):
 def calculate_token_count(portfolio_value, bonus_tokens=0):
     portfolio_tokens = max(0, int((portfolio_value - 100000) // 1000))
     return portfolio_tokens + max(0, bonus_tokens)
+
+
+def _is_demo_leaderboard_user(user):
+    username = (user.username or '').strip().lower()
+    return username.startswith('test') or username.startswith('demo') or username in {'aria_mehta'}
 
 
 CURATED_ASSETS = [
@@ -713,12 +719,16 @@ def sync_user_challenges(user):
 
 
 def refresh_leaderboard_entries():
-    for user in User.objects.filter(is_active=True):
+    for user in User.objects.filter(is_active=True).exclude(username__startswith='test').exclude(username__startswith='demo'):
+        if _is_demo_leaderboard_user(user):
+            continue
         get_or_create_leaderboard_entry(user)
 
-    entries = LeaderboardEntry.objects.select_related('user').all()
+    entries = LeaderboardEntry.objects.select_related('user').filter(user__is_active=True)
     updated = []
     for entry in entries:
+        if _is_demo_leaderboard_user(entry.user):
+            continue
         if not entry.user.is_active:
             continue
         portfolio_value = calculate_portfolio_value(entry.user)
@@ -770,6 +780,9 @@ def rebuild_leaderboard_ranks():
     entries = list(
         LeaderboardEntry.objects.select_related('user')
         .filter(user__is_active=True)
+        .exclude(user__username__startswith='test')
+        .exclude(user__username__startswith='demo')
+        .exclude(user__username__iexact='aria_mehta')
         .order_by('-learning_score', '-token_count', '-portfolio', 'user__username')
     )
     updated = []
@@ -799,10 +812,11 @@ def update_leaderboard_for_user(user):
     entry.handle = entry.handle or f'@{user.username}'
     entry.save(update_fields=['portfolio', 'learning_score', 'badge', 'accuracy', 'token_count', 'handle'])
     rebuild_leaderboard_ranks()
+    return entry
 
 
 # Predictor LLM endpoint
-from .predictor_llm import generate_prediction
+from .predictor_llm import generate_prediction, generate_situation
 
 
 @api_view(['POST'])
@@ -827,6 +841,37 @@ def predictor_llm(request):
     result = generate_prediction(symbols, question, situation=situation, user_context=user_context)
 
     return Response({'prediction': result.get('prediction'), 'raw': result.get('raw')}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def predictor_situation(request):
+    serializer = PredictorSituationRequestSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    data = serializer.validated_data
+    user_context = None
+    try:
+        profile = UserProfile.objects.get_or_create(user=request.user)[0]
+        user_context = f"username={request.user.username}, cash={profile.cash}, portfolio_value={profile.portfolio_value}"
+    except Exception:
+        user_context = None
+
+    stock = {
+        'symbol': data['symbol'],
+        'name': data['name'],
+        'category': data.get('category', ''),
+        'current_price': data.get('current_price', 0),
+        'return_pct': data.get('return_pct', 0),
+        'growth_driver': data.get('growth_driver', ''),
+    }
+
+    result = generate_situation(stock, user_context=user_context)
+    if result.get('error'):
+        return Response(result, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+    return Response({'scenario': result.get('scenario'), 'raw': result.get('raw')}, status=status.HTTP_200_OK)
     profile.global_rank = entry.rank
     profile.save(update_fields=['global_rank'])
     return entry
@@ -1124,6 +1169,8 @@ def trade(request):
     record_portfolio_snapshot(request.user)
     user_challenges = sync_user_challenges(request.user)
     entry = update_leaderboard_for_user(request.user)
+    if entry is None:
+        entry = get_or_create_leaderboard_entry(request.user)
     profile.refresh_from_db()
 
     completed_challenges = [uc for uc in user_challenges if uc.status == 'complete']
@@ -1248,7 +1295,7 @@ def leaderboard(request):
     refresh_leaderboard_entries()
     entries = LeaderboardEntry.objects.select_related('user').filter(
         user__is_active=True
-    ).order_by('rank')
+    ).exclude(user__username__startswith='test').exclude(user__username__startswith='demo').exclude(user__username__iexact='aria_mehta').order_by('rank')
     return Response(LeaderboardEntrySerializer(entries, many=True).data)
 
 

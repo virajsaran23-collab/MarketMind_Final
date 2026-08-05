@@ -161,6 +161,15 @@ class PredictorRequestSerializer(serializers.Serializer):
     situation = serializers.CharField(required=False, allow_blank=True)
 
 
+class PredictorSituationRequestSerializer(serializers.Serializer):
+    symbol = serializers.CharField()
+    name = serializers.CharField()
+    category = serializers.CharField(required=False, allow_blank=True)
+    current_price = serializers.FloatField(required=False)
+    return_pct = serializers.FloatField(required=False)
+    growth_driver = serializers.CharField(required=False, allow_blank=True)
+
+
 class PredictorResponseSerializer(serializers.Serializer):
     prediction = serializers.CharField()
     raw = serializers.JSONField(required=False, allow_null=True)

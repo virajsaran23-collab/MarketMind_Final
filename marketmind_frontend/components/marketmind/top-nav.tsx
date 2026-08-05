@@ -10,6 +10,7 @@ import { useAuth } from '@/lib/auth-context'
 import { useLanguage } from '@/lib/language-context'
 import { LanguageToggle } from './language-toggle'
 import { FinanceGlossaryModal } from './finance-glossary-modal'
+import { getUserScopedKey } from '@/lib/user-storage'
 
 const links = [
   { href: '/predictor', labelEn: 'Predictor Game 🎮', labelHi: 'अनुमान गेम 🎮' },
@@ -34,17 +35,17 @@ export function TopNav() {
   // Check if dashboard is locked (no case study completed yet)
   useEffect(() => {
     if (typeof window === 'undefined') return
-    const completed = localStorage.getItem('MM_CASE_STUDY_COMPLETED') === 'true'
+    const completed = localStorage.getItem(getUserScopedKey(user?.id, 'MM_CASE_STUDY_COMPLETED')) === 'true'
     setDashboardLocked(!completed)
 
     // Listen for storage changes (e.g. another tab completing a case study)
     const onStorage = () => {
-      const nowCompleted = localStorage.getItem('MM_CASE_STUDY_COMPLETED') === 'true'
+      const nowCompleted = localStorage.getItem(getUserScopedKey(user?.id, 'MM_CASE_STUDY_COMPLETED')) === 'true'
       setDashboardLocked(!nowCompleted)
     }
     window.addEventListener('storage', onStorage)
     return () => window.removeEventListener('storage', onStorage)
-  }, [pathname]) // re-check on navigation
+  }, [pathname, user?.id]) // re-check on navigation
 
   const initials = user
     ? (user.first_name?.[0] || user.username[0]).toUpperCase() + (user.last_name?.[0] || '').toUpperCase()

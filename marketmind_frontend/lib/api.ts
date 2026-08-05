@@ -80,6 +80,19 @@ export const api = {
       body: JSON.stringify({ message, symbols, history }),
     }),
 
+  predictorSituation: (data: {
+    symbol: string
+    name: string
+    category?: string
+    current_price?: number
+    return_pct?: number
+    growth_driver?: string
+  }) =>
+    request('/predictor/situation/', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
   aiAnalyzer: () => request('/ai-analyzer/'),
 
   mathModules: () => request('/math-modules/'),

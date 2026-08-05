@@ -32,7 +32,9 @@ import {
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { AIBuddyPortrait } from '@/components/marketmind/ai-buddy-portrait'
+import { useAuth } from '@/lib/auth-context'
 import { useLanguage } from '@/lib/language-context'
+import { getUserScopedKey } from '@/lib/user-storage'
 import { cn } from '@/lib/utils'
 
 /* ─────────────────────────── Module Data ─────────────────────────── */
@@ -1023,10 +1025,12 @@ function ModuleCard({
   module,
   index,
   onModuleComplete,
+  userId,
 }: {
   module: Module
   index: number
   onModuleComplete?: () => void
+  userId?: number | null
 }) {
   const [expanded, setExpanded] = useState(false)
   const [currentLesson, setCurrentLesson] = useState(0)
@@ -1035,13 +1039,19 @@ function ModuleCard({
   const [quizSubmitted, setQuizSubmitted] = useState(false)
   const [completed, setCompleted] = useState(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem(`MM_LEARN_${module.id}`) === 'true'
+      return localStorage.getItem(getUserScopedKey(userId, `MM_LEARN_${module.id}`)) === 'true'
     }
     return false
   })
 
   const quizQuestions = getQuizQuestions(module.id)
   const whyItMatters = getModuleWhyItMatters(module.id)
+  const progressKey = getUserScopedKey(userId, `MM_LEARN_${module.id}`)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    setCompleted(localStorage.getItem(progressKey) === 'true')
+  }, [progressKey])
 
   const handleQuizAnswer = (qIndex: number, optionIndex: number) => {
     if (quizSubmitted) return
@@ -1055,8 +1065,8 @@ function ModuleCard({
     }, 0)
     if (correctCount >= Math.ceil(quizQuestions.length / 2)) {
       if (typeof window !== 'undefined') {
-        localStorage.setItem(`MM_LEARN_${module.id}`, 'true')
-        localStorage.setItem('MM_BASICS_COMPLETED', 'true')
+        localStorage.setItem(progressKey, 'true')
+        localStorage.setItem(getUserScopedKey(userId, 'MM_BASICS_COMPLETED'), 'true')
       }
       setCompleted(true)
       onModuleComplete?.()
@@ -1454,30 +1464,33 @@ function ProfAlgoBasicsGuideModal({
 
 export default function LearningBasicsPage() {
   const { t } = useLanguage()
+  const { user } = useAuth()
   const router = useRouter()
   const [modalMode, setModalMode] = useState<'welcome' | 'completed' | null>(null)
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-    const welcomeSeen = localStorage.getItem('MM_LEARN_WELCOME_SEEN') === 'true'
+    const welcomeSeen = localStorage.getItem(getUserScopedKey(user?.id, 'MM_LEARN_WELCOME_SEEN')) === 'true'
     if (!welcomeSeen) {
       setModalMode('welcome')
-      localStorage.setItem('MM_LEARN_WELCOME_SEEN', 'true')
+      localStorage.setItem(getUserScopedKey(user?.id, 'MM_LEARN_WELCOME_SEEN'), 'true')
     }
-  }, [])
+  }, [user?.id])
 
   const handleModuleComplete = () => {
     if (typeof window === 'undefined') return
-    const completedFlashSeen = localStorage.getItem('MM_LEARN_COMPLETED_FLASH_SEEN') === 'true'
+    const completedFlashKey = getUserScopedKey(user?.id, 'MM_LEARN_COMPLETED_FLASH_SEEN')
+    const basicsCompletedKey = getUserScopedKey(user?.id, 'MM_BASICS_COMPLETED')
+    const completedFlashSeen = localStorage.getItem(completedFlashKey) === 'true'
     if (!completedFlashSeen) {
-      localStorage.setItem('MM_LEARN_COMPLETED_FLASH_SEEN', 'true')
-      localStorage.setItem('MM_BASICS_COMPLETED', 'true')
+      localStorage.setItem(completedFlashKey, 'true')
+      localStorage.setItem(basicsCompletedKey, 'true')
       setModalMode('completed')
     }
   }
 
   const completedCount = MODULES.reduce((acc, m) => {
-    if (typeof window !== 'undefined' && localStorage.getItem(`MM_LEARN_${m.id}`) === 'true') {
+    if (typeof window !== 'undefined' && localStorage.getItem(getUserScopedKey(user?.id, `MM_LEARN_${m.id}`)) === 'true') {
       return acc + 1
     }
     return acc
@@ -1562,6 +1575,7 @@ export default function LearningBasicsPage() {
               module={module}
               index={i}
               onModuleComplete={handleModuleComplete}
+              userId={user?.id ?? null}
             />
           ))}
         </div>

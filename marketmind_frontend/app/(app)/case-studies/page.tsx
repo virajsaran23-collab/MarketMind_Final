@@ -14,6 +14,8 @@ import {
   Loader2,
   ChevronDown,
   ChevronUp,
+  CheckCircle2,
+  RotateCcw,
 } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -607,12 +609,17 @@ export default function CaseStudiesPage() {
                 )}
               </div>
 
-              <Link href={`/case-studies/${featuredStudy.id}`} className="block group">
-                <Card className="overflow-hidden rounded-[1.75rem] border border-slate-200/70 bg-white shadow-sm transition-all duration-300 hover:border-primary/45 hover:shadow-xl hover:-translate-y-1 grid grid-cols-1 lg:grid-cols-12 cursor-pointer relative">
+              <Card className="overflow-hidden rounded-[1.75rem] border border-slate-200/70 bg-white shadow-sm transition-all duration-300 hover:border-primary/45 hover:shadow-xl hover:-translate-y-1 grid grid-cols-1 lg:grid-cols-12 relative">
                   <div className="absolute top-4 left-4 z-20 bg-gradient-to-r from-[#00E5FF] to-[#00B4D8] text-slate-900 border border-slate-900/10 px-3.5 py-1 rounded-full text-xs font-black shadow-[2px_2px_0px_0px_rgba(15,23,42,0.12)] flex items-center gap-1.5 animate-pulse">
                     <Sparkles className="size-3.5 fill-yellow-200 text-slate-900" />
                     <span>START HERE: #1 Recommended Case Study</span>
                   </div>
+
+                  {featuredStudy.completed && (
+                    <div className="absolute top-4 right-4 z-20 bg-emerald-500 text-white border border-emerald-600/30 px-3 py-1 rounded-full text-xs font-black shadow-md flex items-center gap-1.5">
+                      <CheckCircle2 className="size-3.5" /> Done
+                    </div>
+                  )}
 
                   <div className="lg:col-span-7 relative h-60 lg:h-96 w-full overflow-hidden">
                     <CaseStudyImage
@@ -648,21 +655,35 @@ export default function CaseStudiesPage() {
                       </p>
                     </div>
 
-                    <div className="pt-6 border-t border-border/50 flex flex-wrap gap-1.5 items-center justify-between mt-4">
+                    <div className="pt-6 border-t border-border/50 flex flex-wrap gap-2 items-center justify-between mt-4">
                       <div className="flex flex-wrap gap-1">
                         {(featuredStudy.tags || []).slice(0, 3).map((tag: string) => (
                           <Badge key={tag} variant="muted" className="text-[10px] bg-muted/60">{tag}</Badge>
                         ))}
                       </div>
 
-                      <span className="inline-flex items-center gap-1 text-xs font-bold text-primary group-hover:translate-x-1.5 transition-transform">
-                        {t('Explore Lesson', 'पाठ देखें')} <ArrowRight className="size-4 ml-1" />
-                      </span>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Link
+                          href={`/case-studies/${featuredStudy.id}`}
+                          className="inline-flex items-center gap-1 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground hover:opacity-90 transition-opacity"
+                        >
+                          {featuredStudy.completed ? t('Review Study', 'अध्ययन देखें') : t('Explore Lesson', 'पाठ देखें')}
+                          <ArrowRight className="size-4" />
+                        </Link>
+                        {featuredStudy.completed && (
+                          <Link
+                            href={`/case-studies/${featuredStudy.id}?tab=quiz`}
+                            className="inline-flex items-center gap-1 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-xs font-bold text-emerald-600 hover:bg-emerald-500/15 transition-colors"
+                          >
+                            <RotateCcw className="size-4" />
+                            {t('Do Again', 'फिर से करें')}
+                          </Link>
+                        )}
+                      </div>
                     </div>
 
                   </div>
                 </Card>
-              </Link>
             </div>
           )}
 
@@ -674,8 +695,13 @@ export default function CaseStudiesPage() {
               
               <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                 {gridStudies.map((cs) => (
-                  <Link key={cs.id} href={`/case-studies/${cs.id}`} className="group block">
-                    <Card className="h-full overflow-hidden rounded-[1.75rem] border border-slate-200/70 bg-white shadow-sm transition-all duration-300 hover:border-primary/45 hover:shadow-xl hover:-translate-y-1 cursor-pointer flex flex-col justify-between">
+                  <Card key={cs.id} className="h-full overflow-hidden rounded-[1.75rem] border border-slate-200/70 bg-white shadow-sm transition-all duration-300 hover:border-primary/45 hover:shadow-xl hover:-translate-y-1 flex flex-col justify-between relative">
+                    {cs.completed && (
+                      <div className="absolute top-3 right-3 z-10 bg-emerald-500 text-white border border-emerald-600/30 px-2.5 py-1 rounded-full text-[10px] font-black shadow-md flex items-center gap-1">
+                        <CheckCircle2 className="size-3.5" /> Done
+                      </div>
+                    )}
+
                       <div>
                         <CaseStudyImage
                           src={cs.image}
@@ -709,18 +735,32 @@ export default function CaseStudiesPage() {
                         </div>
                       </div>
 
-                      <div className="p-5 pt-3 border-t border-border/40 flex flex-wrap gap-1 items-center justify-between bg-muted/10 rounded-b-2xl">
+                      <div className="p-5 pt-3 border-t border-border/40 flex flex-wrap gap-2 items-center justify-between bg-muted/10 rounded-b-2xl">
                         <div className="flex flex-wrap gap-1">
                           {(cs.tags || []).slice(0, 2).map((tag: string) => (
                             <Badge key={tag} variant="muted" className="text-[9px] bg-muted/80">{tag}</Badge>
                           ))}
                         </div>
-                        <span className="inline-flex items-center gap-0.5 text-[11px] font-bold text-primary group-hover:translate-x-1 transition-transform">
-                          {t('Read', 'पढ़ें')} <ArrowRight className="size-3.5 ml-0.5" />
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <Link
+                            href={`/case-studies/${cs.id}`}
+                            className="inline-flex items-center gap-0.5 rounded-lg bg-primary px-3 py-1.5 text-[11px] font-bold text-primary-foreground hover:opacity-90 transition-opacity"
+                          >
+                            {cs.completed ? t('Review', 'देखें') : t('Read', 'पढ़ें')}
+                            <ArrowRight className="size-3.5" />
+                          </Link>
+                          {cs.completed && (
+                            <Link
+                              href={`/case-studies/${cs.id}?tab=quiz`}
+                              className="inline-flex items-center gap-0.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-[11px] font-bold text-emerald-600 hover:bg-emerald-500/15 transition-colors"
+                            >
+                              <RotateCcw className="size-3.5" />
+                              {t('Do Again', 'फिर से करें')}
+                            </Link>
+                          )}
+                        </div>
                       </div>
                     </Card>
-                  </Link>
                 ))}
               </div>
             </div>

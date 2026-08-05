@@ -28,6 +28,16 @@ python manage.py createsuperuser
 python manage.py runserver        # runs at http://localhost:8000
 ```
 
+If you want the predictor game to generate fresh situations and questions with Groq, add these to `marketmind_backend/.env`:
+
+```env
+GROQ_API_KEY=your_groq_key_here
+GROQ_API_URL=https://api.groq.com/openai/v1/chat/completions
+GROQ_MODEL=llama-3.1-8b-instant
+```
+
+The backend loads `marketmind_backend/.env` automatically.
+
 Admin panel: http://localhost:8000/admin
 
 ---
@@ -73,6 +83,7 @@ pnpm dev         # runs at http://localhost:3000
 - Each new user starts with $100,000 virtual cash.
 - The `seed_data` command populates all static data (assets, case studies, leaderboard demo users).
 - For production: set `DEBUG=False`, change `SECRET_KEY`, configure `ALLOWED_HOSTS`, set `FRONTEND_URL`, and use a `DATABASE_URL`.
+- For Groq-powered predictor situations: set `GROQ_API_KEY` in `marketmind_backend/.env` locally, or add the same env var in your deployment platform.
 
 ---
 

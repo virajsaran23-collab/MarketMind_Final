@@ -2,8 +2,11 @@ from pathlib import Path
 import os
 
 import dj_database_url
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE_DIR / '.env')
 
 def env_bool(name, default=False):
     return os.getenv(name, str(default)).strip().lower() in {'1', 'true', 'yes', 'on'}
@@ -17,6 +20,9 @@ def env_list(name, default):
 
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-marketmind-change-in-production-xyz123')
+GROQ_API_KEY = os.getenv('GROQ_API_KEY', '')
+GROQ_API_URL = os.getenv('GROQ_API_URL', 'https://api.groq.com/openai/v1/chat/completions')
+GROQ_MODEL = os.getenv('GROQ_MODEL', 'llama-3.1-8b-instant')
 
 DEBUG = env_bool('DEBUG', True)
 

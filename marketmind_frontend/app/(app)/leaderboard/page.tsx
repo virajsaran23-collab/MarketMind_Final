@@ -22,6 +22,11 @@ export default function LeaderboardPage() {
   const [rows, setRows] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const { user, profile } = useAuth()
+  const isDemoUser = !!user && (
+    user.username.toLowerCase().startsWith('test') ||
+    user.username.toLowerCase().startsWith('demo') ||
+    user.username.toLowerCase() === 'aria_mehta'
+  )
 
   const fetchLeaderboard = () => {
     setLoading(true)
@@ -35,7 +40,7 @@ export default function LeaderboardPage() {
     fetchLeaderboard()
   }, [])
 
-  const hasCurrentUser = user ? rows.some((row) => row.handle === `@${user.username}`) : false
+  const hasCurrentUser = user && !isDemoUser ? rows.some((row) => row.handle === `@${user.username}`) : false
 
   const badgeLabels: Record<string, string> = {
     'Market Legend': t('Market Legend', 'मार्केट लेजेंड'),
@@ -189,7 +194,7 @@ export default function LeaderboardPage() {
         </div>
       </Card>
 
-      {profile && !hasCurrentUser ? (
+      {profile && !hasCurrentUser && !isDemoUser ? (
         <Card className="border border-border bg-secondary/40 p-4">
           <div className="flex flex-col gap-2 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
             <div>

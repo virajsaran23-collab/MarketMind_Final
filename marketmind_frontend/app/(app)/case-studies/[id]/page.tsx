@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { 
   ArrowLeft, 
@@ -22,6 +22,7 @@ import { CaseStudyImage } from '@/components/marketmind/case-study-image'
 import { api } from '@/lib/api'
 import { cn } from '@/lib/utils'
 import { useAuth, checkChallengeCompletions } from '@/lib/auth-context'
+import { getUserScopedKey } from '@/lib/user-storage'
 import {
   AreaChart,
   Area,
@@ -80,16 +81,17 @@ interface CaseStudyDetails {
 export default function CaseStudyPage() {
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
-  const { profile, refresh: refreshAuth, showToast } = useAuth()
+  const searchParams = useSearchParams()
+  const { user, profile, refresh: refreshAuth, showToast } = useAuth()
   const [cs, setCs] = useState<CaseStudyDetails | null>(null)
   const [activeTab, setActiveTab] = useState<'overview' | 'quiz'>('overview')
 
   const handleGuideToMarkets = () => {
     if (typeof window !== 'undefined') {
       if (id === 'lemonade-stand' || id?.includes('lemonade') || cs?.tags?.includes('Learn Basics')) {
-        localStorage.setItem('MM_BASICS_COMPLETED', 'true')
+        localStorage.setItem(getUserScopedKey(user?.id, 'MM_BASICS_COMPLETED'), 'true')
       } else {
-        localStorage.setItem('MM_CASE_STUDY_COMPLETED_GUIDE', 'true')
+        localStorage.setItem(getUserScopedKey(user?.id, 'MM_CASE_STUDY_COMPLETED_GUIDE'), 'true')
       }
     }
     router.push('/dashboard')
@@ -111,6 +113,13 @@ export default function CaseStudyPage() {
         .catch(() => {})
     }
   }, [id])
+
+  useEffect(() => {
+    const openQuiz = searchParams.get('tab') === 'quiz' || searchParams.get('retake') === '1'
+    if (openQuiz) {
+      setActiveTab('quiz')
+    }
+  }, [searchParams])
 
   if (!cs) {
     return (
@@ -183,12 +192,12 @@ export default function CaseStudyPage() {
       setQuizFinished(true)
       if (typeof window !== 'undefined') {
         if (id === 'lemonade-stand' || id?.includes('lemonade') || cs?.tags?.includes('Learn Basics')) {
-          localStorage.setItem('MM_BASICS_COMPLETED', 'true')
+          localStorage.setItem(getUserScopedKey(user?.id, 'MM_BASICS_COMPLETED'), 'true')
         }
         // Mark that at least one case study has been completed (unlocks dashboard)
-        localStorage.setItem('MM_CASE_STUDY_COMPLETED', 'true')
+        localStorage.setItem(getUserScopedKey(user?.id, 'MM_CASE_STUDY_COMPLETED'), 'true')
         // Signal the dashboard to show the guided tour on next visit
-        localStorage.setItem('MM_SHOW_DASHBOARD_TOUR', 'true')
+        localStorage.setItem(getUserScopedKey(user?.id, 'MM_SHOW_DASHBOARD_TOUR'), 'true')
       }
       api.completeCaseStudy(id, score, cs.quiz.length).then((res: any) => {
         if (res.challenges) {
@@ -423,7 +432,7 @@ export default function CaseStudyPage() {
                       onClick={handleResetQuiz}
                       className={cn(buttonVariants({ variant: 'outline' }), 'px-5 py-2.5 rounded-xl cursor-pointer')}
                     >
-                      Retake Quiz
+                      Do Again
                     </button>
                     <button
                       onClick={handleGuideToMarkets}

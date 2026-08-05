@@ -18,6 +18,7 @@ import { formatCurrency, formatPct } from '@/lib/market-data'
 import { useLanguage } from '@/lib/language-context'
 import { useAuth, type ExperienceLevel } from '@/lib/auth-context'
 import { api } from '@/lib/api'
+import { getUserScopedKey } from '@/lib/user-storage'
 import { cn } from '@/lib/utils'
 
 export default function DashboardPage() {
@@ -37,9 +38,9 @@ export default function DashboardPage() {
   // Check if dashboard is unlocked (at least 1 case study completed)
   useEffect(() => {
     if (typeof window === 'undefined') return
-    const completed = localStorage.getItem('MM_CASE_STUDY_COMPLETED') === 'true'
+    const completed = localStorage.getItem(getUserScopedKey(user?.id, 'MM_CASE_STUDY_COMPLETED')) === 'true'
     setDashboardUnlocked(completed)
-  }, [])
+  }, [user?.id])
 
   // Detect first-time users: show onboarding game (quiz + site intro)
   useEffect(() => {
@@ -55,27 +56,27 @@ export default function DashboardPage() {
   // Detect first-time dashboard unlock → show guided tour
   useEffect(() => {
     if (typeof window === 'undefined' || !dashboardUnlocked) return
-    const shouldShowTour = localStorage.getItem('MM_SHOW_DASHBOARD_TOUR') === 'true'
-    const tourDone = localStorage.getItem('MM_DASHBOARD_TOUR_DONE') === 'true'
+    const shouldShowTour = localStorage.getItem(getUserScopedKey(user?.id, 'MM_SHOW_DASHBOARD_TOUR')) === 'true'
+    const tourDone = localStorage.getItem(getUserScopedKey(user?.id, 'MM_DASHBOARD_TOUR_DONE')) === 'true'
     if (shouldShowTour && !tourDone && !showOnboarding && !showMilestone) {
-      localStorage.removeItem('MM_SHOW_DASHBOARD_TOUR')
+      localStorage.removeItem(getUserScopedKey(user?.id, 'MM_SHOW_DASHBOARD_TOUR'))
       setShowTour(true)
     }
-  }, [dashboardUnlocked, showOnboarding, showMilestone])
+  }, [dashboardUnlocked, showOnboarding, showMilestone, user?.id])
 
   // Detect post-case study return guide (for non-basics case studies)
   useEffect(() => {
     if (typeof window === 'undefined') return
-    const isPostCaseGuide = localStorage.getItem('MM_CASE_STUDY_COMPLETED_GUIDE') === 'true'
+    const isPostCaseGuide = localStorage.getItem(getUserScopedKey(user?.id, 'MM_CASE_STUDY_COMPLETED_GUIDE')) === 'true'
     if (isPostCaseGuide && !showOnboarding && !showTour && !showMilestone) {
       setShowPostCaseTour(true)
     }
-  }, [showOnboarding, showTour, showMilestone])
+  }, [showOnboarding, showTour, showMilestone, user?.id])
 
   const handlePostCaseTourComplete = () => {
     setShowPostCaseTour(false)
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('MM_CASE_STUDY_COMPLETED_GUIDE')
+      localStorage.removeItem(getUserScopedKey(user?.id, 'MM_CASE_STUDY_COMPLETED_GUIDE'))
     }
   }
 
@@ -83,15 +84,15 @@ export default function DashboardPage() {
   useEffect(() => {
     if (typeof window === 'undefined' || !portfolioData?.holdings) return
     const holdingsCount = portfolioData.holdings.length
-    const milestoneDone = localStorage.getItem('MM_MILESTONE_5_DONE') === 'true'
+    const milestoneDone = localStorage.getItem(getUserScopedKey(user?.id, 'MM_MILESTONE_5_DONE')) === 'true'
     if (holdingsCount >= 5 && !milestoneDone && !showTour && !showOnboarding && !showPostCaseTour) {
       setShowMilestone(true)
     }
-  }, [portfolioData?.holdings, showTour, showOnboarding, showPostCaseTour])
+  }, [portfolioData?.holdings, showTour, showOnboarding, showPostCaseTour, user?.id])
 
   const handleGoToCaseStudies = () => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('MM_MILESTONE_5_DONE', 'true')
+      localStorage.setItem(getUserScopedKey(user?.id, 'MM_MILESTONE_5_DONE'), 'true')
     }
     setShowMilestone(false)
     router.push('/case-studies')
@@ -114,7 +115,7 @@ export default function DashboardPage() {
   const handleTourComplete = () => {
     setShowTour(false)
     if (typeof window !== 'undefined') {
-      localStorage.setItem('MM_DASHBOARD_TOUR_DONE', 'true')
+      localStorage.setItem(getUserScopedKey(user?.id, 'MM_DASHBOARD_TOUR_DONE'), 'true')
     }
     const currentLvl = tempLevel || 'beginner'
     completeOnboarding(currentLvl)
