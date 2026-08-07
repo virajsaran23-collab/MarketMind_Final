@@ -10,17 +10,18 @@ import { useAuth } from '@/lib/auth-context'
 import { useLanguage } from '@/lib/language-context'
 import { LanguageToggle } from './language-toggle'
 import { FinanceGlossaryModal } from './finance-glossary-modal'
+import { api } from '@/lib/api'
 import { getUserScopedKey } from '@/lib/user-storage'
 
 const links = [
-  { href: '/predictor', labelEn: 'Predictor Game 🎮', labelHi: 'अनुमान गेम 🎮' },
+  { href: '/predictor', labelEn: 'Predictor Game', labelHi: 'अनुमान गेम' },
   { href: '/learning-basics', labelEn: 'Learning the basics', labelHi: 'बेसिक्स सीखें' },
-  { href: '/case-studies', labelEn: 'Case Studies 📚', labelHi: 'केस स्टडीज़ 📚' },
+  { href: '/case-studies', labelEn: 'Case Studies', labelHi: 'केस स्टडीज़' },
   { href: '/dashboard', labelEn: 'Dashboard', labelHi: 'डैशबोर्ड' },
   { href: '/portfolio', labelEn: 'Portfolio', labelHi: 'पोर्टफोलियो' },
   { href: '/markets', labelEn: 'Markets', labelHi: 'मार्केट्स' },
   { href: '/analytics', labelEn: 'Analytics', labelHi: 'एनालिटिक्स' },
-  { href: '/leaderboard', labelEn: 'Leaderboard 🏆', labelHi: 'लीडरबोर्ड 🏆' },
+  { href: '/leaderboard', labelEn: 'Leaderboard', labelHi: 'लीडरबोर्ड' },
 ]
 
 export function TopNav() {
@@ -31,21 +32,37 @@ export function TopNav() {
   const { t } = useLanguage()
   const router = useRouter()
   const [dashboardLocked, setDashboardLocked] = useState(false)
+  const [marketsLocked, setMarketsLocked] = useState(false)
+  const [predictorLocked, setPredictorLocked] = useState(false)
 
-  // Check if dashboard is locked (no case study completed yet)
+  // Check if dashboard, markets, or predictor game is locked
   useEffect(() => {
     if (typeof window === 'undefined') return
+
+    // Dashboard & Markets lock check: at least 1 case study completed
     const completed = localStorage.getItem(getUserScopedKey(user?.id, 'MM_CASE_STUDY_COMPLETED')) === 'true'
     setDashboardLocked(!completed)
+    setMarketsLocked(!completed)
 
-    // Listen for storage changes (e.g. another tab completing a case study)
+    // Predictor lock check: at least 3 stocks in portfolio
+    api.portfolio()
+      .then((data) => {
+        const count = data?.holdings?.length || 0
+        setPredictorLocked(count < 3)
+      })
+      .catch(() => {
+        setPredictorLocked(true)
+      })
+
+    // Listen for storage changes
     const onStorage = () => {
       const nowCompleted = localStorage.getItem(getUserScopedKey(user?.id, 'MM_CASE_STUDY_COMPLETED')) === 'true'
       setDashboardLocked(!nowCompleted)
+      setMarketsLocked(!nowCompleted)
     }
     window.addEventListener('storage', onStorage)
     return () => window.removeEventListener('storage', onStorage)
-  }, [pathname, user?.id]) // re-check on navigation
+  }, [pathname, user?.id])
 
   const initials = user
     ? (user.first_name?.[0] || user.username[0]).toUpperCase() + (user.last_name?.[0] || '').toUpperCase()
@@ -68,7 +85,10 @@ export function TopNav() {
             <nav className="hidden items-center gap-1 lg:flex">
               {links.map((link) => {
                 const active = pathname === link.href || pathname.startsWith(link.href + '/')
-                const isLockedDashboard = link.href === '/dashboard' && dashboardLocked
+                const isLocked =
+                  (link.href === '/dashboard' && dashboardLocked) ||
+                  (link.href === '/markets' && marketsLocked) ||
+                  (link.href === '/predictor' && predictorLocked)
                 return (
                   <Link
                     key={link.href}
@@ -79,10 +99,10 @@ export function TopNav() {
                       active
                         ? 'bg-[#00B4D8]/15 text-[#00B4D8] font-bold shadow-sm'
                         : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70',
-                      isLockedDashboard && 'opacity-60',
+                      isLocked && 'opacity-60',
                     )}
                   >
-                    {isLockedDashboard && <Lock className="size-3" />}
+                    {isLocked && <Lock className="size-3" />}
                     {t(link.labelEn, link.labelHi)}
                   </Link>
                 )
@@ -137,7 +157,10 @@ export function TopNav() {
           <nav className="flex flex-col gap-1 border-t border-slate-200/80 bg-white/95 backdrop-blur-xl px-4 py-3 lg:hidden">
             {links.map((link) => {
               const active = pathname === link.href || pathname.startsWith(link.href + '/')
-              const isLockedDashboard = link.href === '/dashboard' && dashboardLocked
+              const isLocked =
+                (link.href === '/dashboard' && dashboardLocked) ||
+                (link.href === '/markets' && marketsLocked) ||
+                (link.href === '/predictor' && predictorLocked)
               return (
                 <Link
                   key={link.href}
@@ -148,10 +171,10 @@ export function TopNav() {
                     active
                       ? 'bg-[#00B4D8]/10 text-[#00B4D8] font-semibold'
                       : 'text-slate-600 hover:bg-slate-100',
-                    isLockedDashboard && 'opacity-60',
+                    isLocked && 'opacity-60',
                   )}
                 >
-                  {isLockedDashboard && <Lock className="size-3.5" />}
+                  {isLocked && <Lock className="size-3.5" />}
                   {t(link.labelEn, link.labelHi)}
                 </Link>
               )

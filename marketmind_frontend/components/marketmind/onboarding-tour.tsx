@@ -62,10 +62,10 @@ const TOUR_STEPS: TourStep[] = [
 const POST_CASE_STUDY_STEPS: TourStep[] = [
   {
     targetId: null,
-    titleEn: 'Case Study Mastered! Back to Markets ðŸš€',
-    titleHi: 'à¤•à¥‡à¤¸ à¤¸à¥�à¤Ÿà¤¡à¥€ à¤ªà¥‚à¤°à¥€ à¤¹à¥�à¤ˆ! à¤¬à¤¾à¤œà¤¼à¤¾à¤° à¤®à¥‡à¤‚ à¤µà¤¾à¤ªà¤¸ ðŸš€',
+    titleEn: 'Case Study Mastered! Back to Markets 🚀',
+    titleHi: 'केस स्टडी पूरी हुई! बाज़ार में वापस 🚀',
     descEn: "Bzzzt! Outstanding work completing your case study! You've earned XP and deepened your market wisdom. Now, let's put your learning into action by adding a powerful new stock to your portfolio!",
-    descHi: 'à¤¶à¤¾à¤¨à¤¦à¤¾à¤° à¤•à¤¾à¤®! à¤†à¤ªà¤¨à¥‡ à¤…à¤ªà¤¨à¥€ à¤•à¥‡à¤¸ à¤¸à¥�à¤Ÿà¤¡à¥€ à¤ªà¥‚à¤°à¥€ à¤•à¤° à¤²à¥€ à¤¹à¥ˆ! à¤†à¤ªà¤¨à¥‡ XP à¤…à¤°à¥�à¤œà¤¿à¤¤ à¤•à¤¿à¤¯à¤¾ à¤¹à¥ˆ à¤”à¤° à¤…à¤ªà¤¨à¥€ à¤¬à¤¾à¤œà¤¼à¤¾à¤° à¤•à¥€ à¤¸à¤®à¤� à¤•à¥‹ à¤—à¤¹à¤°à¤¾ à¤•à¤¿à¤¯à¤¾ à¤¹à¥ˆà¥¤ à¤…à¤¬, à¤…à¤ªà¤¨à¥‡ à¤ªà¥‹à¤°à¥�à¤Ÿà¤«à¥‹à¤²à¤¿à¤¯à¥‹ à¤®à¥‡à¤‚ à¤�à¤• à¤¨à¤¯à¤¾ à¤¶à¥‡à¤¯à¤° à¤œà¥‹à¤¡à¤¼à¤•à¤° à¤…à¤ªà¤¨à¥€ à¤¸à¥€à¤– à¤•à¥‹ à¤²à¤¾à¤—à¥‚ à¤•à¤°à¥‡à¤‚!',
+    descHi: 'शानदार काम! आपने अपनी केस स्टडी पूरी कर ली है! आपने XP अर्जित किया है और अपनी बाज़ार की समझ को गहरा किया है। अब, अपने पोर्टफोलियो में एक नया शेयर जोड़कर अपनी सीख को लागू करें!',
   },
   {
     targetId: 'tour-stock-target',
@@ -73,12 +73,11 @@ const POST_CASE_STUDY_STEPS: TourStep[] = [
     titleHi: 'पाठ के बाद शेयर सिफारिश 💻',
     descEn: "Based on your case study completion, I recommend expanding your portfolio! Pick any top market stock from the grid below and click 'Buy' to expand your holdings!",
     descHi: "आपकी केस स्टडी पूरी होने के आधार पर, मैं अपने पोर्टफोलियो का विस्तार करने की सलाह देता हूं! नीचे दिए गए ग्रिड से कोई भी शेयर चुनें और अपनी होल्डिंग्स में जोड़ने के लिए 'Buy' पर क्लिक करें!",
-
   },
   {
     targetId: 'tour-chart-holdings',
-    titleEn: 'Track Your Expanded Portfolio ðŸ“ˆ',
-    titleHi: 'à¤…à¤ªà¤¨à¥‡ à¤µà¤¿à¤¸à¥à¤¤à¤¾à¤°à¤¿à¤¤ à¤ªà¥‹à¤°à¥à¤Ÿà¤«à¥‹à¤²à¤¿à¤¯à¥‹ à¤•à¥‹ à¤Ÿà¥à¤°à¥ˆà¤• à¤•à¤°à¥‡à¤‚ ðŸ“ˆ',
+    titleEn: 'Track Your Expanded Portfolio 📈',
+    titleHi: 'अपने विस्तारित पोर्टफोलियो को ट्रैक करें 📈',
     descEn: "Watch your new stock position appear under Your Holdings and track your total portfolio growth on the live chart!",
     descHi: "अपनी नई शेयर स्थिति को अपनी होल्डिंग्स के तहत दिखाई देते हुए देखें और लाइव चार्ट पर अपने कुल पोर्टफोलियो लाभ को ट्रैक करें!",
   },

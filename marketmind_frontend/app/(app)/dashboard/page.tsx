@@ -8,7 +8,6 @@ import { StatCard } from '@/components/marketmind/stat-card'
 import { PortfolioChart } from '@/components/marketmind/portfolio-chart'
 import { MarketGrid } from '@/components/marketmind/market-grid'
 import { MarketBuddy } from '@/components/marketmind/market-buddy'
-import { OnboardingGame } from '@/components/marketmind/onboarding-game'
 import { OnboardingTour } from '@/components/marketmind/onboarding-tour'
 import { AIBuddyPortrait } from '@/components/marketmind/ai-buddy-portrait'
 import { Card } from '@/components/ui/card'
@@ -42,13 +41,11 @@ export default function DashboardPage() {
     setDashboardUnlocked(completed)
   }, [user?.id])
 
-  // Detect first-time users: show onboarding game (quiz + site intro)
+  // Consume MM_NEW_USER if set
   useEffect(() => {
     if (typeof window === 'undefined') return
     const isNewUser = localStorage.getItem('MM_NEW_USER') === 'true'
     if (isNewUser) {
-      setShowOnboarding(true)
-      // Consume MM_NEW_USER immediately so refreshing never shows it again
       localStorage.removeItem('MM_NEW_USER')
     }
   }, [user])
@@ -316,14 +313,6 @@ export default function DashboardPage() {
 
   return (
     <>
-      {/* Onboarding Game Overlay — shown for first-time users (includes site intro + quiz) */}
-      {showOnboarding && (
-        <OnboardingGame
-          userName={user?.first_name || user?.username || ''}
-          onComplete={handleDiagnosticComplete}
-        />
-      )}
-
       {/* Dashboard Guided Tour — shown after completing basics case study (one-time only) */}
       {showTour && (
         <OnboardingTour
