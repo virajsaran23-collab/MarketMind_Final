@@ -52,16 +52,32 @@ def record_portfolio_snapshot(user):
 
 
 def update_user_badge(profile):
-    score = profile.learning_score
-    sims = profile.simulations_completed
+    """Badge progression strictly tied to completed game challenges.
 
-    if score >= 1000 or sims >= 10:
+    Value Investor  → 'first_trade' challenge complete
+    Trend Hunter    → 'five_profitable_trades' challenge complete
+    Event Strategist→ 'portfolio_105k' challenge complete
+    Market Legend   → ALL three above challenges complete
+    """
+    user = profile.user
+    from .models import UserChallenge
+
+    completed_slugs = set(
+        UserChallenge.objects.filter(user=user, status='complete')
+        .values_list('challenge__slug', flat=True)
+    )
+
+    has_first_trade = 'first_trade' in completed_slugs
+    has_five_profitable = 'five_profitable_trades' in completed_slugs
+    has_portfolio_105k = 'portfolio_105k' in completed_slugs
+
+    if has_first_trade and has_five_profitable and has_portfolio_105k:
         new_badge = 'Market Legend'
-    elif score >= 600 or sims >= 5:
+    elif has_portfolio_105k:
         new_badge = 'Event Strategist'
-    elif score >= 300 or sims >= 3:
+    elif has_five_profitable:
         new_badge = 'Trend Hunter'
-    elif score >= 100 or sims >= 1:
+    elif has_first_trade:
         new_badge = 'Value Investor'
     else:
         new_badge = 'Market Rookie'
@@ -69,6 +85,7 @@ def update_user_badge(profile):
     if profile.badge != new_badge:
         profile.badge = new_badge
         profile.save(update_fields=['badge'])
+
 
 
 def calculate_token_count(portfolio_value, bonus_tokens=0):
@@ -945,9 +962,9 @@ def user_logout(request):
 @permission_classes([IsAuthenticated])
 def me(request):
     profile = UserProfile.objects.get_or_create(user=request.user)[0]
+    sync_user_challenges(request.user)
     update_user_badge(profile)
     get_or_create_leaderboard_entry(request.user)
-    sync_user_challenges(request.user)
     profile.refresh_from_db()
     return Response({
         'user': UserSerializer(request.user).data,

@@ -170,18 +170,16 @@ export default function LandingPage() {
             </dl>
           </div>
 
-          <div className="relative animate-float">
-            <div className="absolute inset-0 -z-10 rounded-3xl bg-[#00B4D8]/15 blur-2xl" />
-            <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-2 shadow-2xl shadow-slate-200">
-              <Image
-                src="/hero-dashboard.png"
-                alt="MarketMind dashboard preview showing stock charts, commodities, and portfolio growth"
-                width={720}
-                height={560}
-                priority
-                className="w-full rounded-xl border border-slate-100"
-              />
-            </div>
+          <div className="relative animate-float flex justify-center items-center">
+            <div className="absolute inset-0 -z-10 rounded-full bg-[#00B4D8]/20 blur-3xl scale-95" />
+            <Image
+              src="/hero-dashboard.png"
+              alt="MarketMind stock trading dashboard preview showing portfolio analytics and live market trends"
+              width={760}
+              height={600}
+              priority
+              className="w-full h-auto max-w-lg lg:max-w-xl object-contain drop-shadow-2xl transition-transform duration-500 hover:scale-[1.02]"
+            />
           </div>
         </div>
       </section>

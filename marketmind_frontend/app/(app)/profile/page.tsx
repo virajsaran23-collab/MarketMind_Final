@@ -12,14 +12,6 @@ import { api } from '@/lib/api'
 import { useAuth, checkChallengeCompletions } from '@/lib/auth-context'
 import { cn } from '@/lib/utils'
 
-const BADGE_RANKS: Record<string, number> = {
-  'Market Rookie': 1,
-  'Value Investor': 2,
-  'Trend Hunter': 3,
-  'Event Strategist': 4,
-  'Market Legend': 5,
-}
-
 export default function ProfilePage() {
   const { user, profile, showToast } = useAuth()
   const { t } = useLanguage()
@@ -29,12 +21,42 @@ export default function ProfilePage() {
   const [riskScore, setRiskScore] = useState<number>(profile?.risk_score ?? 30)
   const [accuracy, setAccuracy] = useState<number>(profile?.accuracy ?? 0)
 
+  const completedChallengeSlugs = useMemo(() => {
+    const set = new Set<string>()
+    challenges.forEach((item) => {
+      if (item.status === 'complete' || item.status === 'done') {
+        set.add(item.challenge?.slug)
+      }
+    })
+    return set
+  }, [challenges])
+
   const ALL_BADGES = useMemo(() => [
-    { name: t('Value Investor', 'वैल्यू निवेशक'), desc: t('Held quality assets through volatility', 'अस्थिरता के बावजूद गुणवत्ता वाली संपत्तियों को बनाए रखा'), icon: BookOpen, rank: 2 },
-    { name: t('Trend Hunter', 'ट्रेंड शिकारी'), desc: t('Caught 3 momentum moves early', '3 मोमेंटम चालों को समय पर पहचाना'), icon: Flame, rank: 3 },
-    { name: t('Event Strategist', 'इवेंट रणनीतिकार'), desc: t('Positioned ahead of a major event', 'बड़ी घटना से पहले स्थिति बनाई'), icon: Target, rank: 4 },
-    { name: t('Market Legend', 'मार्केट लेजेंड'), desc: t('Conquered the stock market with top performance', 'शीर्ष प्रदर्शन के साथ शेयर बाज़ार में विजय प्राप्त की'), icon: Trophy, rank: 5 },
-  ], [t])
+    {
+      name: t('Value Investor', 'वैल्यू निवेशक'),
+      desc: t('Complete your first trade', 'अपना पहला व्यापार पूरा करें'),
+      icon: BookOpen,
+      isUnlocked: completedChallengeSlugs.has('first_trade'),
+    },
+    {
+      name: t('Trend Hunter', 'ट्रेंड शिकारी'),
+      desc: t('Make 5 profitable trades', '5 लाभदायक व्यापार करें'),
+      icon: Flame,
+      isUnlocked: completedChallengeSlugs.has('five_profitable_trades'),
+    },
+    {
+      name: t('Event Strategist', 'इवेंट रणनीतिकार'),
+      desc: t('Grow portfolio above $105K', 'पोर्टफोलियो $105K से ऊपर बढ़ाएं'),
+      icon: Target,
+      isUnlocked: completedChallengeSlugs.has('portfolio_105k'),
+    },
+    {
+      name: t('Market Legend', 'मार्केट लेजेंड'),
+      desc: t('Complete all trading challenges', 'सभी ट्रेडिंग चुनौतियां पूरी करें'),
+      icon: Trophy,
+      isUnlocked: completedChallengeSlugs.has('first_trade') && completedChallengeSlugs.has('five_profitable_trades') && completedChallengeSlugs.has('portfolio_105k'),
+    },
+  ], [t, completedChallengeSlugs])
 
   const getRiskLabel = (score: number) => {
     if (score >= 75) return { label: t('High Risk', 'उच्च जोखिम'), color: 'text-destructive' }
@@ -188,28 +210,26 @@ export default function ProfilePage() {
           <CardHeader><CardTitle>{t('Badges earned', 'अर्जित बैज')}</CardTitle></CardHeader>
           <CardContent className="space-y-3">
             {ALL_BADGES.map((b) => {
-              const currentRank = BADGE_RANKS[profile?.badge || 'Market Rookie'] || 1
-              const isUnlocked = currentRank >= b.rank
               return (
                 <div
                   key={b.name}
                   className={cn(
                     "flex items-center gap-3 rounded-xl border p-3 transition-all",
-                    isUnlocked
+                    b.isUnlocked
                       ? "border-border bg-secondary/40"
                       : "border-border/40 bg-secondary/10 opacity-40 select-none"
                   )}
                 >
                   <span className={cn(
                     "flex size-10 items-center justify-center rounded-xl",
-                    isUnlocked ? "bg-primary/15" : "bg-muted"
+                    b.isUnlocked ? "bg-primary/15" : "bg-muted"
                   )}>
-                    <b.icon className={cn("size-5", isUnlocked ? "text-primary" : "text-muted-foreground")} />
+                    <b.icon className={cn("size-5", b.isUnlocked ? "text-primary" : "text-muted-foreground")} />
                   </span>
                   <div className="flex-1">
                     <div className="flex items-center justify-between gap-2">
                       <p className="text-sm font-medium">{b.name}</p>
-                      {!isUnlocked && (
+                      {!b.isUnlocked && (
                         <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
                           {t('Locked', 'लॉक')}
                         </span>

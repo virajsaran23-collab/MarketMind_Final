@@ -2,12 +2,12 @@
 
 import { useEffect, useState, useMemo, useRef } from 'react'
 import Link from 'next/link'
-import { 
-  Clock, 
-  Search, 
-  ArrowRight, 
-  SlidersHorizontal, 
-  Sparkles, 
+import {
+  Clock,
+  Search,
+  ArrowRight,
+  SlidersHorizontal,
+  Sparkles,
   HelpCircle,
   BrainCircuit,
   Send,
@@ -218,11 +218,11 @@ export default function CaseStudiesPage() {
 
   const filteredStudies = useMemo(() => {
     return studies.filter(cs => {
-      const matchesSearch = 
+      const matchesSearch =
         cs.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         cs.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (cs.tags || []).some((tag: string) => tag.toLowerCase().includes(searchQuery.toLowerCase()))
-      
+
       const matchesDifficulty = selectedDifficulty === 'All' || cs.difficulty === selectedDifficulty
       const matchesTag = selectedTag === 'All' || (cs.tags || []).includes(selectedTag)
 
@@ -425,7 +425,7 @@ export default function CaseStudiesPage() {
       {/* Header section with Stats Card */}
       <div className="relative rounded-3xl overflow-hidden border border-border bg-card/20 p-6 sm:p-8 backdrop-blur-sm shadow-xl mb-10">
         <div className="pointer-events-none absolute -right-20 -top-20 size-64 rounded-full bg-primary/10 blur-3xl opacity-50" />
-        
+
         <div className="flex flex-col md:flex-row justify-between gap-6 items-start md:items-center relative z-10">
           <div className="max-w-2xl">
             <Badge variant="default" className="mb-4 gap-1.5 px-3 py-1 font-semibold text-xs border border-primary/20">
@@ -534,7 +534,7 @@ export default function CaseStudiesPage() {
                 onClick={() => setSelectedDifficulty(diff)}
                 className={cn(
                   "px-3 py-1 text-xs rounded-lg font-medium border transition cursor-pointer",
-                  selectedDifficulty === diff 
+                  selectedDifficulty === diff
                     ? "bg-primary border-primary text-primary-foreground font-bold shadow-md shadow-primary/20"
                     : "border-border bg-muted/20 text-muted-foreground hover:bg-muted"
                 )}
@@ -610,80 +610,80 @@ export default function CaseStudiesPage() {
               </div>
 
               <Card className="overflow-hidden rounded-[1.75rem] border border-slate-200/70 bg-white shadow-sm transition-all duration-300 hover:border-primary/45 hover:shadow-xl hover:-translate-y-1 grid grid-cols-1 lg:grid-cols-12 relative">
-                  <div className="absolute top-4 left-4 z-20 bg-gradient-to-r from-[#00E5FF] to-[#00B4D8] text-slate-900 border border-slate-900/10 px-3.5 py-1 rounded-full text-xs font-black shadow-[2px_2px_0px_0px_rgba(15,23,42,0.12)] flex items-center gap-1.5 animate-pulse">
-                    <Sparkles className="size-3.5 fill-yellow-200 text-slate-900" />
-                    <span>START HERE: #1 Recommended Case Study</span>
+                <div className="absolute top-4 left-4 z-20 bg-gradient-to-r from-[#00E5FF] to-[#00B4D8] text-slate-900 border border-slate-900/10 px-3.5 py-1 rounded-full text-xs font-black shadow-[2px_2px_0px_0px_rgba(15,23,42,0.12)] flex items-center gap-1.5 animate-pulse">
+                  <Sparkles className="size-3.5 fill-yellow-200 text-slate-900" />
+                  <span>START HERE: #1 Recommended Case Study</span>
+                </div>
+
+                {featuredStudy.completed && (
+                  <div className="absolute top-4 right-4 z-20 bg-emerald-500 text-white border border-emerald-600/30 px-3 py-1 rounded-full text-xs font-black shadow-md flex items-center gap-1.5">
+                    <CheckCircle2 className="size-3.5" /> Done
                   </div>
+                )}
 
-                  {featuredStudy.completed && (
-                    <div className="absolute top-4 right-4 z-20 bg-emerald-500 text-white border border-emerald-600/30 px-3 py-1 rounded-full text-xs font-black shadow-md flex items-center gap-1.5">
-                      <CheckCircle2 className="size-3.5" /> Done
-                    </div>
-                  )}
+                <div className="lg:col-span-7 relative h-60 lg:h-96 w-full overflow-hidden">
+                  <CaseStudyImage
+                    src={featuredStudy.image}
+                    alt={featuredStudy.title}
+                    seed={featuredStudy.id}
+                    className="absolute inset-0 w-full h-full rounded-none border-none"
+                  />
+                </div>
 
-                  <div className="lg:col-span-7 relative h-60 lg:h-96 w-full overflow-hidden">
-                    <CaseStudyImage
-                      src={featuredStudy.image}
-                      alt={featuredStudy.title}
-                      seed={featuredStudy.id}
-                      className="absolute inset-0 w-full h-full rounded-none border-none"
-                    />
-                  </div>
-
-                  <div className="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between">
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-2">
-                        <span className={cn('rounded-full px-2.5 py-0.5 text-[10px] font-bold border', DIFF_COLOR[featuredStudy.difficulty])}>
-                          {diffLabels[featuredStudy.difficulty] || featuredStudy.difficulty}
-                        </span>
-                        {featuredStudy.completed && (
-                          <Badge className="bg-success/10 text-success border-success/20 hover:bg-success/15 gap-1 text-[10px] py-0.5 px-2.5 font-bold">
-                            {t('Completed', 'पूर्ण')} ({featuredStudy.completion_score?.score}/{featuredStudy.completion_score?.total_questions})
-                          </Badge>
-                        )}
-                        <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                          <Clock className="size-3" /> {featuredStudy.read_time}
-                        </span>
-                      </div>
-                      
-                      <h2 className="text-2xl font-extrabold tracking-tight group-hover:text-primary transition-colors">
-                        {featuredStudy.title}
-                      </h2>
-                      
-                      <p className="text-muted-foreground text-sm leading-relaxed line-clamp-4">
-                        {featuredStudy.long_description || featuredStudy.description}
-                      </p>
+                <div className="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <span className={cn('rounded-full px-2.5 py-0.5 text-[10px] font-bold border', DIFF_COLOR[featuredStudy.difficulty])}>
+                        {diffLabels[featuredStudy.difficulty] || featuredStudy.difficulty}
+                      </span>
+                      {featuredStudy.completed && (
+                        <Badge className="bg-success/10 text-success border-success/20 hover:bg-success/15 gap-1 text-[10px] py-0.5 px-2.5 font-bold">
+                          {t('Completed', 'पूर्ण')} ({featuredStudy.completion_score?.score}/{featuredStudy.completion_score?.total_questions})
+                        </Badge>
+                      )}
+                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <Clock className="size-3" /> {featuredStudy.read_time}
+                      </span>
                     </div>
 
-                    <div className="pt-6 border-t border-border/50 flex flex-wrap gap-2 items-center justify-between mt-4">
-                      <div className="flex flex-wrap gap-1">
-                        {(featuredStudy.tags || []).slice(0, 3).map((tag: string) => (
-                          <Badge key={tag} variant="muted" className="text-[10px] bg-muted/60">{tag}</Badge>
-                        ))}
-                      </div>
+                    <h2 className="text-2xl font-extrabold tracking-tight group-hover:text-primary transition-colors">
+                      {featuredStudy.title}
+                    </h2>
 
-                      <div className="flex flex-wrap items-center gap-2">
+                    <p className="text-muted-foreground text-sm leading-relaxed line-clamp-4">
+                      {featuredStudy.long_description || featuredStudy.description}
+                    </p>
+                  </div>
+
+                  <div className="pt-6 border-t border-border/50 flex flex-wrap gap-2 items-center justify-between mt-4">
+                    <div className="flex flex-wrap gap-1">
+                      {(featuredStudy.tags || []).slice(0, 3).map((tag: string) => (
+                        <Badge key={tag} variant="muted" className="text-[10px] bg-muted/60">{tag}</Badge>
+                      ))}
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Link
+                        href={`/case-studies/${featuredStudy.id}`}
+                        className="inline-flex items-center gap-1 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground hover:opacity-90 transition-opacity"
+                      >
+                        {featuredStudy.completed ? t('Review Study', 'अध्ययन देखें') : t('Explore Lesson', 'पाठ देखें')}
+                        <ArrowRight className="size-4" />
+                      </Link>
+                      {featuredStudy.completed && (
                         <Link
-                          href={`/case-studies/${featuredStudy.id}`}
-                          className="inline-flex items-center gap-1 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground hover:opacity-90 transition-opacity"
+                          href={`/case-studies/${featuredStudy.id}?tab=quiz`}
+                          className="inline-flex items-center gap-1 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-xs font-bold text-emerald-600 hover:bg-emerald-500/15 transition-colors"
                         >
-                          {featuredStudy.completed ? t('Review Study', 'अध्ययन देखें') : t('Explore Lesson', 'पाठ देखें')}
-                          <ArrowRight className="size-4" />
+                          <RotateCcw className="size-4" />
+                          {t('Do Again', 'फिर से करें')}
                         </Link>
-                        {featuredStudy.completed && (
-                          <Link
-                            href={`/case-studies/${featuredStudy.id}?tab=quiz`}
-                            className="inline-flex items-center gap-1 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-xs font-bold text-emerald-600 hover:bg-emerald-500/15 transition-colors"
-                          >
-                            <RotateCcw className="size-4" />
-                            {t('Do Again', 'फिर से करें')}
-                          </Link>
-                        )}
-                      </div>
+                      )}
                     </div>
-
                   </div>
-                </Card>
+
+                </div>
+              </Card>
             </div>
           )}
 
@@ -692,7 +692,7 @@ export default function CaseStudiesPage() {
               <h3 className="text-lg font-bold border-b border-border/60 pb-2 text-foreground/90 pl-1">
                 {t('More Lessons', 'और पाठ')}
               </h3>
-              
+
               <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                 {gridStudies.map((cs) => (
                   <Card key={cs.id} className="h-full overflow-hidden rounded-[1.75rem] border border-slate-200/70 bg-white shadow-sm transition-all duration-300 hover:border-primary/45 hover:shadow-xl hover:-translate-y-1 flex flex-col justify-between relative">
@@ -702,65 +702,65 @@ export default function CaseStudiesPage() {
                       </div>
                     )}
 
-                      <div>
-                        <CaseStudyImage
-                          src={cs.image}
-                          alt={cs.title}
-                          seed={cs.id}
-                          className="aspect-[16/9] w-full border-none rounded-t-[1.75rem]"
-                        />
-                        
-                        <div className="p-5 space-y-3">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span className={cn('rounded-full px-2 py-0.5 text-[10px] font-bold border', DIFF_COLOR[cs.difficulty])}>
-                              {diffLabels[cs.difficulty] || cs.difficulty}
-                            </span>
-                            {cs.completed && (
-                              <Badge className="bg-success/10 text-success border-success/20 hover:bg-success/15 gap-1 text-[9px] py-0.5 px-2 font-bold">
-                                {t('Completed', 'पूर्ण')} ({cs.completion_score?.score}/{cs.completion_score?.total_questions})
-                              </Badge>
-                            )}
-                            <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
-                              <Clock className="size-3" /> {cs.read_time}
-                            </span>
-                          </div>
-                          
-                          <h4 className="font-extrabold text-[16px] tracking-tight group-hover:text-primary transition-colors line-clamp-1">
-                            {cs.title}
-                          </h4>
-                          
-                          <p className="text-muted-foreground text-xs leading-relaxed line-clamp-2">
-                            {cs.description}
-                          </p>
-                        </div>
-                      </div>
+                    <div>
+                      <CaseStudyImage
+                        src={cs.image}
+                        alt={cs.title}
+                        seed={cs.id}
+                        className="aspect-[16/9] w-full border-none rounded-t-[1.75rem]"
+                      />
 
-                      <div className="p-5 pt-3 border-t border-border/40 flex flex-wrap gap-2 items-center justify-between bg-muted/10 rounded-b-2xl">
-                        <div className="flex flex-wrap gap-1">
-                          {(cs.tags || []).slice(0, 2).map((tag: string) => (
-                            <Badge key={tag} variant="muted" className="text-[9px] bg-muted/80">{tag}</Badge>
-                          ))}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Link
-                            href={`/case-studies/${cs.id}`}
-                            className="inline-flex items-center gap-0.5 rounded-lg bg-primary px-3 py-1.5 text-[11px] font-bold text-primary-foreground hover:opacity-90 transition-opacity"
-                          >
-                            {cs.completed ? t('Review', 'देखें') : t('Read', 'पढ़ें')}
-                            <ArrowRight className="size-3.5" />
-                          </Link>
+                      <div className="p-5 space-y-3">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className={cn('rounded-full px-2 py-0.5 text-[10px] font-bold border', DIFF_COLOR[cs.difficulty])}>
+                            {diffLabels[cs.difficulty] || cs.difficulty}
+                          </span>
                           {cs.completed && (
-                            <Link
-                              href={`/case-studies/${cs.id}?tab=quiz`}
-                              className="inline-flex items-center gap-0.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-[11px] font-bold text-emerald-600 hover:bg-emerald-500/15 transition-colors"
-                            >
-                              <RotateCcw className="size-3.5" />
-                              {t('Do Again', 'फिर से करें')}
-                            </Link>
+                            <Badge className="bg-success/10 text-success border-success/20 hover:bg-success/15 gap-1 text-[9px] py-0.5 px-2 font-bold">
+                              {t('Completed', 'पूर्ण')} ({cs.completion_score?.score}/{cs.completion_score?.total_questions})
+                            </Badge>
                           )}
+                          <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                            <Clock className="size-3" /> {cs.read_time}
+                          </span>
                         </div>
+
+                        <h4 className="font-extrabold text-[16px] tracking-tight group-hover:text-primary transition-colors line-clamp-1">
+                          {cs.title}
+                        </h4>
+
+                        <p className="text-muted-foreground text-xs leading-relaxed line-clamp-2">
+                          {cs.description}
+                        </p>
                       </div>
-                    </Card>
+                    </div>
+
+                    <div className="p-5 pt-3 border-t border-border/40 flex flex-wrap gap-2 items-center justify-between bg-muted/10 rounded-b-2xl">
+                      <div className="flex flex-wrap gap-1">
+                        {(cs.tags || []).slice(0, 2).map((tag: string) => (
+                          <Badge key={tag} variant="muted" className="text-[9px] bg-muted/80">{tag}</Badge>
+                        ))}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href={`/case-studies/${cs.id}`}
+                          className="inline-flex items-center gap-0.5 rounded-lg bg-primary px-3 py-1.5 text-[11px] font-bold text-primary-foreground hover:opacity-90 transition-opacity"
+                        >
+                          {cs.completed ? t('Review', 'देखें') : t('Read', 'पढ़ें')}
+                          <ArrowRight className="size-3.5" />
+                        </Link>
+                        {cs.completed && (
+                          <Link
+                            href={`/case-studies/${cs.id}?tab=quiz`}
+                            className="inline-flex items-center gap-0.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-[11px] font-bold text-emerald-600 hover:bg-emerald-500/15 transition-colors"
+                          >
+                            <RotateCcw className="size-3.5" />
+                            {t('Do Again', 'फिर से करें')}
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  </Card>
                 ))}
               </div>
             </div>
