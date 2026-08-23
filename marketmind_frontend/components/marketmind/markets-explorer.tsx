@@ -115,8 +115,8 @@ export function MarketsExplorer({
             </button>
           )}
         </div>
-        <div className="flex items-center gap-3">
-          <div className="inline-flex rounded-xl border border-border bg-secondary p-1">
+        <div className="flex items-center gap-3 w-full sm:w-auto overflow-x-auto no-scrollbar pb-1 sm:pb-0">
+          <div className="inline-flex shrink-0 rounded-xl border border-border bg-secondary p-1">
             {filters.map((f) => (
               <button
                 key={f}

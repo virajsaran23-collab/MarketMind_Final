@@ -123,10 +123,10 @@ export function ProfAlgoFloatingCompanion() {
   if (!user || !isOpen) return null
 
   return (
-    <div className="fixed bottom-6 right-6 z-[100] flex flex-col items-end gap-3 select-none font-sans">
+    <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[100] flex flex-col items-end gap-3 select-none font-sans max-w-[calc(100vw-2rem)]">
       {/* Expanded Floating Speech Card */}
       {!isMinimized && (
-        <div className="w-80 sm:w-96 rounded-3xl border-2 border-[#00B4D8]/40 bg-slate-950/95 text-white p-5 shadow-[0_20px_50px_rgba(0,180,216,0.3)] backdrop-blur-xl animate-in slide-in-from-bottom-6 fade-in duration-300">
+        <div className="w-[calc(100vw-2rem)] sm:w-96 rounded-3xl border-2 border-[#00B4D8]/40 bg-slate-950/95 text-white p-5 shadow-[0_20px_50px_rgba(0,180,216,0.3)] backdrop-blur-xl animate-in slide-in-from-bottom-6 fade-in duration-300">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-slate-800 pb-3">
             <div className="flex items-center gap-2">

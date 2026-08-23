@@ -136,7 +136,7 @@ export function FinanceGlossaryModal({
           </button>
         </div>
 
-        <div className="grid flex-1 grid-cols-1 overflow-hidden md:grid-cols-12">
+        <div className="grid flex-1 grid-cols-1 overflow-y-auto md:overflow-hidden md:grid-cols-12">
           <div className="flex flex-col border-r border-border bg-card/50 p-4 md:col-span-5">
             <div className="mb-3 rounded-2xl border border-[#00B4D8]/20 bg-[#00B4D8]/10 p-3">
               <div className="text-[11px] font-bold uppercase tracking-wider text-[#00B4D8]">Starter path</div>

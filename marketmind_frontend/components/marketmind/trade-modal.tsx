@@ -89,7 +89,7 @@ export function TradeModal({
       aria-modal="true"
     >
       <div
-        className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl"
+        className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl border border-border bg-card p-6 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {confirmed ? (
