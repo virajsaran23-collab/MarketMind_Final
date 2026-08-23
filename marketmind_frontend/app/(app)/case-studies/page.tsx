@@ -441,18 +441,18 @@ export default function CaseStudiesPage() {
           </div>
 
           {/* Quick Stats Sidebar */}
-          <div className="flex gap-4 shrink-0 bg-muted/40 p-4 rounded-2xl border border-border/60">
-            <div className="text-center px-3 border-r border-border/80">
-              <div className="text-2xl font-extrabold text-foreground">{statCounts.total}</div>
-              <div className="text-[10px] uppercase font-bold text-muted-foreground mt-0.5">{t('Total Lessons', 'कुल पाठ')}</div>
+          <div className="grid grid-cols-3 sm:flex gap-1.5 sm:gap-4 w-full sm:w-auto bg-muted/40 p-2.5 sm:p-4 rounded-2xl border border-border/60 text-center select-none shrink-0">
+            <div className="text-center px-1 sm:px-3 border-r border-border/80 min-w-0">
+              <div className="text-xl sm:text-2xl font-extrabold text-foreground">{statCounts.total}</div>
+              <div className="text-[9px] sm:text-[10px] uppercase font-bold text-muted-foreground mt-0.5 whitespace-nowrap">{t('Total Lessons', 'कुल पाठ')}</div>
             </div>
-            <div className="text-center px-3 border-r border-border/80">
-              <div className="text-2xl font-extrabold text-green-400">{statCounts.beginner}</div>
-              <div className="text-[10px] uppercase font-bold text-muted-foreground mt-0.5">{t('Beginner', 'शुरुआती')}</div>
+            <div className="text-center px-1 sm:px-3 border-r border-border/80 min-w-0">
+              <div className="text-xl sm:text-2xl font-extrabold text-green-400">{statCounts.beginner}</div>
+              <div className="text-[9px] sm:text-[10px] uppercase font-bold text-muted-foreground mt-0.5 whitespace-nowrap">{t('Beginner', 'शुरुआती')}</div>
             </div>
-            <div className="text-center px-3">
-              <div className="text-2xl font-extrabold text-red-400">{statCounts.advanced}</div>
-              <div className="text-[10px] uppercase font-bold text-muted-foreground mt-0.5">{t('Advanced', 'उन्नत')}</div>
+            <div className="text-center px-1 sm:px-3 min-w-0">
+              <div className="text-xl sm:text-2xl font-extrabold text-red-400">{statCounts.advanced}</div>
+              <div className="text-[9px] sm:text-[10px] uppercase font-bold text-muted-foreground mt-0.5 whitespace-nowrap">{t('Advanced', 'उन्नत')}</div>
             </div>
           </div>
         </div>
@@ -477,7 +477,7 @@ export default function CaseStudiesPage() {
 
           <Link
             href="/predictor"
-            className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#00B4D8] to-[#0891b2] px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:-translate-y-0.5 transition-all shrink-0 cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#00B4D8] to-[#0891b2] px-5 sm:px-6 py-3 sm:py-3.5 text-xs sm:text-sm font-bold text-white shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:-translate-y-0.5 transition-all w-full md:w-auto shrink-0 cursor-pointer text-center"
           >
             Play Event Predictor Game <ArrowRight className="size-4" />
           </Link>

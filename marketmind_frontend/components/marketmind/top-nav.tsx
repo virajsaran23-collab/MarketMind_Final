@@ -78,7 +78,7 @@ export function TopNav() {
       <FinanceGlossaryModal isOpen={glossaryOpen} onClose={() => setGlossaryOpen(false)} />
 
       <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/85 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-2 px-2.5 sm:px-6">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-1.5 px-2 sm:px-6">
           <div className="flex items-center gap-2 sm:gap-6 shrink-0">
             <Logo />
 
@@ -110,8 +110,9 @@ export function TopNav() {
             </nav>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3">
-            <LanguageToggle />
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+            <LanguageToggle className="hidden sm:inline-flex" />
+            <LanguageToggle variant="compact" className="sm:hidden" />
 
             <button
               className="hidden size-9 items-center justify-center rounded-xl border border-slate-200/80 bg-slate-50/80 text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors sm:flex"
@@ -122,7 +123,7 @@ export function TopNav() {
 
             <Link
               href="/profile"
-              className="flex items-center gap-2 rounded-full border border-slate-200/80 bg-slate-50/80 py-1 pl-1 pr-3 hover:bg-slate-100 hover:border-slate-300 transition-all"
+              className="flex items-center gap-1.5 rounded-full border border-slate-200/80 bg-slate-50/80 p-1 pr-2 sm:pr-3 hover:bg-slate-100 hover:border-slate-300 transition-all shrink-0"
             >
               <span className="flex size-7 items-center justify-center rounded-full bg-gradient-to-tr from-[#00B4D8] to-[#0891b2] text-xs font-semibold text-white shadow-sm">
                 {initials}
@@ -144,7 +145,7 @@ export function TopNav() {
             )}
 
             <button
-              className="flex size-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-800 lg:hidden"
+              className="flex size-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-800 lg:hidden shrink-0"
               onClick={() => setOpen((v) => !v)}
               aria-label="Toggle menu"
             >
