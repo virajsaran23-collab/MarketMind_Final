@@ -1737,3 +1737,4 @@ def submit_math_quiz(request, slug):
         'challenges': UserChallengeSerializer(user_challenges, many=True).data,
     })
 
+
